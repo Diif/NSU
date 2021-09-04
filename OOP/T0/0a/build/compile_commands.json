@@ -1,0 +1,22 @@
+[
+{
+  "directory": "C:/Users/kiwul/Documents/projects/NSU/OOP/T0/0a/build",
+  "command": "C:\\PROGRA~1\\MINGW-~1\\X86_64~1.0-P\\mingw64\\bin\\X86_64~2.EXE  @CMakeFiles/task1.dir/includes_CXX.rsp -g -o CMakeFiles\\task1.dir\\main.cpp.obj -c C:\\Users\\kiwul\\Documents\\projects\\NSU\\OOP\\T0\\0a\\main.cpp",
+  "file": "C:/Users/kiwul/Documents/projects/NSU/OOP/T0/0a/main.cpp"
+},
+{
+  "directory": "C:/Users/kiwul/Documents/projects/NSU/OOP/T0/0a/build",
+  "command": "C:\\PROGRA~1\\MINGW-~1\\X86_64~1.0-P\\mingw64\\bin\\X86_64~2.EXE  @CMakeFiles/task1.dir/includes_CXX.rsp -g -o CMakeFiles\\task1.dir\\src\\module1.cpp.obj -c C:\\Users\\kiwul\\Documents\\projects\\NSU\\OOP\\T0\\0a\\src\\module1.cpp",
+  "file": "C:/Users/kiwul/Documents/projects/NSU/OOP/T0/0a/src/module1.cpp"
+},
+{
+  "directory": "C:/Users/kiwul/Documents/projects/NSU/OOP/T0/0a/build",
+  "command": "C:\\PROGRA~1\\MINGW-~1\\X86_64~1.0-P\\mingw64\\bin\\X86_64~2.EXE  @CMakeFiles/task1.dir/includes_CXX.rsp -g -o CMakeFiles\\task1.dir\\src\\module2.cpp.obj -c C:\\Users\\kiwul\\Documents\\projects\\NSU\\OOP\\T0\\0a\\src\\module2.cpp",
+  "file": "C:/Users/kiwul/Documents/projects/NSU/OOP/T0/0a/src/module2.cpp"
+},
+{
+  "directory": "C:/Users/kiwul/Documents/projects/NSU/OOP/T0/0a/build",
+  "command": "C:\\PROGRA~1\\MINGW-~1\\X86_64~1.0-P\\mingw64\\bin\\X86_64~2.EXE  @CMakeFiles/task1.dir/includes_CXX.rsp -g -o CMakeFiles\\task1.dir\\src\\module3.cpp.obj -c C:\\Users\\kiwul\\Documents\\projects\\NSU\\OOP\\T0\\0a\\src\\module3.cpp",
+  "file": "C:/Users/kiwul/Documents/projects/NSU/OOP/T0/0a/src/module3.cpp"
+}
+]
