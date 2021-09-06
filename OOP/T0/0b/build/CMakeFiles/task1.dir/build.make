@@ -52,10 +52,10 @@ RM = "C:\Program Files\CMake\bin\cmake.exe" -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "C:\Users\kiwul\Documents\projects\NSU C++\T1\0b"
+CMAKE_SOURCE_DIR = C:\Users\kiwul\Documents\projects\NSU\OOP\T0\0b
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "C:\Users\kiwul\Documents\projects\NSU C++\T1\0b\build"
+CMAKE_BINARY_DIR = C:\Users\kiwul\Documents\projects\NSU\OOP\T0\0b\build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/task1.dir/depend.make
@@ -72,31 +72,31 @@ CMakeFiles/task1.dir/main.cpp.obj: CMakeFiles/task1.dir/flags.make
 CMakeFiles/task1.dir/main.cpp.obj: CMakeFiles/task1.dir/includes_CXX.rsp
 CMakeFiles/task1.dir/main.cpp.obj: ../main.cpp
 CMakeFiles/task1.dir/main.cpp.obj: CMakeFiles/task1.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="C:\Users\kiwul\Documents\projects\NSU C++\T1\0b\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/task1.dir/main.cpp.obj"
-	C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\X86_64~2.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/task1.dir/main.cpp.obj -MF CMakeFiles\task1.dir\main.cpp.obj.d -o CMakeFiles\task1.dir\main.cpp.obj -c "C:\Users\kiwul\Documents\projects\NSU C++\T1\0b\main.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\Users\kiwul\Documents\projects\NSU\OOP\T0\0b\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/task1.dir/main.cpp.obj"
+	C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\X86_64~2.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/task1.dir/main.cpp.obj -MF CMakeFiles\task1.dir\main.cpp.obj.d -o CMakeFiles\task1.dir\main.cpp.obj -c C:\Users\kiwul\Documents\projects\NSU\OOP\T0\0b\main.cpp
 
 CMakeFiles/task1.dir/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/task1.dir/main.cpp.i"
-	C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\X86_64~2.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "C:\Users\kiwul\Documents\projects\NSU C++\T1\0b\main.cpp" > CMakeFiles\task1.dir\main.cpp.i
+	C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\X86_64~2.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\kiwul\Documents\projects\NSU\OOP\T0\0b\main.cpp > CMakeFiles\task1.dir\main.cpp.i
 
 CMakeFiles/task1.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/task1.dir/main.cpp.s"
-	C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\X86_64~2.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "C:\Users\kiwul\Documents\projects\NSU C++\T1\0b\main.cpp" -o CMakeFiles\task1.dir\main.cpp.s
+	C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\X86_64~2.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\kiwul\Documents\projects\NSU\OOP\T0\0b\main.cpp -o CMakeFiles\task1.dir\main.cpp.s
 
 CMakeFiles/task1.dir/src/solution.cpp.obj: CMakeFiles/task1.dir/flags.make
 CMakeFiles/task1.dir/src/solution.cpp.obj: CMakeFiles/task1.dir/includes_CXX.rsp
 CMakeFiles/task1.dir/src/solution.cpp.obj: ../src/solution.cpp
 CMakeFiles/task1.dir/src/solution.cpp.obj: CMakeFiles/task1.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="C:\Users\kiwul\Documents\projects\NSU C++\T1\0b\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/task1.dir/src/solution.cpp.obj"
-	C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\X86_64~2.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/task1.dir/src/solution.cpp.obj -MF CMakeFiles\task1.dir\src\solution.cpp.obj.d -o CMakeFiles\task1.dir\src\solution.cpp.obj -c "C:\Users\kiwul\Documents\projects\NSU C++\T1\0b\src\solution.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\Users\kiwul\Documents\projects\NSU\OOP\T0\0b\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/task1.dir/src/solution.cpp.obj"
+	C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\X86_64~2.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/task1.dir/src/solution.cpp.obj -MF CMakeFiles\task1.dir\src\solution.cpp.obj.d -o CMakeFiles\task1.dir\src\solution.cpp.obj -c C:\Users\kiwul\Documents\projects\NSU\OOP\T0\0b\src\solution.cpp
 
 CMakeFiles/task1.dir/src/solution.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/task1.dir/src/solution.cpp.i"
-	C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\X86_64~2.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "C:\Users\kiwul\Documents\projects\NSU C++\T1\0b\src\solution.cpp" > CMakeFiles\task1.dir\src\solution.cpp.i
+	C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\X86_64~2.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\kiwul\Documents\projects\NSU\OOP\T0\0b\src\solution.cpp > CMakeFiles\task1.dir\src\solution.cpp.i
 
 CMakeFiles/task1.dir/src/solution.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/task1.dir/src/solution.cpp.s"
-	C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\X86_64~2.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "C:\Users\kiwul\Documents\projects\NSU C++\T1\0b\src\solution.cpp" -o CMakeFiles\task1.dir\src\solution.cpp.s
+	C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\X86_64~2.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\kiwul\Documents\projects\NSU\OOP\T0\0b\src\solution.cpp -o CMakeFiles\task1.dir\src\solution.cpp.s
 
 # Object files for target task1
 task1_OBJECTS = \
@@ -112,7 +112,7 @@ task1.exe: CMakeFiles/task1.dir/build.make
 task1.exe: CMakeFiles/task1.dir/linklibs.rsp
 task1.exe: CMakeFiles/task1.dir/objects1.rsp
 task1.exe: CMakeFiles/task1.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="C:\Users\kiwul\Documents\projects\NSU C++\T1\0b\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable task1.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=C:\Users\kiwul\Documents\projects\NSU\OOP\T0\0b\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable task1.exe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\task1.dir\link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -124,6 +124,6 @@ CMakeFiles/task1.dir/clean:
 .PHONY : CMakeFiles/task1.dir/clean
 
 CMakeFiles/task1.dir/depend:
-	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" "C:\Users\kiwul\Documents\projects\NSU C++\T1\0b" "C:\Users\kiwul\Documents\projects\NSU C++\T1\0b" "C:\Users\kiwul\Documents\projects\NSU C++\T1\0b\build" "C:\Users\kiwul\Documents\projects\NSU C++\T1\0b\build" "C:\Users\kiwul\Documents\projects\NSU C++\T1\0b\build\CMakeFiles\task1.dir\DependInfo.cmake" --color=$(COLOR)
+	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" C:\Users\kiwul\Documents\projects\NSU\OOP\T0\0b C:\Users\kiwul\Documents\projects\NSU\OOP\T0\0b C:\Users\kiwul\Documents\projects\NSU\OOP\T0\0b\build C:\Users\kiwul\Documents\projects\NSU\OOP\T0\0b\build C:\Users\kiwul\Documents\projects\NSU\OOP\T0\0b\build\CMakeFiles\task1.dir\DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/task1.dir/depend
 

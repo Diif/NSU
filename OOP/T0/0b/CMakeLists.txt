@@ -5,7 +5,7 @@ include(CTest)
 enable_testing()
 
 include_directories(include)
-add_executable(task1 main.cpp include/solution.h src/solution.cpp)
+add_executable(task1 main.cpp src/solution.cpp include/solution.h)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

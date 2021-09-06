@@ -291,7 +291,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "task1::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-task1-Debug-ac9c8ef98b8dd93dd7fd.json",
+					"jsonFile" : "target-task1-Debug-d79cde5847be8f0dc7df.json",
 					"name" : "task1",
 					"projectIndex" : 0
 				}
@@ -301,8 +301,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "C:/Users/kiwul/Documents/projects/NSU C++/T1/0b/build",
-		"source" : "C:/Users/kiwul/Documents/projects/NSU C++/T1/0b"
+		"build" : "C:/Users/kiwul/Documents/projects/NSU/OOP/T0/0b/build",
+		"source" : "C:/Users/kiwul/Documents/projects/NSU/OOP/T0/0b"
 	},
 	"version" : 
 	{

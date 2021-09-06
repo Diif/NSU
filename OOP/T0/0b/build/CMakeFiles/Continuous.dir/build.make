@@ -52,10 +52,10 @@ RM = "C:\Program Files\CMake\bin\cmake.exe" -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "C:\Users\kiwul\Documents\projects\NSU C++\T1\0b"
+CMAKE_SOURCE_DIR = C:\Users\kiwul\Documents\projects\NSU\OOP\T0\0b
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "C:\Users\kiwul\Documents\projects\NSU C++\T1\0b\build"
+CMAKE_BINARY_DIR = C:\Users\kiwul\Documents\projects\NSU\OOP\T0\0b\build
 
 # Utility rule file for Continuous.
 
@@ -81,6 +81,6 @@ CMakeFiles/Continuous.dir/clean:
 .PHONY : CMakeFiles/Continuous.dir/clean
 
 CMakeFiles/Continuous.dir/depend:
-	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" "C:\Users\kiwul\Documents\projects\NSU C++\T1\0b" "C:\Users\kiwul\Documents\projects\NSU C++\T1\0b" "C:\Users\kiwul\Documents\projects\NSU C++\T1\0b\build" "C:\Users\kiwul\Documents\projects\NSU C++\T1\0b\build" "C:\Users\kiwul\Documents\projects\NSU C++\T1\0b\build\CMakeFiles\Continuous.dir\DependInfo.cmake" --color=$(COLOR)
+	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" C:\Users\kiwul\Documents\projects\NSU\OOP\T0\0b C:\Users\kiwul\Documents\projects\NSU\OOP\T0\0b C:\Users\kiwul\Documents\projects\NSU\OOP\T0\0b\build C:\Users\kiwul\Documents\projects\NSU\OOP\T0\0b\build C:\Users\kiwul\Documents\projects\NSU\OOP\T0\0b\build\CMakeFiles\Continuous.dir\DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/Continuous.dir/depend
 

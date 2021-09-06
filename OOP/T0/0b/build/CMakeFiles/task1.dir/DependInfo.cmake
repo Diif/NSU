@@ -8,8 +8,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "C:/Users/kiwul/Documents/projects/NSU C++/T1/0b/main.cpp" "CMakeFiles/task1.dir/main.cpp.obj" "gcc" "CMakeFiles/task1.dir/main.cpp.obj.d"
-  "C:/Users/kiwul/Documents/projects/NSU C++/T1/0b/src/solution.cpp" "CMakeFiles/task1.dir/src/solution.cpp.obj" "gcc" "CMakeFiles/task1.dir/src/solution.cpp.obj.d"
+  "C:/Users/kiwul/Documents/projects/NSU/OOP/T0/0b/main.cpp" "CMakeFiles/task1.dir/main.cpp.obj" "gcc" "CMakeFiles/task1.dir/main.cpp.obj.d"
+  "C:/Users/kiwul/Documents/projects/NSU/OOP/T0/0b/src/solution.cpp" "CMakeFiles/task1.dir/src/solution.cpp.obj" "gcc" "CMakeFiles/task1.dir/src/solution.cpp.obj.d"
   )
 
 # Targets to which this target links.

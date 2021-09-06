@@ -83,7 +83,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "c:/Users/kiwul/Documents/projects/NSU C++/T1/0b/build"
+			"value" : "c:/Users/kiwul/Documents/projects/NSU/OOP/T0/0b/build"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -679,7 +679,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Users/kiwul/Documents/projects/NSU C++/T1/0b"
+			"value" : "C:/Users/kiwul/Documents/projects/NSU/OOP/T0/0b"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -1727,7 +1727,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/kiwul/Documents/projects/NSU C++/T1/0b/build"
+			"value" : "C:/Users/kiwul/Documents/projects/NSU/OOP/T0/0b/build"
 		},
 		{
 			"name" : "task1_IS_TOP_LEVEL",
@@ -1751,7 +1751,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/kiwul/Documents/projects/NSU C++/T1/0b"
+			"value" : "C:/Users/kiwul/Documents/projects/NSU/OOP/T0/0b"
 		}
 	],
 	"kind" : "cache",

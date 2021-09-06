@@ -4,8 +4,8 @@
 
 
 # Configuration directories and files
-SourceDirectory: C:/Users/kiwul/Documents/projects/NSU C++/T1/0b
-BuildDirectory: C:/Users/kiwul/Documents/projects/NSU C++/T1/0b/build
+SourceDirectory: C:/Users/kiwul/Documents/projects/NSU/OOP/T0/0b
+BuildDirectory: C:/Users/kiwul/Documents/projects/NSU/OOP/T0/0b/build
 
 # Where to place the cost data store
 CostDataFile: 
@@ -26,7 +26,7 @@ SubmitURL: http://
 NightlyStartTime: 00:00:00 EDT
 
 # Commands for the build/test/submit cycle
-ConfigureCommand: "C:/Program Files/CMake/bin/cmake.exe" "C:/Users/kiwul/Documents/projects/NSU C++/T1/0b"
+ConfigureCommand: "C:/Program Files/CMake/bin/cmake.exe" "C:/Users/kiwul/Documents/projects/NSU/OOP/T0/0b"
 MakeCommand: C:/Program\ Files/CMake/bin/cmake.exe --build . --config "${CTEST_CONFIGURATION_TYPE}" -- -i
 DefaultCTestConfigurationType: Release
 

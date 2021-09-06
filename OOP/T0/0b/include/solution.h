@@ -1,16 +1,35 @@
-#ifndef INCLUDE_SOLUTION_H_
-#define INCLUDE_SOLUTION_H_
+#ifndef OOP_T0_0B_INCLUDE_SOLUTION_H_
+#define OOP_T0_0B_INCLUDE_SOLUTION_H_
+#include <fstream>
 #include <map>
+#include <sstream>
 #include <string>
+
+// DELETE
+#include <iostream>
+
 class WordReader {
  private:
-  bool is_EOF_;
   std::string cur_word_;
+  std::string cur_line;
+  std::ifstream file_;
+  std::stringstream line_stream_;
+  int total_words_;
+  bool line_eof_reached_;
+  bool file_eof_reached_;
 
  public:
   WordReader();
+  ~WordReader();
+  void OpenFile(std::string str);
   std::string GetCurrentWord();
+  std::ifstream* GetFilePointer();
+  void ReadLine();
   void ReadWord();
-  bool WasEndFound();
+  void IncreaseTotalWordsCount();
+  int GetTotalWordsCount();
+  bool WasFileEndFound();
+  bool WasTextEndFound();
+  bool WasLineEndFound();
 };
-#endif  //  INCLUDE_SOLUTION_H_
+#endif  //  OOP_T0_0B_INCLUDE_SOLUTION_H_
