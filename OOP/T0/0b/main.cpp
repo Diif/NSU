@@ -42,6 +42,7 @@ int main(int argc, char** argv) {
   int size = sorted_item_list->size();
   WriteCSVToFile(&reader, sorted_item_list, &output_file_name);
 
+  words_freq.clear();
   sorted_item_list->clear();
   delete sorted_item_list;
 }
