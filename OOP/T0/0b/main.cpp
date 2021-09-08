@@ -42,8 +42,6 @@ int main(int argc, char** argv) {
   int size = sorted_item_list->size();
   WriteCSVToFile(&reader, sorted_item_list, &output_file_name);
 
-  words_freq.clear();
-  sorted_item_list->clear();
   delete sorted_item_list;
 }
 
@@ -117,7 +115,8 @@ void WriteCSVToFile(WordReader* reader, list<pair<int, string>>* item_list,
   int total_words = reader->GetTotalWordsCount();
   list<pair<int, string>>::iterator it = item_list->begin();
   for (int i = 0; i < size; i++) {
-    output_file << (*it).second << "," << (*it).first << ","
+    output_file << "\"" << (*it).second << "\""
+                << "," << (*it).first << ","
                 << static_cast<double>((*it).first) / total_words << endl;
     it++;
   }
