@@ -5,9 +5,6 @@
 #include <sstream>
 #include <string>
 
-// DELETE
-#include <iostream>
-
 class WordReader {
  private:
   std::string cur_word_;

@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = @CMakeFiles/task1.dir/includes_CXX.rsp
 
-CXX_FLAGS = -g
+CXX_FLAGS = -O3 -DNDEBUG
 

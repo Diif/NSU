@@ -23,7 +23,11 @@ void WordReader::ReadWord() {
     ReadLine();
   }
   if (line_eof_reached_ == false) {
+    cur_word_ = "";
     std::getline(line_stream_, cur_word_, ' ');
+    if (cur_word_.empty() == false) {
+      IncreaseTotalWordsCount();
+    }
     if (line_stream_.eof()) {
       line_eof_reached_ = true;
     }

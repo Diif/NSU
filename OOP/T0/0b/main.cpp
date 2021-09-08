@@ -24,9 +24,10 @@ int main(int argc, char** argv) {
   ValidateArgCount(argc);
 
   string file_name(argv[1]);
-  string input_file_name("input.txt");
-  string output_file_name("out.csv");
+  string input_file_name(argv[1]);
+  string output_file_name(argv[2]);
   WordReader reader;
+
   ValidateFile(reader.GetFilePointer());
 
   map<string, int> words_freq;
@@ -39,7 +40,7 @@ int main(int argc, char** argv) {
   list<pair<int, string>>* sorted_item_list = GetSortedListFromMap(&words_freq);
   sorted_item_list->reverse();
 
-  int size = sorted_item_list->size();
+  int list_size = sorted_item_list->size();
   WriteCSVToFile(&reader, sorted_item_list, &output_file_name);
 
   delete sorted_item_list;
@@ -66,10 +67,12 @@ void CheckForEmptyFile(int total_words) {
 }
 
 void ProcessMapWithWord(map<string, int>* words_freq_map, string word) {
-  if (words_freq_map->count(word) <= 0) {
-    words_freq_map->insert(make_pair(word, 1));
-  } else {
-    (*words_freq_map)[word]++;
+  if (word.empty() == false) {
+    if (words_freq_map->count(word) <= 0) {
+      words_freq_map->insert(make_pair(word, 1));
+    } else {
+      (*words_freq_map)[word]++;
+    }
   }
 }
 
@@ -99,17 +102,16 @@ void FillMapFromFile(WordReader* reader, map<string, int>* word_freq) {
   while (!reader->WasTextEndFound()) {
     ProcessMapWithWord(word_freq, reader->GetCurrentWord());
     reader->ReadWord();
-    reader->IncreaseTotalWordsCount();
   }
   if (reader->GetTotalWordsCount() != 0) {
     ProcessMapWithWord(word_freq, reader->GetCurrentWord());
-    reader->IncreaseTotalWordsCount();
   }
 }
 
 void WriteCSVToFile(WordReader* reader, list<pair<int, string>>* item_list,
                     string* output_file_name) {
   ofstream output_file;
+  cout << *output_file_name << endl;
   output_file.open(*output_file_name, ofstream::out);
   int size = item_list->size();
   int total_words = reader->GetTotalWordsCount();
