@@ -1,2 +1,9 @@
+
 playground
 .vscode
+*.exe
+*.o
+*.out
+test
+*.sh
+*.bash

@@ -7,7 +7,7 @@
 using namespace std;
 
 double MathFunction(double x);
-double CalculateIntegral(int num_of_interval);
+double CalculateIntegral(long long num_of_interval);
 
 int main(int, char**) {
   struct tms start, end;
@@ -16,7 +16,7 @@ int main(int, char**) {
   cout.precision(20);
 
   times(&start);
-  cout << CalculateIntegral(100000000) << endl;
+  cout << CalculateIntegral(10000000000ll) << endl;
   times(&end);
 
   clocks = end.tms_utime - start.tms_utime;
@@ -24,7 +24,7 @@ int main(int, char**) {
   return 0;
 }
 
-double CalculateIntegral(int num_of_interval) {
+double CalculateIntegral(long long num_of_interval) {
   double a = 0;
   double b = M_PI;
   double x = a;
