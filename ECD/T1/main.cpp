@@ -93,10 +93,13 @@ double MakeMeasurementAndGetTimeSec(long long num_of_intervals) {
   struct tms start, end;
   long long clocks_per_sec = sysconf(_SC_CLK_TCK);
   long long clocks;
-  cout << num_of_intervals << endl;
+  double result;
+  cout << num_of_intervals << "    res:  ";
   times(&start);
-  CalculateIntegral(num_of_intervals);
+  result = CalculateIntegral(num_of_intervals);
   times(&end);
+  cout.precision(5);
+  cout << result << endl;
   clocks = end.tms_utime - start.tms_utime;
   return (double)clocks / clocks_per_sec;
 }
