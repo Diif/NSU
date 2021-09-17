@@ -16,7 +16,8 @@ double MakeMeasurementAndGetTimeSec(long long num_of_intervals);
 void WriteDoubleToTable(double data, string file_name);
 void WriteNewRowToTable(string file_name);
 void WriteTestedValuesToFile(int count_of_measurements);
-const string kOutFile = "out.csv";
+const string kOutFile = "outtime.csv";
+const string kOutFileValues = "outval.csv"
 const int kNFor40Secs = 600000000;
 
 int main(int argc, char** argv) {
@@ -49,7 +50,7 @@ int main(int argc, char** argv) {
   return 0;
 }
 
-void WriteTestedValuesToFile(int count_of_measurements) {
+void WriteTestedValuesToFile(int count_of_measurements, string) {
   double step;
   double cur_stage;
   double edge;
@@ -98,6 +99,7 @@ double MakeMeasurementAndGetTimeSec(long long num_of_intervals) {
   times(&start);
   result = CalculateIntegral(num_of_intervals);
   times(&end);
+  WriteDoubleToTable(result, kOutFile);
   cout.precision(5);
   cout << result << endl;
   clocks = end.tms_utime - start.tms_utime;
@@ -107,7 +109,7 @@ double MakeMeasurementAndGetTimeSec(long long num_of_intervals) {
 void WriteDoubleToTable(double data, string file_name) {
   ofstream out_file;
   out_file.open(file_name, ios::app);
-  out_file << std::fixed << std::setprecision(3) << data << ',';
+  out_file << std::fixed << std::setprecision(8) << data << ',';
   out_file.close();
 }
 void WriteNewRowToTable(string file_name) {
