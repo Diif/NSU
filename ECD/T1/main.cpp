@@ -15,9 +15,9 @@ void MakeNMeasurementsAndPrintToFile(int count_of_measurements,
 double MakeMeasurementAndGetTimeSec(long long num_of_intervals);
 void WriteDoubleToTable(double data, string file_name);
 void WriteNewRowToTable(string file_name);
-void WriteTestedValuesToFile(int count_of_measurements);
+void WriteTestedValuesToFile(int count_of_measurements, string file_name);
 const string kOutFile = "outtime.csv";
-const string kOutFileValues = "outval.csv"
+const string kOutFileValues = "outval.csv";
 const int kNFor40Secs = 600000000;
 
 int main(int argc, char** argv) {
@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
   if (argc >= 3) {
     int count_of_measurements = stoi(argv[2]);
     if (print_tested_value) {
-      WriteTestedValuesToFile(count_of_measurements);
+      WriteTestedValuesToFile(count_of_measurements, kOutFile);
     }
     MakeNMeasurementsAndPrintToFile(count_of_measurements, num_of_intervals);
   } else {
@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
   return 0;
 }
 
-void WriteTestedValuesToFile(int count_of_measurements, string) {
+void WriteTestedValuesToFile(int count_of_measurements, string out_file) {
   double step;
   double cur_stage;
   double edge;
@@ -64,9 +64,9 @@ void WriteTestedValuesToFile(int count_of_measurements, string) {
     edge = 1 + (step / 2);
   }
   for (double i = cur_stage; i <= edge; i += step) {
-    WriteDoubleToTable(i, kOutFile);
+    WriteDoubleToTable(i, out_file);
   }
-  WriteNewRowToTable(kOutFile);
+  WriteNewRowToTable(out_file);
 }
 
 void MakeNMeasurementsAndPrintToFile(int count_of_measurements,
@@ -99,7 +99,7 @@ double MakeMeasurementAndGetTimeSec(long long num_of_intervals) {
   times(&start);
   result = CalculateIntegral(num_of_intervals);
   times(&end);
-  WriteDoubleToTable(result, kOutFile);
+  WriteDoubleToTable(result, kOutFileValues);
   cout.precision(5);
   cout << result << endl;
   clocks = end.tms_utime - start.tms_utime;
@@ -109,7 +109,11 @@ double MakeMeasurementAndGetTimeSec(long long num_of_intervals) {
 void WriteDoubleToTable(double data, string file_name) {
   ofstream out_file;
   out_file.open(file_name, ios::app);
-  out_file << std::fixed << std::setprecision(8) << data << ',';
+  if (file_name == kOutFileValues) {
+    out_file << std::fixed << std::setprecision(8) << data << ',';
+  } else {
+    out_file << std::fixed << std::setprecision(3) << data << ',';
+  }
   out_file.close();
 }
 void WriteNewRowToTable(string file_name) {
