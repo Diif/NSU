@@ -50,28 +50,36 @@ Trit TritSet::GetTritValue(const uint trit_ind) {
 }
 
 void TritSet::SetTritValue(uint trit_ind, Trit new_value) {
-  uint uint_ind = GetUintIndFromTritInd(trit_ind);
-  uint uint_to_change = trits_array_[uint_ind];
-}
+  if (array_size_ <= trit_ind) {
+    return;
+  }
 
-void TritSet::SetTritUnknown(uint trit_ind) {
   uint uint_ind = GetUintIndFromTritInd(trit_ind);
   uint uint_to_change = trits_array_[uint_ind];
   uint trit_ind_in_uint = GetTritIndInUint(trit_ind);
-  uint zeroes_in_trit_place = UINT_MAX;
-  uint frst_two_are_ones = UINT_MAX << (sizeof(uint) * CHAR_BIT) - 2;
-  zeroes_in_trit_place = zeroes_in_trit_place >> 2;
-  for (size_t i = 0; i < trit_ind_in_uint; i += 2) {
+
+  uint new_uint_to_put =
+      PutTritToIndInUint(new_value, trit_ind_in_uint, uint_to_change);
+  trits_array_[uint_ind] = new_uint_to_put;
+}
+// Proxy
+uint PutTritToIndInUint(uint trit, uint trit_ind_in_uint, uint uint_to_change) {
+  uint new_value_in_trit_place = 0;  //  = 00...000
+  new_value_in_trit_place =
+      new_value_in_trit_place |
+      (trit << (sizeof(uint) * CHAR_BIT) - 2);  //  XX00...000
+  uint frst_two_are_ones = UINT_MAX
+                           << (sizeof(uint) * CHAR_BIT) - 2;  //  1100...000
+  uint zeroes_in_trit_place = UINT_MAX >> 2;                  //  =  00111...111
+  for (uint i = 0; i < trit_ind_in_uint; i += 2) {
+    new_value_in_trit_place = new_value_in_trit_place >> 2;
     zeroes_in_trit_place = zeroes_in_trit_place >> 2;
     zeroes_in_trit_place = zeroes_in_trit_place | frst_two_are_ones;
   }
   uint_to_change = uint_to_change & zeroes_in_trit_place;
-  trits_array_[uint_ind] = uint_to_change;
+  uint_to_change = uint_to_change | new_value_in_trit_place;
+  return uint_to_change;
 }
-void TritSet::SetTritFalse(uint trit_ind) {}
-void TritSet::SetTritTrue(uint trit_ind) {}
-// Proxy
-
 TritSet::ProxyTrit::ProxyTrit(TritSet &set, uint ind_of_uint_with_trit,
                               uint trit_ind)
     : set(set), trit_ind(trit_ind) {

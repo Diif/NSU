@@ -30,18 +30,27 @@ TEST(TritSetTest, TritIndToUintInd) {
   EXPECT_EQ(0, set.GetUintIndFromTritInd(15));
   EXPECT_EQ(0, set.GetUintIndFromTritInd(1));
 }
-TEST(TritSetTest, GetTritValue) {
+TEST(TritSetTest, GetStartTritValue) {
   TritSet set(10);
   unsigned int max = kTritsInUint * 2;
   for (size_t i = 0; i < max; i++) {
     EXPECT_EQ(Unknown, set.GetTritValue(i));
   }
+  EXPECT_EQ(Unknown, set.GetTritValue(max));
+  EXPECT_EQ(Unknown, set.GetTritValue(max + 1));
+  EXPECT_EQ(Unknown, set.GetTritValue(1000));
 }
 
 TEST(TritSetTest, SetAndGetTritValue) {
   TritSet set(10);
   unsigned int max = kTritsInUint * 2;
   for (size_t i = 0; i < max; i++) {
+    set.SetTritValue(i, False);
+    EXPECT_EQ(False, set.GetTritValue(i));
+    set.SetTritValue(i, Unknown);
     EXPECT_EQ(Unknown, set.GetTritValue(i));
+    set.SetTritValue(i, True);
+    EXPECT_EQ(True, set.GetTritValue(i));
   }
+  EXPECT_EQ(Unknown, set.GetTritValue(1000));
 }

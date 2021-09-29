@@ -7,7 +7,7 @@
 using uint = unsigned int;
 using namespace std;
 
-enum Trit { False = 1, Unknown = 0, True = 2 };
+enum Trit : uint { False = 1, Unknown = 0, True = 2 };
 
 const uint kTritBitesSize = 2;
 const uint kTritsInUint = sizeof(uint) * CHAR_BIT / kTritBitesSize;
@@ -38,9 +38,6 @@ class TritSet {
   TritSet(const TritSet &set);
   void SetSize(const uint new_size_in_trits);
   void SetTritValue(uint trit_ind, Trit new_value);
-  void SetTritUnknown(uint trit_ind);
-  void SetTritFalse(uint trit_ind);
-  void SetTritTrue(uint trit_ind);
   ProxyTrit operator[](const uint trit_ind);
   // ~TritSet();
 };
