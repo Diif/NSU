@@ -30,6 +30,16 @@ Trit operator~(Trit trit) {
   return Unknown;
 }
 
+ostream &operator<<(ostream &out, Trit trit) {
+  if (trit == True) {
+    return out << "T";
+  }
+  if (trit == False) {
+    return out << "F";
+  }
+  return out << "U";
+}
+
 // private
 
 uint TritSet::GetSize() { return array_size_; }
@@ -114,7 +124,7 @@ uint TritSet::PutTritToIndInUint(uint trit, uint trit_ind_in_uint,
   return uint_to_change;
 }
 
-uint TritSet::FindUintIndWithLastTrit() {
+uint TritSet::GetUintIndWithLastTrit() {
   uint uint_count = GetSize() / kTritsInUint;
   uint last_filled_uint;
   for (last_filled_uint = uint_count - 1; last_filled_uint >= 0;
@@ -126,17 +136,56 @@ uint TritSet::FindUintIndWithLastTrit() {
   return last_filled_uint;
 }
 
+uint TritSet::GetLastSettedTritIndInUint(uint uint_with_trits) {
+  Trit cur_trit = Unknown;
+  uint cur_trit_ind;
+  uint last_two_ones = 3;  //  00..11
+  for (cur_trit_ind = kTritsInUint; cur_trit_ind >= 0 && cur_trit == Unknown;) {
+    cur_trit_ind--;
+    cur_trit = static_cast<Trit>(uint_with_trits & last_two_ones);
+    uint_with_trits = uint_with_trits >> 2;
+  }
+  return cur_trit_ind;
+}
+
+uint TritSet::GetLastSettedTritInd() {
+  uint last_uint_ind_with_trit = GetUintIndWithLastTrit();
+  uint trit_ind_in_uint =
+      GetLastSettedTritIndInUint(trits_array_[last_uint_ind_with_trit]);
+  uint trit_ind = last_uint_ind_with_trit * kTritsInUint + trit_ind_in_uint;
+  return trit_ind;
+}
+
 void TritSet::Shrink() {
-  uint last_filled_uint = FindUintIndWithLastTrit();
+  uint last_filled_uint = GetUintIndWithLastTrit();
   Resize((last_filled_uint + 1) * kTritsInUint);
 }
 
+void TritSet::TrimUintAfterTritInd(uint trit_ind) {
+  uint trit_ind_in_uint = GetTritIndInUint(trit_ind);
+  uint shift = (kTritsInUint - 1) - trit_ind_in_uint;
+  uint zeroes_after_trit = UINT_MAX;
+  for (uint i = 0; i < shift; i++) {
+    zeroes_after_trit = zeroes_after_trit << 2;
+  }
+  uint uint_to_change_ind = GetUintIndFromTritInd(trit_ind);
+  uint uint_to_change = trits_array_[uint_to_change_ind];
+  uint_to_change = uint_to_change & zeroes_after_trit;
+  trits_array_[uint_to_change_ind] = uint_to_change;
+}
+
+void TritSet::Trim(uint trit_ind) {
+  uint last_uint_ind = GetUintIndFromTritInd(trit_ind);
+  Resize((last_uint_ind + 1) * kTritsInUint);
+  TrimUintAfterTritInd(trit_ind);
+}
+
 uint TritSet::GetCountOfTritsWithType(Trit type) {
-  uint last_filled_uint_ind = FindUintIndWithLastTrit();
+  uint last_filled_uint_ind = GetUintIndWithLastTrit();
   uint last_trit_ind = (last_filled_uint_ind + 1) * kTritsInUint - 1;
   uint unknown_trits_after_last_trit = 0;
   uint trit_count = 0;
-  for (uint i = 0; i < last_trit_ind; i++) {
+  for (uint i = 0; i <= last_trit_ind; i++) {
     Trit cur_trit = GetTritValue(i);
     if (cur_trit == type) {
       trit_count++;
@@ -153,45 +202,57 @@ uint TritSet::GetCountOfTritsWithType(Trit type) {
   return trit_count;
 }
 
+unordered_map<Trit, uint> TritSet::Cardinality() {
+  unordered_map<Trit, uint> result;
+  result[False] = GetCountOfTritsWithType(False);
+  result[True] = GetCountOfTritsWithType(True);
+  result[Unknown] = GetCountOfTritsWithType(Unknown);
+  return result;
+}
+
 // operator override
+
+ostream &operator<<(ostream &out, TritSet::ProxyTrit proxy_trit) {
+  return out << proxy_trit.GetTritValue();
+}
 
 TritSet::ProxyTrit TritSet::operator[](const uint trit_ind) {
   uint uint_ind = GetUintIndFromTritInd(trit_ind);
   return ProxyTrit(*this, uint_ind, trit_ind);
 }
 
-TritSet &TritSet::operator&(TritSet &set) {
+TritSet TritSet::operator&(TritSet &set) {
   uint set1_size = GetSize();
   uint set2_size = set.GetSize();
   uint new_set_size = max(set1_size, set2_size);
 
-  TritSet *result_set = new TritSet(new_set_size);
+  TritSet result_set(new_set_size);
   for (uint cur_trit_ind = 0; cur_trit_ind < new_set_size; cur_trit_ind++) {
-    (*result_set)[cur_trit_ind] = (*this)[cur_trit_ind] & set[cur_trit_ind];
+    result_set[cur_trit_ind] = (*this)[cur_trit_ind] & set[cur_trit_ind];
   }
-  return *result_set;
+  return result_set;
 }
 
-TritSet &TritSet::operator|(TritSet &set) {
+TritSet TritSet::operator|(TritSet &set) {
   uint set1_size = GetSize();
   uint set2_size = set.GetSize();
   uint new_set_size = max(set1_size, set2_size);
 
-  TritSet *result_set = new TritSet(new_set_size);
+  TritSet result_set(new_set_size);
   for (uint cur_trit_ind = 0; cur_trit_ind < new_set_size; cur_trit_ind++) {
-    (*result_set)[cur_trit_ind] = (*this)[cur_trit_ind] | set[cur_trit_ind];
+    result_set[cur_trit_ind] = (*this)[cur_trit_ind] | set[cur_trit_ind];
   }
-  return *result_set;
+  return result_set;
 }
 
-TritSet &TritSet::operator~() {
+TritSet TritSet::operator~() {
   uint new_set_size = GetSize();
 
-  TritSet *result_set = new TritSet(new_set_size);
+  TritSet result_set(new_set_size);
   for (uint cur_trit_ind = 0; cur_trit_ind < new_set_size; cur_trit_ind++) {
-    (*result_set)[cur_trit_ind] = ~(*this)[cur_trit_ind];
+    result_set[cur_trit_ind] = ~(*this)[cur_trit_ind];
   }
-  return *result_set;
+  return result_set;
 }
 
 // Proxy
@@ -202,6 +263,8 @@ TritSet::ProxyTrit::ProxyTrit(TritSet &set, uint ind_of_uint_with_trit,
   trit_value = set.GetTritValue(trit_ind);
   cur_uint = ind_of_uint_with_trit;
 }
+
+Trit TritSet::ProxyTrit::GetTritValue() { return trit_value; }
 
 void TritSet::ProxyTrit::operator=(Trit new_trit_value) {
   uint number_of_trits = trit_ind + 1;

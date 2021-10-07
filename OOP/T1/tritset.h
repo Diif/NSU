@@ -1,8 +1,10 @@
-#ifndef INCLUDE_TRITSET_H_
-#define INCLUDE_TRITSET_H_
+#ifndef OOP_T1_TRITSET_H_
+#define OOP_T1_TRITSET_H_
+#include <algorithm>
 #include <climits>
 #include <cmath>
 #include <iostream>
+#include <unordered_map>
 #include <vector>
 
 using uint = unsigned int;
@@ -12,6 +14,8 @@ enum Trit : uint { False = 1, Unknown = 0, True = 2 };
 Trit operator&(Trit trit1, Trit trit2);
 Trit operator~(Trit trit);
 Trit operator|(Trit trit1, Trit trit2);
+
+ostream &operator<<(ostream &out, Trit trit);
 
 const uint kTritBitesSize = 2;
 const uint kTritsInUint = sizeof(uint) * CHAR_BIT / kTritBitesSize;
@@ -27,7 +31,8 @@ class TritSet {
    public:
     ProxyTrit(TritSet &set, uint ind_of_uint_with_trit, uint trit_ind);
     ProxyTrit(Trit trit);
-    operator Trit() { return trit_value; };
+    Trit GetTritValue();
+    operator Trit() { return trit_value; }
     void operator=(Trit new_trit_value);
     void operator=(ProxyTrit new_trit);
   };
@@ -35,29 +40,37 @@ class TritSet {
  private:
   vector<uint> trits_array_;
   uint array_size_ = 0;
-
- public:
-  uint GetSize();
   uint GetUintCountFromTritsCount(const uint trits_count);
   uint GetTritIndInUint(uint trit_ind);
-  uint GetUintIndFromTritInd(const uint trit_ind);  //  TODO move to private
+  uint GetUintIndFromTritInd(const uint trit_ind);  // TODO move to private
   Trit GetTritValue(const uint trit_ind);
-  uint FindUintIndWithLastTrit();
-  uint GetCountOfTritsWithType(Trit type);
-  explicit TritSet(const uint size);
-  TritSet(const TritSet &set);
-  void Resize(const uint new_size_in_trits);
-  void SetTritValue(uint trit_ind, Trit new_value);
+  uint GetUintIndWithLastTrit();
+  uint GetLastSettedTritIndInUint(uint uint_with_trits);
   uint PutTritToIndInUint(uint trit, uint trit_ind_in_uint,
                           uint uint_to_change);
+  void TrimUintAfterTritInd(uint trit_ind);
+  void SetTritValue(uint trit_ind, Trit new_value);
+
+ public:
+  // constructor
+  explicit TritSet(const uint size);
+  TritSet(const TritSet &set);
+  // methods
+  uint GetSize();
+  uint GetCountOfTritsWithType(Trit type);
+  unordered_map<Trit, uint> Cardinality();
+  uint GetLastSettedTritInd();
+  void Resize(const uint new_size_in_trits);
   void Shrink();
-  TritSet &operator&(TritSet &set);
-  TritSet &operator|(TritSet &set);
-  TritSet &operator~();
+  void Trim(uint trit_ind);
+  // operators
+  TritSet operator&(TritSet &set);
+  TritSet operator|(TritSet &set);
+  TritSet operator~();
+  friend ostream &operator<<(ostream &out, TritSet::ProxyTrit proxy_trit);
   ProxyTrit operator[](const uint trit_ind);
   // ~TritSet();
 };
 
 Trit operator&(Trit trit1, Trit trit2);
-
-#endif  //  INCLUDE_TRITSET_H_
+#endif  //  OOP_T1_TRITSET_H_
