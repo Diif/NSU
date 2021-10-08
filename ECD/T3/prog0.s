@@ -126,7 +126,7 @@ main:
 	
 	# pxor	%xmm0, %xmm0
 	# movsd	%xmm0, -24(%rbp) операции просто кладут 0 в стек
-	movsd   $0, -24(%rbp) 
+	movq   $0, -24(%rbp) 
 	
 	movl	$400000000, %edi
 	call	_Znam
@@ -144,7 +144,7 @@ main:
 	# movq	-8(%rbp), %rdx
 	# movq	-16(%rbp), %rax
 	movq	-16(%rbp), %rsi
-	movq 	%rsi, %edi
+	movq 	%rsi, %rdi
 	#movq	%rdx, %rsi
 	#movq	%rax, %rdi
 	#call	_Z5func2PdS_ функция 0 вернет
