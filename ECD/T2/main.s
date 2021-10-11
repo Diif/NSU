@@ -1,14 +1,14 @@
 	.file	"main.cpp"
-	.section	.rodata
-	.type	_ZStL19piecewise_construct, @object
+	.section	.rodata	# данные только для чтения. .section присваивает код к определенной секции
+	.type	_ZStL19piecewise_construct, @object	# тип данных
 	.size	_ZStL19piecewise_construct, 1
 _ZStL19piecewise_construct:
-	.zero	1
+	.zero	1 # заполняет один байт нулем. Для, похоже, выравнивания
 	.section	.text._ZNSt11char_traitsIcE7compareEPKcS2_m,"axG",@progbits,_ZNSt11char_traitsIcE7compareEPKcS2_m,comdat
 	.weak	_ZNSt11char_traitsIcE7compareEPKcS2_m
 	.type	_ZNSt11char_traitsIcE7compareEPKcS2_m, @function
 _ZNSt11char_traitsIcE7compareEPKcS2_m:
-.LFB542:
+.LFB542:	# метка - константа с адресом. Символ - просто константа.
 	pushq	%rbp
 .LCFI0:
 	movq	%rsp, %rbp
@@ -290,8 +290,8 @@ _ZSt12setprecisioni:
 	.size	_ZSt12setprecisioni, .-_ZSt12setprecisioni
 	.local	_ZStL8__ioinit
 	.comm	_ZStL8__ioinit,1,1
-	.local	_ZL8kOutFile
-	.comm	_ZL8kOutFile,32,32
+	.local	_ZL8kOutFile # объявляет символ локальным 
+	.comm	_ZL8kOutFile,32,32 # allocates storage in the data section
 	.local	_ZL14kOutFileValues
 	.comm	_ZL14kOutFileValues,32,32
 	.section	.rodata
@@ -310,18 +310,18 @@ main:
 	movq	%rsp, %rbp
 .LCFI34:
 	pushq	%rbx
-	subq	$88, %rsp
+	subq	$88, %rsp	# выделение памяти на стеке
 .LCFI35:
-	movl	%edi, -84(%rbp)
-	movq	%rsi, -96(%rbp)
-	movq	%fs:40, %rax
+	movl	%edi, -84(%rbp) # argc 
+	movq	%rsi, -96(%rbp) # argv
+	movq	%fs:40, %rax # проверка на целостность стека
 	movq	%rax, -24(%rbp)
 	xorl	%eax, %eax
-	movl	$0, -72(%rbp)
-	cmpl	$1, -84(%rbp)
-	jle	.L25
-	leaq	-77(%rbp), %rax
-	movq	%rax, %rdi
+	movl	$0, -72(%rbp) # print_tested_value = 0
+	cmpl	$1, -84(%rbp) # if argc <= 1
+	jle	.L25 # do
+	leaq	-77(%rbp), %rax # else
+	movq	%rax, %rdi # серия команд для вызова stoi
 	call	_ZNSaIcEC1Ev
 	movq	-96(%rbp), %rax
 	addq	$8, %rax
@@ -340,28 +340,28 @@ main:
 .LEHB1:
 	call	_ZNSt7__cxx114stoiERKNS_12basic_stringIcSt11char_traitsIcESaIcEEEPmi
 .LEHE1:
-	movl	%eax, -76(%rbp)
+	movl	%eax, -76(%rbp) # num_of_intervals = stoi
 	leaq	-64(%rbp), %rax
-	movq	%rax, %rdi
+	movq	%rax, %rdi # опять что-то системное
 	call	_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev
 	leaq	-77(%rbp), %rax
 	movq	%rax, %rdi
-	call	_ZNSaIcED1Ev
-	cmpl	$0, -76(%rbp)
-	jne	.L26
-	movl	$600000000, -76(%rbp)
+	call	_ZNSaIcED1Ev # это std::allocator<char>::~allocator() - деструктор
+	cmpl	$0, -76(%rbp) # num_of_intervals != 0
+	jne	.L26 # do
+	movl	$600000000, -76(%rbp) # else 
 	jmp	.L26
 .L25:
 	movl	$600000000, -76(%rbp)
 .L26:
-	cmpl	$3, -84(%rbp)
-	jle	.L27
-	movl	$1, -72(%rbp)
+	cmpl	$3, -84(%rbp) # argc <= 3
+	jle	.L27 # do
+	movl	$1, -72(%rbp) # else
 .L27:
-	cmpl	$2, -84(%rbp)
-	jle	.L28
-	leaq	-77(%rbp), %rax
-	movq	%rax, %rdi
+	cmpl	$2, -84(%rbp) # argc <= 2
+	jle	.L28 # do
+	leaq	-77(%rbp), %rax # else
+	movq	%rax, %rdi # instructions to call stoi
 	call	_ZNSaIcEC1Ev
 	movq	-96(%rbp), %rax
 	addq	$16, %rax
@@ -380,26 +380,26 @@ main:
 .LEHB3:
 	call	_ZNSt7__cxx114stoiERKNS_12basic_stringIcSt11char_traitsIcESaIcEEEPmi
 .LEHE3:
-	movl	%eax, -68(%rbp)
-	leaq	-64(%rbp), %rax
+	movl	%eax, -68(%rbp) # count of measurements = stoi
+	leaq	-64(%rbp), %rax # destructors call
 	movq	%rax, %rdi
 	call	_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev
 	leaq	-77(%rbp), %rax
 	movq	%rax, %rdi
 	call	_ZNSaIcED1Ev
-	cmpl	$0, -72(%rbp)
-	je	.L29
-	leaq	-64(%rbp), %rax
+	cmpl	$0, -72(%rbp) # print_tested_value == 0
+	je	.L29 # do
+	leaq	-64(%rbp), %rax # else 
 	movl	$_ZL8kOutFile, %esi
 	movq	%rax, %rdi
 .LEHB4:
 	call	_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC1ERKS4_
 .LEHE4:
-	leaq	-64(%rbp), %rdx
-	movl	-68(%rbp), %eax
+	leaq	-64(%rbp), %rdx # kOutFile
+	movl	-68(%rbp), %eax # count_of_measurements
 	movq	%rdx, %rsi
 	movl	%eax, %edi
-.LEHB5:
+.LEHB5: # call func
 	call	_Z23WriteTestedValuesToFileiNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
 .LEHE5:
 	leaq	-64(%rbp), %rax
@@ -408,8 +408,8 @@ main:
 .L29:
 	movl	-76(%rbp), %edx
 	movl	-68(%rbp), %eax
-	movl	%edx, %esi
-	movl	%eax, %edi
+	movl	%edx, %esi # num_of_intervals
+	movl	%eax, %edi # count_of_measurements
 .LEHB6:
 	call	_Z31MakeNMeasurementsAndPrintToFileii
 	jmp	.L30
@@ -522,47 +522,47 @@ _Z23WriteTestedValuesToFileiNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
 	pushq	%rbx
 	subq	$120, %rsp
 .LCFI39:
-	movl	%edi, -100(%rbp)
-	movq	%rsi, -112(%rbp)
+	movl	%edi, -100(%rbp) # count_of_measurements
+	movq	%rsi, -112(%rbp) # out_file
 	movq	%fs:40, %rax
 	movq	%rax, -24(%rbp)
 	xorl	%eax, %eax
-	cmpl	$1, -100(%rbp)
-	jle	.L45
+	cmpl	$1, -100(%rbp) #  count_of_measurements <= 1
+	jle	.L45 # do
 	pxor	%xmm0, %xmm0
-	cvtsi2sd	-100(%rbp), %xmm0
-	movsd	.LC1(%rip), %xmm1
-	divsd	%xmm0, %xmm1
-	movapd	%xmm1, %xmm0
-	movsd	%xmm0, -96(%rbp)
+	cvtsi2sd	-100(%rbp), %xmm0 # convert int to scalar double
+	movsd	.LC1(%rip), %xmm1 # LC1 = 2
+	divsd	%xmm0, %xmm1 # 2 / count_of_measurements
+	movapd	%xmm1, %xmm0 # a - align, p - packed(vector), d - double
+	movsd	%xmm0, -96(%rbp) # step = 2 / count_of_measurements
 	movsd	-96(%rbp), %xmm0
-	movsd	%xmm0, -88(%rbp)
+	movsd	%xmm0, -88(%rbp) # cur_stage = step
 	movsd	-96(%rbp), %xmm0
 	movsd	.LC1(%rip), %xmm1
-	divsd	%xmm1, %xmm0
-	movsd	.LC1(%rip), %xmm1
+	divsd	%xmm1, %xmm0  # step / 2
+	movsd	.LC1(%rip), %xmm1 
 	addsd	%xmm1, %xmm0
-	movsd	%xmm0, -80(%rbp)
+	movsd	%xmm0, -80(%rbp) # edge = 2 + (step / 2)
 	jmp	.L46
 .L45:
-	movsd	.LC2(%rip), %xmm0
-	movsd	%xmm0, -96(%rbp)
+	movsd	.LC2(%rip), %xmm0 # LC2 = 1
+	movsd	%xmm0, -96(%rbp) # step = 1
 	movsd	-96(%rbp), %xmm0
-	movsd	%xmm0, -88(%rbp)
+	movsd	%xmm0, -88(%rbp) # cur_stage = step
 	movsd	-96(%rbp), %xmm0
 	movsd	.LC1(%rip), %xmm1
 	divsd	%xmm1, %xmm0
 	movsd	.LC2(%rip), %xmm1
 	addsd	%xmm1, %xmm0
-	movsd	%xmm0, -80(%rbp)
+	movsd	%xmm0, -80(%rbp) # edge = 1 + (step / 2)
 .L46:
 	movsd	-88(%rbp), %xmm0
-	movsd	%xmm0, -72(%rbp)
+	movsd	%xmm0, -72(%rbp) # i = cur_stage
 .L49:
-	movsd	-80(%rbp), %xmm0
-	ucomisd	-72(%rbp), %xmm0
-	jb	.L56
-	movq	-112(%rbp), %rdx
+	movsd	-80(%rbp), %xmm0 # edge ---> xmm0
+	ucomisd	-72(%rbp), %xmm0 # edge < i ---> set CF = 1
+	jb	.L56 # jump if CF == 1
+	movq	-112(%rbp), %rdx # prepare string out_file
 	leaq	-64(%rbp), %rax
 	movq	%rdx, %rsi
 	movq	%rax, %rdi
@@ -571,21 +571,21 @@ _Z23WriteTestedValuesToFileiNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
 .LEHE7:
 	leaq	-64(%rbp), %rdx
 	movq	-72(%rbp), %rax
-	movq	%rdx, %rdi
+	movq	%rdx, %rdi # out_file ---> rdi
 	movq	%rax, -120(%rbp)
-	movsd	-120(%rbp), %xmm0
+	movsd	-120(%rbp), %xmm0 # i ---> xmm0
 .LEHB8:
 	call	_Z18WriteDoubleToTabledNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
 .LEHE8:
 	leaq	-64(%rbp), %rax
 	movq	%rax, %rdi
 	call	_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev
-	movsd	-72(%rbp), %xmm0
-	addsd	-96(%rbp), %xmm0
-	movsd	%xmm0, -72(%rbp)
-	jmp	.L49
+	movsd	-72(%rbp), %xmm0 # i --> xmm0
+	addsd	-96(%rbp), %xmm0 # i+= step;
+	movsd	%xmm0, -72(%rbp) # xmm0 ---> i
+	jmp	.L49 # repeat 
 .L56:
-	movq	-112(%rbp), %rdx
+	movq	-112(%rbp), %rdx # prepare out_file
 	leaq	-64(%rbp), %rax
 	movq	%rdx, %rsi
 	movq	%rax, %rdi
@@ -593,18 +593,18 @@ _Z23WriteTestedValuesToFileiNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
 	call	_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC1ERKS4_
 .LEHE9:
 	leaq	-64(%rbp), %rax
-	movq	%rax, %rdi
+	movq	%rax, %rdi # call WriteNewRowToTable with out_file
 .LEHB10:
 	call	_Z18WriteNewRowToTableNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
 .LEHE10:
-	leaq	-64(%rbp), %rax
+	leaq	-64(%rbp), %rax # destructor
 	movq	%rax, %rdi
 	call	_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev
 	nop
 	movq	-24(%rbp), %rax
-	xorq	%fs:40, %rax
-	je	.L52
-	jmp	.L57
+	xorq	%fs:40, %rax # stack check
+	je	.L52 # exit
+	jmp	.L57 # error handling
 .L53:
 	movq	%rax, %rbx
 	leaq	-64(%rbp), %rax
@@ -665,6 +665,7 @@ _Z23WriteTestedValuesToFileiNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
 	.globl	_Z31MakeNMeasurementsAndPrintToFileii
 	.type	_Z31MakeNMeasurementsAndPrintToFileii, @function
 _Z31MakeNMeasurementsAndPrintToFileii:
+# структура программы абсолютно аналогична WriteTestedValuesToFile
 .LFB2132:
 	pushq	%rbp
 .LCFI41:
@@ -719,7 +720,7 @@ _Z31MakeNMeasurementsAndPrintToFileii:
 	cvttsd2siq	%xmm0, %rax
 	movq	%rax, %rdi
 .LEHB12:
-	call	_Z28MakeMeasurementAndGetTimeSecx
+	call	_Z28MakeMeasurementAndGetTimeSecx # вызов функции, её листинг разобран.
 	movq	%xmm0, %rax
 	movq	%rax, -72(%rbp)
 	leaq	-64(%rbp), %rax
@@ -791,7 +792,7 @@ _Z31MakeNMeasurementsAndPrintToFileii:
 .LFE2132:
 	.section	.gcc_except_table
 .LLSDA2132:
-	.byte	0xff
+	.byte	0xffF
 	.byte	0xff
 	.byte	0x1
 	.uleb128 .LLSDACSE2132-.LLSDACSB2132
@@ -834,33 +835,33 @@ _Z28MakeMeasurementAndGetTimeSecx:
 	pushq	%rbx
 	subq	$168, %rsp
 .LCFI47:
-	movq	%rdi, -168(%rbp)
+	movq	%rdi, -168(%rbp) # long long num_of_intervals
 	movq	%fs:40, %rax
 	movq	%rax, -24(%rbp)
 	xorl	%eax, %eax
-	movl	$2, %edi
+	movl	$2, %edi # sysconf with _SC_CLK_TCK
 	call	sysconf
-	movq	%rax, -152(%rbp)
+	movq	%rax, -152(%rbp) # clocks_per_sec = sysconf(_SC_CLK_TCK);
 	movq	-168(%rbp), %rax
 	movq	%rax, %rsi
-	movl	$_ZSt4cout, %edi
+	movl	$_ZSt4cout, %edi # std::cout label for linker ?
 .LEHB17:
-	call	_ZNSolsEx
-	movl	$.LC3, %esi
+	call	_ZNSolsEx # std::ostream::operator<<(long long)
+	movl	$.LC3, %esi # pointer to string "res:"
 	movq	%rax, %rdi
 	call	_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc
-	leaq	-128(%rbp), %rax
+	leaq	-128(%rbp), %rax # start in -128(%rbp)
 	movq	%rax, %rdi
 	call	times
 	movq	-168(%rbp), %rax
 	movq	%rax, %rdi
 	call	_Z17CalculateIntegralx
 	movq	%xmm0, %rax
-	movq	%rax, -144(%rbp)
-	leaq	-96(%rbp), %rax
+	movq	%rax, -144(%rbp) # result = CalculateIntegral(num_of_intervals);
+	leaq	-96(%rbp), %rax # -96(%rbp) = end
 	movq	%rax, %rdi
-	call	times
-	leaq	-64(%rbp), %rax
+	call	times # times(&end);
+	leaq	-64(%rbp), %rax # prepare to call WriteDoubleToTable
 	movl	$_ZL14kOutFileValues, %esi
 	movq	%rax, %rdi
 	call	_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC1ERKS4_
@@ -876,29 +877,29 @@ _Z28MakeMeasurementAndGetTimeSecx:
 	leaq	-64(%rbp), %rax
 	movq	%rax, %rdi
 	call	_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev
-	movl	$5, %esi
+	movl	$5, %esi # cout.precision(5);
 	movl	$_ZSt4cout+8, %edi
 	call	_ZNSt8ios_base9precisionEl
 	movq	-144(%rbp), %rax
 	movq	%rax, -176(%rbp)
 	movsd	-176(%rbp), %xmm0
-	movl	$_ZSt4cout, %edi
+	movl	$_ZSt4cout, %edi # cout << result << endl;
 .LEHB19:
 	call	_ZNSolsEd
 	movl	$_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_, %esi
 	movq	%rax, %rdi
 	call	_ZNSolsEPFRSoS_E
-	movq	-96(%rbp), %rdx
-	movq	-128(%rbp), %rax
-	subq	%rax, %rdx
+	movq	-96(%rbp), %rdx # end
+	movq	-128(%rbp), %rax # start
+	subq	%rax, %rdx # end - start
 	movq	%rdx, %rax
-	movq	%rax, -136(%rbp)
+	movq	%rax, -136(%rbp) # clocks
 	pxor	%xmm0, %xmm0
-	cvtsi2sdq	-136(%rbp), %xmm0
+	cvtsi2sdq	-136(%rbp), %xmm0 # clocks to double
 	pxor	%xmm1, %xmm1
 	cvtsi2sdq	-152(%rbp), %xmm1
-	divsd	%xmm1, %xmm0
-	movq	-24(%rbp), %rax
+	divsd	%xmm1, %xmm0 # clocks / clocks_per_sec;
+	movq	-24(%rbp), %rax # stack system check
 	xorq	%fs:40, %rax
 	je	.L75
 	jmp	.L77
@@ -945,7 +946,7 @@ _Z28MakeMeasurementAndGetTimeSecx:
 	.globl	_Z18WriteDoubleToTabledNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
 	.type	_Z18WriteDoubleToTabledNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE, @function
 _Z18WriteDoubleToTabledNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE:
-.LFB2134:
+.LFB2134: # В функции новых конструкций нет, в основном происходят вызовы с++ классов.
 	pushq	%rbp
 .LCFI49:
 	movq	%rsp, %rbp
@@ -953,8 +954,8 @@ _Z18WriteDoubleToTabledNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE:
 	pushq	%rbx
 	subq	$568, %rsp
 .LCFI51:
-	movsd	%xmm0, -552(%rbp)
-	movq	%rdi, -560(%rbp)
+	movsd	%xmm0, -552(%rbp) # double data
+	movq	%rdi, -560(%rbp) # string file_name
 	movq	%fs:40, %rax
 	movq	%rax, -24(%rbp)
 	xorl	%eax, %eax
@@ -1073,7 +1074,7 @@ _Z18WriteDoubleToTabledNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE:
 	.globl	_Z18WriteNewRowToTableNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
 	.type	_Z18WriteNewRowToTableNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE, @function
 _Z18WriteNewRowToTableNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE:
-.LFB2135:
+.LFB2135: # в функции происходит только работа с c++ функциями.
 	pushq	%rbp
 .LCFI53:
 	movq	%rsp, %rbp
@@ -1163,34 +1164,34 @@ _Z17CalculateIntegralx:
 	movq	%rsp, %rbp
 .LCFI58:
 	subq	$80, %rsp
-	movq	%rdi, -72(%rbp)
-	pxor	%xmm0, %xmm0
-	movsd	%xmm0, -32(%rbp)
+	movq	%rdi, -72(%rbp) # long long num_of_intervals
+	pxor	%xmm0, %xmm0 
+	movsd	%xmm0, -32(%rbp) # double a = 0
 	movsd	.LC5(%rip), %xmm0
-	movsd	%xmm0, -24(%rbp)
+	movsd	%xmm0, -24(%rbp) # double b = M_PI
 	movsd	-32(%rbp), %xmm0
-	movsd	%xmm0, -48(%rbp)
+	movsd	%xmm0, -48(%rbp) # x = a
 	pxor	%xmm0, %xmm0
-	cvtsi2sdq	-72(%rbp), %xmm0
+	cvtsi2sdq	-72(%rbp), %xmm0 # num_of_intervals --> convert to doble
 	movsd	.LC5(%rip), %xmm1
 	divsd	%xmm0, %xmm1
 	movapd	%xmm1, %xmm0
-	movsd	%xmm0, -16(%rbp)
+	movsd	%xmm0, -16(%rbp) # double step = M_PI / num_of_intervals;
 	pxor	%xmm0, %xmm0
-	movsd	%xmm0, -40(%rbp)
+	movsd	%xmm0, -40(%rbp) # sum = 0
 	movsd	-24(%rbp), %xmm0
-	subsd	-32(%rbp), %xmm0
+	subsd	-32(%rbp), %xmm0 # (b - a)
 	pxor	%xmm1, %xmm1
 	cvtsi2sdq	-72(%rbp), %xmm1
 	divsd	%xmm1, %xmm0
-	movsd	%xmm0, -8(%rbp)
-	movl	$0, -52(%rbp)
+	movsd	%xmm0, -8(%rbp) # double len_coeff = (b - a) / num_of_intervals;
+	movl	$0, -52(%rbp) # int i = 0
 .L92:
 	movl	-52(%rbp), %eax
 	cltq
-	cmpq	-72(%rbp), %rax
-	jge	.L91
-	movq	-48(%rbp), %rax
+	cmpq	-72(%rbp), %rax # i > num_of_intervals
+	jge	.L91 # do
+	movq	-48(%rbp), %rax # else
 	movq	%rax, -80(%rbp)
 	movsd	-80(%rbp), %xmm0
 	call	_Z12MathFunctiond
@@ -1205,9 +1206,9 @@ _Z17CalculateIntegralx:
 	addsd	%xmm1, %xmm0
 	movsd	%xmm0, -40(%rbp)
 	movsd	-48(%rbp), %xmm0
-	addsd	-16(%rbp), %xmm0
+	addsd	-16(%rbp), %xmm0 # x += step
 	movsd	%xmm0, -48(%rbp)
-	addl	$1, -52(%rbp)
+	addl	$1, -52(%rbp) # i++
 	jmp	.L92
 .L91:
 	movsd	-40(%rbp), %xmm0
@@ -1226,17 +1227,17 @@ _Z12MathFunctiond:
 	movq	%rsp, %rbp
 .LCFI61:
 	subq	$32, %rsp
-	movsd	%xmm0, -8(%rbp)
+	movsd	%xmm0, -8(%rbp) # double x --> -8(%rbp)
 	movq	-8(%rbp), %rax
 	movq	%rax, -16(%rbp)
 	movsd	-16(%rbp), %xmm0
-	call	sin
-	movsd	%xmm0, -16(%rbp)
-	movq	-8(%rbp), %rax
+	call	sin # sin(x)
+	movsd	%xmm0, -16(%rbp) # sin(x) ---> -16(%rbp)
+	movq	-8(%rbp), %rax 
 	movq	%rax, -24(%rbp)
 	movsd	-24(%rbp), %xmm0
-	call	exp
-	mulsd	-16(%rbp), %xmm0
+	call	exp # exp(x)
+	mulsd	-16(%rbp), %xmm0 # exp(x) * sin(x) ---> xmm0
 	leave
 .LCFI62:
 	ret
