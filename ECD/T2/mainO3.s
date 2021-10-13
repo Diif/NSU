@@ -1276,7 +1276,7 @@ _Z31MakeNMeasurementsAndPrintToFileii:
 	movsd	40(%rsp), %xmm0
 	movq	%rax, 80(%rsp)
 .L201:
-	movq	%rbx, %rdx
+	movq	%rbx, %rdx # инлайнинг
 	movq	%rbp, %rsi
 	movsd	%xmm0, 40(%rsp)
 	call	memcpy
@@ -1578,7 +1578,7 @@ _ZN9__gnu_cxx6__stoaIlicJiEEET0_PFT_PKT1_PPS3_DpT2_EPKcS5_PmS9_:
 	.type	main, @function
 main:
 .LFB2216:
-	pushq	%r13
+	pushq	%r13 # использует дополнительные регистры 
 .LCFI83:
 	pushq	%r12
 .LCFI84:
@@ -1586,15 +1586,15 @@ main:
 .LCFI85:
 	pushq	%rbx
 .LCFI86:
-	subq	$56, %rsp
+	subq	$56, %rsp # выделяет меньше памяти
 .LCFI87:
 	movq	%fs:40, %rax
 	movq	%rax, 40(%rsp)
 	xorl	%eax, %eax
-	cmpl	$1, %edi
-	jle	.L283
+	cmpl	$1, %edi # не перекладывает argc, argv, а сразу их использует
+	jle	.L283 # num_of_intervals = kNFor40Secs;
 	movq	%rsi, %r12
-	movq	8(%rsi), %rsi
+	movq	8(%rsi), %rsi # работает с регистрами, старается не обращаться в стек
 	movl	%edi, %ebp
 	movq	%rsp, %rdi
 .LEHB24:
@@ -1605,7 +1605,7 @@ main:
 	xorl	%ecx, %ecx
 	movl	$.LC19, %esi
 	movl	$strtol, %edi
-.LEHB25:
+.LEHB25: # использует иные функции, если посчитает нужным
 	call	_ZN9__gnu_cxx6__stoaIlicJiEEET0_PFT_PKT1_PPS3_DpT2_EPKcS5_PmS9_
 .LEHE25:
 	movq	(%rsp), %rdi
@@ -1617,7 +1617,7 @@ main:
 .L269:
 	testl	%ebx, %ebx
 	movl	$600000000, %eax
-	movl	$1, %r13d
+	movl	$1, %r13d # использует условные переходы
 	cmove	%eax, %ebx
 	cmpl	$3, %ebp
 	jle	.L297
@@ -1642,7 +1642,7 @@ main:
 	je	.L272
 	call	_ZdlPv
 .L272:
-	testl	%r13d, %r13d
+	testl	%r13d, %r13d # использует битовые операции вместо сравнения
 	je	.L273
 	movq	_ZL8kOutFile(%rip), %rsi
 	leaq	16(%rsp), %rax
@@ -1838,483 +1838,3 @@ _GLOBAL__sub_I_main:
 	.long	0
 	.long	1073741824
 	.section	.eh_frame,"a",@progbits
-.Lframe1:
-	.long	.LECIE1-.LSCIE1
-.LSCIE1:
-	.long	0
-	.byte	0x3
-	.string	"zPLR"
-	.uleb128 0x1
-	.sleb128 -8
-	.uleb128 0x10
-	.uleb128 0x7
-	.byte	0x3
-	.long	__gxx_personality_v0
-	.byte	0x3
-	.byte	0x3
-	.byte	0xc
-	.uleb128 0x7
-	.uleb128 0x8
-	.byte	0x90
-	.uleb128 0x1
-	.align 8
-.LECIE1:
-.LSFDE1:
-	.long	.LEFDE1-.LASFDE1
-.LASFDE1:
-	.long	.LASFDE1-.Lframe1
-	.long	.LFB2514
-	.long	.LFE2514-.LFB2514
-	.uleb128 0x4
-	.long	0
-	.byte	0x4
-	.long	.LCFI0-.LFB2514
-	.byte	0xe
-	.uleb128 0x10
-	.byte	0x8c
-	.uleb128 0x2
-	.byte	0x4
-	.long	.LCFI1-.LCFI0
-	.byte	0xe
-	.uleb128 0x18
-	.byte	0x86
-	.uleb128 0x3
-	.byte	0x4
-	.long	.LCFI2-.LCFI1
-	.byte	0xe
-	.uleb128 0x20
-	.byte	0x83
-	.uleb128 0x4
-	.byte	0x4
-	.long	.LCFI3-.LCFI2
-	.byte	0xe
-	.uleb128 0x30
-	.byte	0x4
-	.long	.LCFI4-.LCFI3
-	.byte	0xa
-	.byte	0xe
-	.uleb128 0x20
-	.byte	0x4
-	.long	.LCFI5-.LCFI4
-	.byte	0xe
-	.uleb128 0x18
-	.byte	0x4
-	.long	.LCFI6-.LCFI5
-	.byte	0xe
-	.uleb128 0x10
-	.byte	0x4
-	.long	.LCFI7-.LCFI6
-	.byte	0xe
-	.uleb128 0x8
-	.byte	0x4
-	.long	.LCFI8-.LCFI7
-	.byte	0xb
-	.align 8
-.LEFDE1:
-.LSFDE3:
-	.long	.LEFDE3-.LASFDE3
-.LASFDE3:
-	.long	.LASFDE3-.Lframe1
-	.long	.LFB2220
-	.long	.LFE2220-.LFB2220
-	.uleb128 0x4
-	.long	.LLSDA2220
-	.byte	0x4
-	.long	.LCFI15-.LFB2220
-	.byte	0xe
-	.uleb128 0x10
-	.byte	0x8c
-	.uleb128 0x2
-	.byte	0x4
-	.long	.LCFI16-.LCFI15
-	.byte	0xe
-	.uleb128 0x18
-	.byte	0x86
-	.uleb128 0x3
-	.byte	0x4
-	.long	.LCFI17-.LCFI16
-	.byte	0xe
-	.uleb128 0x20
-	.byte	0x83
-	.uleb128 0x4
-	.byte	0x4
-	.long	.LCFI18-.LCFI17
-	.byte	0xe
-	.uleb128 0x250
-	.byte	0x4
-	.long	.LCFI19-.LCFI18
-	.byte	0xa
-	.byte	0xe
-	.uleb128 0x20
-	.byte	0x4
-	.long	.LCFI20-.LCFI19
-	.byte	0xe
-	.uleb128 0x18
-	.byte	0x4
-	.long	.LCFI21-.LCFI20
-	.byte	0xe
-	.uleb128 0x10
-	.byte	0x4
-	.long	.LCFI22-.LCFI21
-	.byte	0xe
-	.uleb128 0x8
-	.byte	0x4
-	.long	.LCFI23-.LCFI22
-	.byte	0xb
-	.align 8
-.LEFDE3:
-.LSFDE5:
-	.long	.LEFDE5-.LASFDE5
-.LASFDE5:
-	.long	.LASFDE5-.Lframe1
-	.long	.LFB2219
-	.long	.LFE2219-.LFB2219
-	.uleb128 0x4
-	.long	.LLSDA2219
-	.byte	0x4
-	.long	.LCFI24-.LFB2219
-	.byte	0xe
-	.uleb128 0x10
-	.byte	0x8c
-	.uleb128 0x2
-	.byte	0x4
-	.long	.LCFI25-.LCFI24
-	.byte	0xe
-	.uleb128 0x18
-	.byte	0x86
-	.uleb128 0x3
-	.byte	0x4
-	.long	.LCFI26-.LCFI25
-	.byte	0xe
-	.uleb128 0x20
-	.byte	0x83
-	.uleb128 0x4
-	.byte	0x4
-	.long	.LCFI27-.LCFI26
-	.byte	0xe
-	.uleb128 0xd0
-	.byte	0x4
-	.long	.LCFI28-.LCFI27
-	.byte	0xa
-	.byte	0xe
-	.uleb128 0x20
-	.byte	0x4
-	.long	.LCFI29-.LCFI28
-	.byte	0xe
-	.uleb128 0x18
-	.byte	0x4
-	.long	.LCFI30-.LCFI29
-	.byte	0xe
-	.uleb128 0x10
-	.byte	0x4
-	.long	.LCFI31-.LCFI30
-	.byte	0xe
-	.uleb128 0x8
-	.byte	0x4
-	.long	.LCFI32-.LCFI31
-	.byte	0xb
-	.align 8
-.LEFDE5:
-.LSFDE7:
-	.long	.LEFDE7-.LASFDE7
-.LASFDE7:
-	.long	.LASFDE7-.Lframe1
-	.long	.LFB2221
-	.long	.LFE2221-.LFB2221
-	.uleb128 0x4
-	.long	.LLSDA2221
-	.byte	0x4
-	.long	.LCFI33-.LFB2221
-	.byte	0xe
-	.uleb128 0x10
-	.byte	0x8c
-	.uleb128 0x2
-	.byte	0x4
-	.long	.LCFI34-.LCFI33
-	.byte	0xe
-	.uleb128 0x18
-	.byte	0x86
-	.uleb128 0x3
-	.byte	0x4
-	.long	.LCFI35-.LCFI34
-	.byte	0xe
-	.uleb128 0x20
-	.byte	0x83
-	.uleb128 0x4
-	.byte	0x4
-	.long	.LCFI36-.LCFI35
-	.byte	0xe
-	.uleb128 0x230
-	.byte	0x4
-	.long	.LCFI37-.LCFI36
-	.byte	0xa
-	.byte	0xe
-	.uleb128 0x20
-	.byte	0x4
-	.long	.LCFI38-.LCFI37
-	.byte	0xe
-	.uleb128 0x18
-	.byte	0x4
-	.long	.LCFI39-.LCFI38
-	.byte	0xe
-	.uleb128 0x10
-	.byte	0x4
-	.long	.LCFI40-.LCFI39
-	.byte	0xe
-	.uleb128 0x8
-	.byte	0x4
-	.long	.LCFI41-.LCFI40
-	.byte	0xb
-	.align 8
-.LEFDE7:
-.LSFDE9:
-	.long	.LEFDE9-.LASFDE9
-.LASFDE9:
-	.long	.LASFDE9-.Lframe1
-	.long	.LFB2217
-	.long	.LFE2217-.LFB2217
-	.uleb128 0x4
-	.long	.LLSDA2217
-	.byte	0x4
-	.long	.LCFI42-.LFB2217
-	.byte	0xe
-	.uleb128 0x10
-	.byte	0x8c
-	.uleb128 0x2
-	.byte	0x4
-	.long	.LCFI43-.LCFI42
-	.byte	0xe
-	.uleb128 0x18
-	.byte	0x86
-	.uleb128 0x3
-	.byte	0x4
-	.long	.LCFI44-.LCFI43
-	.byte	0xe
-	.uleb128 0x20
-	.byte	0x83
-	.uleb128 0x4
-	.byte	0x4
-	.long	.LCFI45-.LCFI44
-	.byte	0xe
-	.uleb128 0xa0
-	.byte	0x4
-	.long	.LCFI46-.LCFI45
-	.byte	0xa
-	.byte	0xe
-	.uleb128 0x20
-	.byte	0x4
-	.long	.LCFI47-.LCFI46
-	.byte	0xe
-	.uleb128 0x18
-	.byte	0x4
-	.long	.LCFI48-.LCFI47
-	.byte	0xe
-	.uleb128 0x10
-	.byte	0x4
-	.long	.LCFI49-.LCFI48
-	.byte	0xe
-	.uleb128 0x8
-	.byte	0x4
-	.long	.LCFI50-.LCFI49
-	.byte	0xb
-	.align 8
-.LEFDE9:
-.LSFDE11:
-	.long	.LEFDE11-.LASFDE11
-.LASFDE11:
-	.long	.LASFDE11-.Lframe1
-	.long	.LFB2218
-	.long	.LFE2218-.LFB2218
-	.uleb128 0x4
-	.long	.LLSDA2218
-	.byte	0x4
-	.long	.LCFI51-.LFB2218
-	.byte	0xe
-	.uleb128 0x10
-	.byte	0x8c
-	.uleb128 0x2
-	.byte	0x4
-	.long	.LCFI52-.LCFI51
-	.byte	0xe
-	.uleb128 0x18
-	.byte	0x86
-	.uleb128 0x3
-	.byte	0x4
-	.long	.LCFI53-.LCFI52
-	.byte	0xe
-	.uleb128 0x20
-	.byte	0x83
-	.uleb128 0x4
-	.byte	0x4
-	.long	.LCFI54-.LCFI53
-	.byte	0xe
-	.uleb128 0xb0
-	.byte	0x4
-	.long	.LCFI55-.LCFI54
-	.byte	0xa
-	.byte	0xe
-	.uleb128 0x20
-	.byte	0x4
-	.long	.LCFI56-.LCFI55
-	.byte	0xe
-	.uleb128 0x18
-	.byte	0x4
-	.long	.LCFI57-.LCFI56
-	.byte	0xe
-	.uleb128 0x10
-	.byte	0x4
-	.long	.LCFI58-.LCFI57
-	.byte	0xe
-	.uleb128 0x8
-	.byte	0x4
-	.long	.LCFI59-.LCFI58
-	.byte	0xb
-	.align 8
-.LEFDE11:
-.LSFDE13:
-	.long	.LEFDE13-.LASFDE13
-.LASFDE13:
-	.long	.LASFDE13-.Lframe1
-	.long	.LFB2225
-	.long	.LFE2225-.LFB2225
-	.uleb128 0x4
-	.long	0
-	.byte	0x4
-	.long	.LCFI68-.LFB2225
-	.byte	0xe
-	.uleb128 0x10
-	.byte	0x8f
-	.uleb128 0x2
-	.byte	0x4
-	.long	.LCFI69-.LCFI68
-	.byte	0xe
-	.uleb128 0x18
-	.byte	0x8e
-	.uleb128 0x3
-	.byte	0x4
-	.long	.LCFI70-.LCFI69
-	.byte	0xe
-	.uleb128 0x20
-	.byte	0x8d
-	.uleb128 0x4
-	.byte	0x4
-	.long	.LCFI71-.LCFI70
-	.byte	0xe
-	.uleb128 0x28
-	.byte	0x8c
-	.uleb128 0x5
-	.byte	0x4
-	.long	.LCFI72-.LCFI71
-	.byte	0xe
-	.uleb128 0x30
-	.byte	0x86
-	.uleb128 0x6
-	.byte	0x4
-	.long	.LCFI73-.LCFI72
-	.byte	0xe
-	.uleb128 0x38
-	.byte	0x83
-	.uleb128 0x7
-	.byte	0x4
-	.long	.LCFI74-.LCFI73
-	.byte	0xe
-	.uleb128 0x50
-	.byte	0x4
-	.long	.LCFI75-.LCFI74
-	.byte	0xa
-	.byte	0xe
-	.uleb128 0x38
-	.byte	0x4
-	.long	.LCFI76-.LCFI75
-	.byte	0xe
-	.uleb128 0x30
-	.byte	0x4
-	.long	.LCFI77-.LCFI76
-	.byte	0xe
-	.uleb128 0x28
-	.byte	0x4
-	.long	.LCFI78-.LCFI77
-	.byte	0xe
-	.uleb128 0x20
-	.byte	0x4
-	.long	.LCFI79-.LCFI78
-	.byte	0xe
-	.uleb128 0x18
-	.byte	0x4
-	.long	.LCFI80-.LCFI79
-	.byte	0xe
-	.uleb128 0x10
-	.byte	0x4
-	.long	.LCFI81-.LCFI80
-	.byte	0xe
-	.uleb128 0x8
-	.byte	0x4
-	.long	.LCFI82-.LCFI81
-	.byte	0xb
-	.align 8
-.LEFDE13:
-.LSFDE15:
-	.long	.LEFDE15-.LASFDE15
-.LASFDE15:
-	.long	.LASFDE15-.Lframe1
-	.long	.LFB2216
-	.long	.LFE2216-.LFB2216
-	.uleb128 0x4
-	.long	.LLSDA2216
-	.byte	0x4
-	.long	.LCFI83-.LFB2216
-	.byte	0xe
-	.uleb128 0x10
-	.byte	0x8d
-	.uleb128 0x2
-	.byte	0x4
-	.long	.LCFI84-.LCFI83
-	.byte	0xe
-	.uleb128 0x18
-	.byte	0x8c
-	.uleb128 0x3
-	.byte	0x4
-	.long	.LCFI85-.LCFI84
-	.byte	0xe
-	.uleb128 0x20
-	.byte	0x86
-	.uleb128 0x4
-	.byte	0x4
-	.long	.LCFI86-.LCFI85
-	.byte	0xe
-	.uleb128 0x28
-	.byte	0x83
-	.uleb128 0x5
-	.byte	0x4
-	.long	.LCFI87-.LCFI86
-	.byte	0xe
-	.uleb128 0x60
-	.byte	0x4
-	.long	.LCFI88-.LCFI87
-	.byte	0xa
-	.byte	0xe
-	.uleb128 0x28
-	.byte	0x4
-	.long	.LCFI89-.LCFI88
-	.byte	0xe
-	.uleb128 0x20
-	.byte	0x4
-	.long	.LCFI90-.LCFI89
-	.byte	0xe
-	.uleb128 0x18
-	.byte	0x4
-	.long	.LCFI91-.LCFI90
-	.byte	0xe
-	.uleb128 0x10
-	.byte	0x4
-	.long	.LCFI92-.LCFI91
-	.byte	0xe
-	.uleb128 0x8
-	.byte	0x4
-	.long	.LCFI93-.LCFI92
-	.byte	0xb
-	.align 8
-.LEFDE15:
-	.hidden	__dso_handle
-	.ident	"GCC: (Ubuntu 5.5.0-12ubuntu1~16.04) 5.5.0 20171010"
-	.section	.note.GNU-stack,"",@progbits
