@@ -24,11 +24,16 @@ void WordReader::ReadWord() {
   }
   if (line_eof_reached_ == false) {
     cur_word_ = "";
-    std::getline(line_stream_, cur_word_, ' ');
+    std::regex rgx("\\s+");
+    std::sregex_token_iterator iter(cur_line.begin(), cur_line.end(), rgx, -1);
+    cur_word_ = (*iter);
     if (cur_word_.empty() == false) {
+      iter++;
+      cur_line += cur_word_.length();
       IncreaseTotalWordsCount();
     }
-    if (line_stream_.eof()) {
+    std::sregex_token_iterator end;
+    if (iter == end) {
       line_eof_reached_ = true;
     }
   }

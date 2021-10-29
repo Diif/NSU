@@ -21,11 +21,10 @@ void WriteCSVToFile(WordReader* reader, list<pair<int, string>>* item_list,
                     string* output_file_name);
 
 int main(int argc, char** argv) {
-  ValidateArgCount(argc);
+  // ValidateArgCount(argc);
 
-  string file_name(argv[1]);
-  string input_file_name(argv[1]);
-  string output_file_name(argv[2]);
+  string input_file_name = "input.txt";  //(argv[1]);
+  string output_file_name = "out.csv";   //(argv[2]);
   WordReader reader;
 
   ValidateFile(reader.GetFilePointer());
@@ -99,6 +98,7 @@ list<pair<int, string>>* GetSortedListFromMap(map<string, int>* words_freq) {
 
 void FillMapFromFile(WordReader* reader, map<string, int>* word_freq) {
   reader->ReadWord();
+
   while (!reader->WasTextEndFound()) {
     ProcessMapWithWord(word_freq, reader->GetCurrentWord());
     reader->ReadWord();

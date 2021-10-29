@@ -2,6 +2,7 @@
 #define OOP_T0_0B_INCLUDE_SOLUTION_H_
 #include <fstream>
 #include <map>
+#include <regex>
 #include <sstream>
 #include <string>
 

@@ -1,12 +1,12 @@
 [
 {
   "directory": "C:/Users/kiwul/Documents/projects/NSU/OOP/T0/0b/build",
-  "command": "C:\\PROGRA~1\\MINGW-~1\\X86_64~1.0-P\\mingw64\\bin\\X86_64~2.EXE  @CMakeFiles/task1.dir/includes_CXX.rsp -O3 -DNDEBUG -o CMakeFiles\\task1.dir\\main.cpp.obj -c C:\\Users\\kiwul\\Documents\\projects\\NSU\\OOP\\T0\\0b\\main.cpp",
+  "command": "C:\\PROGRA~1\\MINGW-~1\\X86_64~1.0-P\\mingw64\\bin\\X86_64~2.EXE  @CMakeFiles/task1.dir/includes_CXX.rsp -g -o CMakeFiles\\task1.dir\\main.cpp.obj -c C:\\Users\\kiwul\\Documents\\projects\\NSU\\OOP\\T0\\0b\\main.cpp",
   "file": "C:/Users/kiwul/Documents/projects/NSU/OOP/T0/0b/main.cpp"
 },
 {
   "directory": "C:/Users/kiwul/Documents/projects/NSU/OOP/T0/0b/build",
-  "command": "C:\\PROGRA~1\\MINGW-~1\\X86_64~1.0-P\\mingw64\\bin\\X86_64~2.EXE  @CMakeFiles/task1.dir/includes_CXX.rsp -O3 -DNDEBUG -o CMakeFiles\\task1.dir\\src\\solution.cpp.obj -c C:\\Users\\kiwul\\Documents\\projects\\NSU\\OOP\\T0\\0b\\src\\solution.cpp",
+  "command": "C:\\PROGRA~1\\MINGW-~1\\X86_64~1.0-P\\mingw64\\bin\\X86_64~2.EXE  @CMakeFiles/task1.dir/includes_CXX.rsp -g -o CMakeFiles\\task1.dir\\src\\solution.cpp.obj -c C:\\Users\\kiwul\\Documents\\projects\\NSU\\OOP\\T0\\0b\\src\\solution.cpp",
   "file": "C:/Users/kiwul/Documents/projects/NSU/OOP/T0/0b/src/solution.cpp"
 }
 ]
