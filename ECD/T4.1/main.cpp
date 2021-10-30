@@ -55,12 +55,16 @@ void printdev(libusb_device *dev) {
     return;
   }
   r = libusb_open(dev, &dev_handle);
+  if (r != 0) {
+    fprintf(stderr, "Не удалось открыть USB device: %d.\n", r);
+    return;
+  }
   r = libusb_get_string_descriptor_ascii(dev_handle, desc.iSerialNumber, serial,
                                          20);
-  //if (r < 0) {
-  //  fprintf(stderr, "Не удалось открыть USB device: %d.\n", r);
-//    return;
-//  }
+  if (r <=) {
+    fprintf(stderr, "Не удалось получить номер USB device: %d.\n", r);
+    return;
+  }
   string device_class, id_vendor, id_product;
   device_class += to_string((int)desc.bDeviceClass);
   id_vendor += to_string(desc.idVendor);
@@ -75,9 +79,9 @@ void printdev(libusb_device *dev) {
   if (id_product.length() < title2_and3_len) {
     id_product += string(title2_and3_len - id_product.length(), ' ');
   }
-  cout << device_class << '|' << id_vendor << '|' << id_product << '|' ;
-printf("%s", serial);
-cout << endl;
+  cout << device_class << '|' << id_vendor << '|' << id_product << '|';
+  printf("%s", serial);
+  cout << endl;
   libusb_close(dev_handle);
   // printf("%.2d %.4d %.4d  |  |  |  |\n", (int)desc.bDeviceClass,
   // desc.idVendor,
