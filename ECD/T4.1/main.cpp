@@ -28,36 +28,13 @@ int main() {
     fprintf(stderr, "Ошибка: список USB устройств не получен.\n", return_value);
     return 1;
   }
-  printf("найдено устройств: %d\n", cnt);
-  printf(
-      "=============================="
-      "=============================\n");
-  printf("* количество возможных конфигураций\n");
-  printf("|  * класс устройства\n");
-  printf("|  |  * идентификатор производителя\n");
-  printf("|  |  |    * идентификатор устройства\n");
-  printf("|  |  |    |    * количество интерфейсов\n");
-  printf(
-      "|  |  |    |    |   * количество "
-      "альтернативных настроек\n");
-  printf("|  |  |    |    |   |  *  класс устройства\n");
-  printf("|  |  |    |    |   |  |  * номер интерфейса\n");
-  printf(
-      "|  |  |    |    |   |  |  |  * количество "
-      "конечных точек\n");
-  printf("|  |  |    |    |   |  |  |  |  * тип дескриптора\n");
-  printf(
-      "|  |  |    |    |   |  |  |  |  |  * адрес "
-      "конечной точки\n");
-  printf(
-      "+--+--+----+----+---+--+--+--+"
-      "--+--+----------------------\n");
+  // 6 10 10
+  printf("Class |Vendor ID |Product ID\n");
+
   for (i = 0; i < cnt; i++) {  // цикл перебора всех устройств
     printdev(devs[i]);  // печать параметров устройства
   }
-  printf(
-      "=============================="
-      "=============================\n");
+
   // освободить память, выделенную функцией получения списка устройств
   libusb_free_device_list(devs, 1);
   libusb_exit(ctx);  // завершить работу с библиотекой libusb,
@@ -66,41 +43,29 @@ int main() {
 }
 
 void printdev(libusb_device *dev) {
+  int title1_len = 6;
+  int title2_and3_len = 10;
   libusb_device_descriptor desc;  // дескриптор устройства
-  libusb_config_descriptor *config;  // дескриптор конфигурации объекта
-  const libusb_interface *inter;
-  const libusb_interface_descriptor *interdesc;
-  const libusb_endpoint_descriptor *epdesc;
   int r = libusb_get_device_descriptor(dev, &desc);
   if (r < 0) {
     fprintf(stderr, "Ошибка: дескриптор устройства не получен, код: %d.\n", r);
     return;
   }
-  // получить конфигурацию устройства
-  libusb_get_config_descriptor(dev, 0, &config);
-  printf("%.2d %.2d %.4d %.4d %.3d |  |  |  |  |  |\n",
-         (int)desc.bNumConfigurations, (int)desc.bDeviceClass, desc.idVendor,
-         desc.idProduct, (int)config->bNumInterfaces);
-  for (int i = 0; i < (int)config->bNumInterfaces; i++) {
-    inter = &config->interface[i];
-    printf(
-        "|  |  |    |    |   "
-        "%.2d %.2d |  |  |  |\n",
-        inter->num_altsetting, (int)desc.bDeviceClass);
-    for (int j = 0; j < inter->num_altsetting; j++) {
-      interdesc = &inter->altsetting[j];
-      printf(
-          "|  |  |    |    |   |  |  "
-          "%.2d %.2d |  |\n",
-          (int)interdesc->bInterfaceNumber, (int)interdesc->bNumEndpoints);
-      for (int k = 0; k < (int)interdesc->bNumEndpoints; k++) {
-        epdesc = &interdesc->endpoint[k];
-        printf(
-            "|  |  |    |    |   |  |  |  |  "
-            "%.2d %.9d\n",
-            (int)epdesc->bDescriptorType, (int)(int)epdesc->bEndpointAddress);
-      }
-    }
+  string device_class, id_vendor, id_product;
+  device_class += (int)desc.bDeviceClass;
+  id_vendor += desc.idVendor;
+  id_product += desc.idProduct;
+  if (device_class.length() < title1_len) {
+    device_class += title1_len - device_class.length();
   }
-  libusb_free_config_descriptor(config);
+  if (id_vendor.length() < title2_and3_len) {
+    id_vendor += title2_and3_len - id_vendor.length();
+  }
+  if (id_product.length() < title2_and3_len) {
+    id_product += title2_and3_len - id_product.length();
+  }
+  cout << device_class << '|' << id_vendor << '|' << id_product;
+  // printf("%.2d %.4d %.4d  |  |  |  |\n", (int)desc.bDeviceClass,
+  // desc.idVendor,
+  //  desc.idProduct);
 }
