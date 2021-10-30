@@ -2,6 +2,11 @@
 #include <stdio.h>
 
 #include <iostream>
+#define TITLE1_LEN 6
+#define TITLE3_LEN 7
+#define TITLE2_LEN 10
+#define TITLE3_LEN 15
+#define TITLE4_LEN 50
 
 using namespace std;
 void printdev(libusb_device *dev);
@@ -29,7 +34,7 @@ int main() {
     return 1;
   }
   // 6 10 10
-  printf("Class |Vendor ID |Product ID\n");
+  printf("Class |Vendor ID |Product ID     |Serial num     |Manufacturer\n");
 
   for (i = 0; i < cnt; i++) {  // цикл перебора всех устройств
     printdev(devs[i]);  // печать параметров устройства
@@ -43,47 +48,53 @@ int main() {
 }
 
 void printdev(libusb_device *dev) {
-  int title1_len = 6;
-  int title2_and3_len = 10;
   libusb_device_descriptor desc;  // дескриптор устройства
   libusb_device_handle *dev_handle;
   unsigned char serial[20] = {0};
+  char *serial_ptr = (char *)(&(*serial));
+  unsigned char manufacturer[50] = {0};
+  char *man_ptr = (char *)(&(*manufacturer));
   int r = libusb_get_device_descriptor(dev, &desc);
   if (r < 0) {
     fprintf(stderr, "Ошибка: дескриптор устройства не получен, код: %d.\n", r);
     return;
   }
+
   r = libusb_open(dev, &dev_handle);
   if (r != 0) {
     fprintf(stderr, "Не удалось открыть USB device: %d.\n", r);
     return;
   }
+  r = libusb_get_string_descriptor_ascii(dev_handle, desc.iManufacturer,
+                                         manufacturer, 50);
+
   r = libusb_get_string_descriptor_ascii(dev_handle, desc.iSerialNumber, serial,
                                          20);
-  if (r <= 0) {
-    // fprintf(stderr, "Не удалось получить номер USB device: %d.\n", r);
-    // r = libusb_open(dev, &dev_handle);
-    // return;
-  }
-  string device_class, id_vendor, id_product;
+  string device_class, id_vendor, id_product, serial_num, manufacturer_str;
   device_class += to_string((int)desc.bDeviceClass);
   id_vendor += to_string(desc.idVendor);
   id_product += to_string(desc.idProduct);
+  serial_num += serial_ptr;
+  manufacturer_str += man_ptr;
 
-  if (device_class.length() < title1_len) {
-    device_class += string(title1_len - device_class.length(), ' ');
+  if (device_class.length() < TITLE1_LEN) {
+    device_class += string(TITLE1_LEN - device_class.length(), ' ');
   }
-  if (id_vendor.length() < title2_and3_len) {
-    id_vendor += string(title2_and3_len - id_vendor.length(), ' ');
+  if (id_vendor.length() < TITLE2_LEN) {
+    id_vendor += string(TITLE2_LEN - id_vendor.length(), ' ');
   }
-  if (id_product.length() < title2_and3_len) {
-    id_product += string(title2_and3_len - id_product.length(), ' ');
+  if (id_product.length() < TITLE3_LEN) {
+    id_product += string(TITLE3_LEN - id_product.length(), ' ');
   }
-  cout << device_class << '|' << id_vendor << '|' << id_product << '|';
-  printf("%s", serial);
+  if (serial_num.length() < TITLE3_LEN) {
+    serial_num += string(TITLE3_LEN - serial_num.length(), ' ');
+  }
+  if (manufacturer_str.length() < TITLE4_LEN) {
+    manufacturer_str += string(TITLE4_LEN - manufacturer_str.length(), ' ');
+  }
+
+  cout << device_class << '|' << id_vendor << '|' << id_product << '|'
+       << serial_num << '|' << manufacturer_str;
   cout << endl;
   libusb_close(dev_handle);
-  // printf("%.2d %.4d %.4d  |  |  |  |\n", (int)desc.bDeviceClass,
-  // desc.idVendor,
-  //  desc.idProduct);
 }
