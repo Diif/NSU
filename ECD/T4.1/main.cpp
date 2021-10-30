@@ -75,7 +75,9 @@ void printdev(libusb_device *dev) {
   if (id_product.length() < title2_and3_len) {
     id_product += title2_and3_len - id_product.length();
   }
-  cout << device_class << '|' << id_vendor << '|' << id_product < < < < endl;
+  cout << device_class << '|' << id_vendor << '|' << id_product << '|' << serial
+       << endl;
+  libusb_close(dev_handle);
   // printf("%.2d %.4d %.4d  |  |  |  |\n", (int)desc.bDeviceClass,
   // desc.idVendor,
   //  desc.idProduct);
