@@ -61,10 +61,6 @@ void printdev(libusb_device *dev) {
   }
 
   r = libusb_open(dev, &dev_handle);
-  if (r != 0) {
-    fprintf(stderr, "Не удалось открыть USB device: %d.\n", r);
-    return;
-  }
   r = libusb_get_string_descriptor_ascii(dev_handle, desc.iManufacturer,
                                          manufacturer, 50);
 
