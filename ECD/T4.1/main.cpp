@@ -47,8 +47,7 @@ void printdev(libusb_device *dev) {
   int title2_and3_len = 10;
   libusb_device_descriptor desc;  // дескриптор устройства
   libusb_device_handle *dev_handle;
-  unsigned char serial[20];
-
+  unsigned char serial[20] = {0};
   int r = libusb_get_device_descriptor(dev, &desc);
   if (r < 0) {
     fprintf(stderr, "Ошибка: дескриптор устройства не получен, код: %d.\n", r);
@@ -61,9 +60,10 @@ void printdev(libusb_device *dev) {
   }
   r = libusb_get_string_descriptor_ascii(dev_handle, desc.iSerialNumber, serial,
                                          20);
-  if (r <=) {
-    fprintf(stderr, "Не удалось получить номер USB device: %d.\n", r);
-    return;
+  if (r <= 0) {
+    // fprintf(stderr, "Не удалось получить номер USB device: %d.\n", r);
+    // r = libusb_open(dev, &dev_handle);
+    // return;
   }
   string device_class, id_vendor, id_product;
   device_class += to_string((int)desc.bDeviceClass);
