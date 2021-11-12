@@ -33,11 +33,12 @@ _Z5func1PdS_:
 	#movsd	.LC2(%rip), %xmm1 # const3 --> xmm1
 	subsd	.LC2(%rip), %xmm0 # xmm0 - xmm1;
 	movsd	%xmm0, (%rbx) # v1[i*8] = result
-	movq	%r12, %rax # i--> eax
+	#movq	%r12, %rax # i--> eax
 	#cltq
-	leaq	0(,%rax,8), %rdx # i * 8 --> rdx
-	movq	-48(%rbp), %rax # v2[0] -->rax
-	leaq	(%rdx,%rax), %rbx # rbx = rax + rdx
+	leaq	0(,%r12,8), %rbx # i * 8 --> rdx
+	#movq	-48(%rbp), %rax # v2[0] -->rax
+	addq	-48(%rbp), %rbx
+	#leaq	(%rdx,%rax), %rbx # rbx = rax + rdx
 	call	rand
 	pxor	%xmm0, %xmm0
 	cvtsi2sd	%eax, %xmm0
