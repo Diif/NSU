@@ -73,12 +73,12 @@ _Z5func2PdS_:
 	movq	%rsi, -32(%rbp) # v2 -> -32
 	pxor	%xmm0, %xmm0
 	movsd	%xmm0, -8(%rbp) # k = 0 -> -8rbp
-	movl	$0, -12(%rbp) # int i = 0
+	movq	$0, %r12 # int i = 0
 .L7:
-	cmpl	$49999999, -12(%rbp)
+	cmpq	$49999999, %r12
 	jg	.L6 # if i <= 49999999
-	movl	-12(%rbp), %eax
-	cltq
+	movq	%r12, %rax
+	#cltq
 	leaq	0(,%rax,8), %rdx # rdx = i * 8
 	movq	-24(%rbp), %rax # rax = v1
 	addq	%rdx, %rax # rax = v1 + i*8
@@ -90,8 +90,8 @@ _Z5func2PdS_:
 	movsd	.LC4(%rip), %xmm0 # const1 -> xmm0
 	mulsd	%xmm0, %xmm1 # xmm1 = const1 * xmm1
 	movsd	%xmm1, -40(%rbp) # xmm1 -> -40rbp, -40rbp = sin(v1[i*8]) * const1
-	movl	-12(%rbp), %eax  # eax = i
-	cltq
+	movq	%r12, %rax  # eax = i
+	#cltq
 	leaq	0(,%rax,8), %rdx # rdx = i * 8
 	movq	-32(%rbp), %rax # rax = v2
 	addq	%rdx, %rax # rdx = v2 + i * 8
@@ -103,7 +103,7 @@ _Z5func2PdS_:
 	movsd	-8(%rbp), %xmm1 # xmm1 = k
 	addsd	%xmm1, %xmm0 # xmm0 = xmm0 + k
 	movsd	%xmm0, -8(%rbp) # k = k + xmm0
-	addl	$1, -12(%rbp) # i++
+	addq	$1, %r12 # i++
 	jmp	.L7
 .L6:
 	movsd	-8(%rbp), %xmm0 # return k
