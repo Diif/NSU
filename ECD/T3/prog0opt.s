@@ -20,7 +20,7 @@ _Z5func1PdS_:
 	movq	%r12, %rax # do i --> eax
 	#cltq # convert long to quad
 	leaq	0(,%rax,8), %rdx # rdx = i * 8
-	#movq	-40(%rbp), %rax #  в rax кладет v1
+	movq	-40(%rbp), %rax #  в rax кладет v1
 	addq	-40(%rbp), %rdx #
 	#leaq	(%rdx,%rax), %rbx # rbx = rdx + rax, rbx = v1[i*8]
 	call	rand # берет случайное число, но т.к. зерна нет, то исход один
