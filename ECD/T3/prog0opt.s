@@ -17,36 +17,22 @@ _Z5func1PdS_:
 .L3:
 	cmpq	$49999999, %r12
 	jg	.L2 # if i < 49999999
-	#movq	%r12, %rax # do i --> eax
-	#cltq # convert long to quad
 	leaq	0(,%r12,8), %rbx # rdx = i * 8
-	#movq	-40(%rbp), %rax #  в rax кладет v1
 	addq	-40(%rbp), %rbx #
-	#leaq	(%rdx,%rax), %rbx # rbx = rdx + rax, rbx = v1[i*8]
 	call	rand # берет случайное число, но т.к. зерна нет, то исход один
 	pxor	%xmm0, %xmm0 # v1[i*8] = rand() * const1 / const 2 - const 3
 	cvtsi2sd	%eax, %xmm0 # convert eax to double
-	#movsd	.LC0(%rip), %xmm1 # const1 -> xmm1
 	mulsd	.LC0(%rip), %xmm0 # xmm1 * xmm0
-	#movsd	.LC1(%rip), %xmm1 # const2 --> xmm1
 	divsd	.LC1(%rip), %xmm0 # xmm0 / xmm1
-	#movsd	.LC2(%rip), %xmm1 # const3 --> xmm1
 	subsd	.LC2(%rip), %xmm0 # xmm0 - xmm1;
 	movsd	%xmm0, (%rbx) # v1[i*8] = result
-	#movq	%r12, %rax # i--> eax
-	#cltq
 	leaq	0(,%r12,8), %rbx # i * 8 --> rdx
-	#movq	-48(%rbp), %rax # v2[0] -->rax
 	addq	-48(%rbp), %rbx
-	#leaq	(%rdx,%rax), %rbx # rbx = rax + rdx
 	call	rand
 	pxor	%xmm0, %xmm0
 	cvtsi2sd	%eax, %xmm0
-	#movsd	.LC0(%rip), %xmm1
 	mulsd	.LC0(%rip), %xmm0
-	#movsd	.LC1(%rip), %xmm1
 	divsd	.LC1(%rip), %xmm0
-	#movsd	.LC2(%rip), %xmm1
 	subsd	.LC2(%rip), %xmm0
 	movsd	%xmm0, (%rbx)
 	addq	$1, %r12 # i++
@@ -71,36 +57,18 @@ _Z5func2PdS_:
 	subq	$48, %rsp
 	movq	%rdi, -24(%rbp) # v1 -> -24
 	movq	%rsi, -32(%rbp) # v2 -> -32
-	#pxor	%xmm0, %xmm0
-	#movsd	%xmm0, -8(%rbp) # k = 0 -> -8rbp
 	movq	$0, %r12 # int i = 0
 	movq	%r12, -8(%rbp)
 .L7:
 	cmpq	$49999999, %r12
 	jg	.L6 # if i <= 49999999
-	movq	%r12, %rax
-	#cltq
-	leaq	0(,%rax,8), %rdx # rdx = i * 8
+	leaq	0(,%r12,8), %rdx # rdx = i * 8
 	addq	-24(%rbp), %rdx
-	#movq	-24(%rbp), %rax # rax = v1
-	#addq	%rdx, %rax # rax = v1 + i*8
-	#movq	(%rax), %rax # rax = v1[i*8]
-	#movq	%rax, -40(%rbp) # -40rbp = v1[i*8]
-	#movsd	-40(%rbp), %xmm0 # v1[i*8] -> xmm0
 	movsd	(%rdx), %xmm0
 	call	sin # sin(v1[i*8])
-	#movapd	%xmm0, %xmm1 # copy xmm0 -> xmm1
-	#movsd	.LC4(%rip), %xmm0 # const1 -> xmm0
 	mulsd	.LC4(%rip), %xmm0 # xmm1 = const1 * xmm1
 	movsd	%xmm0, -40(%rbp) # xmm1 -> -40rbp, -40rbp = sin(v1[i*8]) * const1
-	#movq	%r12, %rax  # eax = i
-	#cltq
 	leaq	0(,%r12,8), %rdx # rdx = i * 8
-	#movq	-32(%rbp), %rax # rax = v2
-	#addq	%rdx, %rax # rdx = v2 + i * 8
-	#movq	(%rax), %rax # rax = v2[i*8]
-	#movq	%rax, -48(%rbp) # v2[i*8] -> -48rbp
-	#movsd	-48(%rbp), %xmm0
 	addq	-32(%rbp), %rdx
 	movsd	(%rdx), %xmm0
 	call	cos # cos(v2[i*8])
@@ -131,8 +99,6 @@ main:
 	movq	%rsp, %rbp
 .LCFI8:
 	subq	$48, %rsp
-	#pxor	%xmm0, %xmm0
-	#movsd	%xmm0, -24(%rbp) # -24(%rbp) = 0
 	movl	$400000000, %edi
 	call	_Znam # new 
 	movq	%rax, -16(%rbp) # double v1 = new double[400000000] --> -16rbp
@@ -149,11 +115,6 @@ main:
 	movq	%rdx, %rsi # v2 -> rsi
 	movq	%rax, %rdi # v1 -> rdi
 	call	_Z5func2PdS_ # get k
-	#movq	%xmm0, %rax
-	#movq	%rax, -24(%rbp) # -24rbp = fun2 = k
-	#movq	-24(%rbp), %rax # -24rbp -> rax
-	#movq	%rax, -40(%rbp) # double m = k
-	#movsd	-40(%rbp), %xmm0
 	movl	$.LC5, %edi
 	movl	$1, %eax
 	call	printf #printf("\n\n result = %lf", m);

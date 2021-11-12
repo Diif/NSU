@@ -78,9 +78,9 @@ _Z5func2PdS_:
 .L7:
 	cmpq	$49999999, %r12
 	jg	.L6 # if i <= 49999999
-	movq	%r12, %rax
+	#movq	%r12, %rax
 	#cltq
-	leaq	0(,%rax,8), %rdx # rdx = i * 8
+	leaq	0(,%r12,8), %rdx # rdx = i * 8
 	addq	-24(%rbp), %rdx
 	#movq	-24(%rbp), %rax # rax = v1
 	#addq	%rdx, %rax # rax = v1 + i*8
