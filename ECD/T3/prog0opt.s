@@ -106,9 +106,10 @@ _Z5func2PdS_:
 	call	cos # cos(v2[i*8])
 	mulsd	-40(%rbp), %xmm0 # xmm0 = cos(v2[i*8]) * sin(v1[i*8]) * const1
 	#movsd	-8(%rbp), %xmm1 # xmm1 = k
+	movsd	%xmm0, %rax
 	#addsd	%xmm1, %xmm0 # xmm0 = xmm0 + k
-	addsd	%xmm0,  -8(%rbp)# xmm0 = xmm0 + k
 	#movsd	%xmm0, -8(%rbp) # k = k + xmm0
+	addq	%rax, -8(%rbp)
 	addq	$1, %r12 # i++
 	jmp	.L7
 .L6:
