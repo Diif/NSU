@@ -71,20 +71,23 @@ _Z5func2PdS_:
 	subq	$48, %rsp
 	movq	%rdi, -24(%rbp) # v1 -> -24
 	movq	%rsi, -32(%rbp) # v2 -> -32
-	pxor	%xmm0, %xmm0
-	movsd	%xmm0, -8(%rbp) # k = 0 -> -8rbp
+	#pxor	%xmm0, %xmm0
+	#movsd	%xmm0, -8(%rbp) # k = 0 -> -8rbp
 	movq	$0, %r12 # int i = 0
+	movq	%r12, -8(%rbp)
 .L7:
 	cmpq	$49999999, %r12
 	jg	.L6 # if i <= 49999999
 	movq	%r12, %rax
 	#cltq
 	leaq	0(,%rax,8), %rdx # rdx = i * 8
-	movq	-24(%rbp), %rax # rax = v1
-	addq	%rdx, %rax # rax = v1 + i*8
-	movq	(%rax), %rax # rax = v1[i*8]
-	movq	%rax, -40(%rbp) # -40rbp = v1[i*8]
-	movsd	-40(%rbp), %xmm0 # v1[i*8] -> xmm0
+	addq	-24(%rbp), %rdx
+	#movq	-24(%rbp), %rax # rax = v1
+	#addq	%rdx, %rax # rax = v1 + i*8
+	#movq	(%rax), %rax # rax = v1[i*8]
+	#movq	%rax, -40(%rbp) # -40rbp = v1[i*8]
+	#movsd	-40(%rbp), %xmm0 # v1[i*8] -> xmm0
+	movsd	(%rdx), %xmm0
 	call	sin # sin(v1[i*8])
 	movapd	%xmm0, %xmm1 # copy xmm0 -> xmm1
 	movsd	.LC4(%rip), %xmm0 # const1 -> xmm0
@@ -125,8 +128,8 @@ main:
 	movq	%rsp, %rbp
 .LCFI8:
 	subq	$48, %rsp
-	pxor	%xmm0, %xmm0
-	movsd	%xmm0, -24(%rbp) # -24(%rbp) = 0
+	#pxor	%xmm0, %xmm0
+	#movsd	%xmm0, -24(%rbp) # -24(%rbp) = 0
 	movl	$400000000, %edi
 	call	_Znam # new 
 	movq	%rax, -16(%rbp) # double v1 = new double[400000000] --> -16rbp
@@ -143,11 +146,11 @@ main:
 	movq	%rdx, %rsi # v2 -> rsi
 	movq	%rax, %rdi # v1 -> rdi
 	call	_Z5func2PdS_ # get k
-	movq	%xmm0, %rax
-	movq	%rax, -24(%rbp) # -24rbp = fun2 = k
-	movq	-24(%rbp), %rax # -24rbp -> rax
-	movq	%rax, -40(%rbp) # double m = k
-	movsd	-40(%rbp), %xmm0
+	#movq	%xmm0, %rax
+	#movq	%rax, -24(%rbp) # -24rbp = fun2 = k
+	#movq	-24(%rbp), %rax # -24rbp -> rax
+	#movq	%rax, -40(%rbp) # double m = k
+	#movsd	-40(%rbp), %xmm0
 	movl	$.LC5, %edi
 	movl	$1, %eax
 	call	printf #printf("\n\n result = %lf", m);
