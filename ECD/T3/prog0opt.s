@@ -13,12 +13,12 @@ _Z5func1PdS_:
 .LCFI2:
 	movq	%rdi, -40(%rbp) # double* v1 --> -40rbp
 	movq	%rsi, -48(%rbp) # double* v2 --> -48rbp
-	movl	$0, -20(%rbp) # int i = 0 ---> -20rbp
+	movl	$0, %r12 # int i = 0 ---> -20rbp
 .L3:
-	cmpl	$49999999, -20(%rbp)
+	cmpl	$49999999, %r12
 	jg	.L2 # if i < 49999999
-	movl	-20(%rbp), %eax # do i --> eax
-	cltq # convert long to quad
+	movl	%r12, %rax # do i --> eax
+	#cltq # convert long to quad
 	leaq	0(,%rax,8), %rdx # rdx = i * 8
 	movq	-40(%rbp), %rax #  в rax кладет v1[0]
 	leaq	(%rdx,%rax), %rbx # rbx = rdx + rax, rbx = v1[i*8]
@@ -32,8 +32,8 @@ _Z5func1PdS_:
 	movsd	.LC2(%rip), %xmm1 # const3 --> xmm1
 	subsd	%xmm1, %xmm0 # xmm0 - xmm1;
 	movsd	%xmm0, (%rbx) # v1[i*8] = result
-	movl	-20(%rbp), %eax # i--> eax
-	cltq
+	movl	%r12, %rax # i--> eax
+	#cltq
 	leaq	0(,%rax,8), %rdx # i * 8 --> rdx
 	movq	-48(%rbp), %rax # v2[0] -->rax
 	leaq	(%rdx,%rax), %rbx # rbx = rax + rdx
@@ -47,7 +47,7 @@ _Z5func1PdS_:
 	movsd	.LC2(%rip), %xmm1
 	subsd	%xmm1, %xmm0
 	movsd	%xmm0, (%rbx)
-	addl	$1, -20(%rbp) # i++
+	addl	$1, %r12 # i++
 	jmp	.L3
 .L2: # else
 	movl	$0, %eax
