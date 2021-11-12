@@ -89,10 +89,10 @@ _Z5func2PdS_:
 	#movsd	-40(%rbp), %xmm0 # v1[i*8] -> xmm0
 	movsd	(%rdx), %xmm0
 	call	sin # sin(v1[i*8])
-	movapd	%xmm0, %xmm1 # copy xmm0 -> xmm1
-	movsd	.LC4(%rip), %xmm0 # const1 -> xmm0
-	mulsd	%xmm0, %xmm1 # xmm1 = const1 * xmm1
-	movsd	%xmm1, -40(%rbp) # xmm1 -> -40rbp, -40rbp = sin(v1[i*8]) * const1
+	#movapd	%xmm0, %xmm1 # copy xmm0 -> xmm1
+	#movsd	.LC4(%rip), %xmm0 # const1 -> xmm0
+	mulsd	.LC4(%rip), %xmm0 # xmm1 = const1 * xmm1
+	movsd	%xmm0, -40(%rbp) # xmm1 -> -40rbp, -40rbp = sin(v1[i*8]) * const1
 	movq	%r12, %rax  # eax = i
 	#cltq
 	leaq	0(,%rax,8), %rdx # rdx = i * 8
