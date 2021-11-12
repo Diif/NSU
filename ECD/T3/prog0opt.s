@@ -47,7 +47,7 @@ _Z5func1PdS_:
 	#movsd	.LC1(%rip), %xmm1
 	divsd	.LC1(%rip), %xmm0
 	#movsd	.LC2(%rip), %xmm1
-	#subsd	.LC2(%rip), %xmm0
+	subsd	.LC2(%rip), %xmm0
 	movsd	%xmm0, (%rbx)
 	addq	$1, %r12 # i++
 	jmp	.L3
