@@ -17,12 +17,12 @@ _Z5func1PdS_:
 .L3:
 	cmpl	$49999999, -20(%rbp)
 	jg	.L2 # if i < 49999999
-	# movl	-20(%rbp), %eax # do i --> eax
-	# cltq # скорее всего конвертация в long
-	# leaq	0(,%rax,8), %rdx # rdx = i * 8
-	# movq	-40(%rbp), %rax #  в rax кладет адрес v1
-	# leaq	(%rdx,%rax), %rbx # rdx + rax
-	call	rand
+	movl	-20(%rbp), %eax # do i --> eax
+	cltq # convert long to quad
+	leaq	0(,%rax,8), %rdx # rdx = i * 8
+	movq	-40(%rbp), %rax #  в rax кладет v1[0]
+	#leaq	(%rdx,%rax), %rbx # rbx = rdx + rax
+	call	rand # берет случайное число, но т.к. зерна нет, то исход один
 	pxor	%xmm0, %xmm0
 	cvtsi2sd	%eax, %xmm0 # convert eax to double
 	movsd	.LC0(%rip), %xmm1 # const -> xmm1

@@ -18,11 +18,11 @@ _Z5func1PdS_:
 	cmpl	$49999999, -20(%rbp)
 	jg	.L2 # if i < 49999999
 	movl	-20(%rbp), %eax # do i --> eax
-	cltq # скорее всего конвертация в long
+	cltq # convert long to quad
 	leaq	0(,%rax,8), %rdx # rdx = i * 8
-	movq	-40(%rbp), %rax # рандомное что-то в rax v1[0]
-	leaq	(%rdx,%rax), %rbx # rdx + rax
-	call	rand
+	movq	-40(%rbp), %rax #  в rax кладет v1[0]
+	leaq	(%rdx,%rax), %rbx # rbx = rdx + rax
+	call	rand # берет случайное число, но т.к. зерна нет, то исход один
 	pxor	%xmm0, %xmm0
 	cvtsi2sd	%eax, %xmm0 # convert eax to double
 	movsd	.LC0(%rip), %xmm1 # const -> xmm1
@@ -126,7 +126,7 @@ main:
 	pxor	%xmm0, %xmm0
 	movsd	%xmm0, -24(%rbp) # -24(%rbp) = 0
 	movl	$400000000, %edi
-	call	_Znam
+	call	_Znam # new 
 	movq	%rax, -16(%rbp) # double v1 = new double[400000000] --> -16rbp
 	movl	$400000000, %edi
 	call	_Znam
