@@ -20,13 +20,14 @@ _Z5func1PdS_:
 	movq	%r12, %rax # do i --> eax
 	#cltq # convert long to quad
 	leaq	0(,%rax,8), %rdx # rdx = i * 8
-	movq	-40(%rbp), %rax #  в rax кладет v1[0]
-	leaq	(%rdx,%rax), %rbx # rbx = rdx + rax, rbx = v1[i*8]
+	#movq	-40(%rbp), %rax #  в rax кладет v1
+	addq	-40(%rbp), %rdx # в rdx = i * 8 + v1
+	#leaq	(%rdx,%rax), %rbx # rbx = rdx + rax, rbx = v1[i*8]
 	call	rand # берет случайное число, но т.к. зерна нет, то исход один
 	pxor	%xmm0, %xmm0 # v1[i*8] = rand() * const1 / const 2 - const 3
 	cvtsi2sd	%eax, %xmm0 # convert eax to double
-	movsd	.LC0(%rip), %xmm1 # const1 -> xmm1
-	mulsd	%xmm1, %xmm0 # xmm1 * xmm0
+	#movsd	.LC0(%rip), %xmm1 # const1 -> xmm1
+	mulsd	.LC0(%rip), %xmm0 # xmm1 * xmm0
 	movsd	.LC1(%rip), %xmm1 # const2 --> xmm1
 	divsd	%xmm1, %xmm0 # xmm0 / xmm1
 	movsd	.LC2(%rip), %xmm1 # const3 --> xmm1
