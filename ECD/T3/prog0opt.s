@@ -17,9 +17,9 @@ _Z5func1PdS_:
 .L3:
 	cmpq	$49999999, %r12
 	jg	.L2 # if i < 49999999
-	movq	%r12, %rax # do i --> eax
+	#movq	%r12, %rax # do i --> eax
 	#cltq # convert long to quad
-	leaq	0(,%rax,8), %rbx # rdx = i * 8
+	leaq	0(,%r12,8), %rbx # rdx = i * 8
 	#movq	-40(%rbp), %rax #  в rax кладет v1
 	addq	-40(%rbp), %rbx #
 	#leaq	(%rdx,%rax), %rbx # rbx = rdx + rax, rbx = v1[i*8]
