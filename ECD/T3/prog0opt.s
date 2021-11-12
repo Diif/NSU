@@ -26,18 +26,19 @@ _Z5func1PdS_:
 	call	rand # берет случайное число, но т.к. зерна нет, то исход один
 	pxor	%xmm0, %xmm0 # v1[i*8] = rand() * const1 / const 2 - const 3
 	cvtsi2sd	%eax, %xmm0 # convert eax to double
-	movsd	.LC0(%rip), %xmm1 # const1 -> xmm1
-	mulsd	%xmm1, %xmm0 # xmm1 * xmm0
-	movsd	.LC1(%rip), %xmm1 # const2 --> xmm1
-	divsd	%xmm1, %xmm0 # xmm0 / xmm1
-	movsd	.LC2(%rip), %xmm1 # const3 --> xmm1
-	subsd	%xmm1, %xmm0 # xmm0 - xmm1;
+	#movsd	.LC0(%rip), %xmm1 # const1 -> xmm1
+	mulsd	.LC0(%rip), %xmm0 # xmm1 * xmm0
+	#movsd	.LC1(%rip), %xmm1 # const2 --> xmm1
+	divsd	.LC1(%rip), %xmm0 # xmm0 / xmm1
+	#movsd	.LC2(%rip), %xmm1 # const3 --> xmm1
+	subsd	.LC2(%rip), %xmm0 # xmm0 - xmm1;
 	movsd	%xmm0, (%rbx) # v1[i*8] = result
-	movq	%r12, %rax # i--> eax
+	#movq	%r12, %rax # i--> eax
 	#cltq
-	leaq	0(,%rax,8), %rdx # i * 8 --> rdx
-	movq	-48(%rbp), %rax # v2[0] -->rax
-	leaq	(%rdx,%rax), %rbx # rbx = rax + rdx
+	leaq	0(,%r12,8), %rbx # i * 8 --> rdx
+	#movq	-48(%rbp), %rax # v2[0] -->rax
+	addq	-40(%rbp), %rbx #
+	#leaq	(%rdx,%rax), %rbx # rbx = rax + rdx
 	call	rand
 	pxor	%xmm0, %xmm0
 	cvtsi2sd	%eax, %xmm0
