@@ -19,9 +19,9 @@ _Z5func1PdS_:
 	jg	.L2 # if i < 49999999
 	movq	%r12, %rax # do i --> eax
 	#cltq # convert long to quad
-	leaq	0(,%rax,8), %rdx # rdx = i * 8
+	leaq	0(,%rax,8), %rbx # rdx = i * 8
 	#movq	-40(%rbp), %rax #  в rax кладет v1
-	addq	-40(%rbp), %rdx #
+	addq	-40(%rbp), %rbx #
 	#leaq	(%rdx,%rax), %rbx # rbx = rdx + rax, rbx = v1[i*8]
 	call	rand # берет случайное число, но т.к. зерна нет, то исход один
 	pxor	%xmm0, %xmm0 # v1[i*8] = rand() * const1 / const 2 - const 3
@@ -32,7 +32,7 @@ _Z5func1PdS_:
 	divsd	%xmm1, %xmm0 # xmm0 / xmm1
 	movsd	.LC2(%rip), %xmm1 # const3 --> xmm1
 	subsd	%xmm1, %xmm0 # xmm0 - xmm1;
-	movsd	%xmm0, (%rdx) # v1[i*8] = result
+	movsd	%xmm0, (%rbx) # v1[i*8] = result
 	movq	%r12, %rax # i--> eax
 	#cltq
 	leaq	0(,%rax,8), %rdx # i * 8 --> rdx
