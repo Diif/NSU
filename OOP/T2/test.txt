@@ -1,4 +1,8 @@
-test1
-test45
-ests53
-tste12
+
+descs 
+1 = readfile in_file.txt
+2 = writefile out_file.txt
+3 = sort
+10 =  replace word1 word2
+csed
+1 -> 3 -> 10 -> 3 -> 2
