@@ -94,16 +94,14 @@ _Z5func2PdS_:
 	#mulsd	%xmm0, %xmm1 # xmm1 = const1 * xmm1
 	mulsd	.LC4(%rip), %xmm0 # xmm1 = const1 * xmm1
 	movsd	%xmm1, -40(%rbp) # xmm1 -> -40rbp, -40rbp = sin(v1[i*8]) * const1
-	movapd	%xmm1, %xmm2 # xmm1 -> -40rbp, -40rbp = sin(v1[i*8]) * const1
-	#movq	%r12, %rax  # eax = i
+	movq	%r12, %rax  # eax = i
 	#cltq
-	leaq	0(,%r12,8), %rdx # rdx = i * 8
-	addq	-32(%rbp), %rdx
-	#movq	-32(%rbp), %rax # rax = v2
-	#addq	%rdx, %rax # rdx = v2 + i * 8
-	#movq	(%rax), %rax # rax = v2[i*8]
-	#movq	%rax, -48(%rbp) # v2[i*8] -> -48rbp
-	movsd	(%rdx), %xmm0
+	leaq	0(,%rax,8), %rdx # rdx = i * 8
+	movq	-32(%rbp), %rax # rax = v2
+	addq	%rdx, %rax # rdx = v2 + i * 8
+	movq	(%rax), %rax # rax = v2[i*8]
+	movq	%rax, -48(%rbp) # v2[i*8] -> -48rbp
+	movsd	-48(%rbp), %xmm0
 	call	cos # cos(v2[i*8])
 	mulsd	-40(%rbp), %xmm0 # xmm0 = cos(v2[i*8]) * sin(v1[i*8]) * const1
 	movsd	-8(%rbp), %xmm1 # xmm1 = k
