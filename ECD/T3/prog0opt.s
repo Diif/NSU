@@ -102,7 +102,7 @@ _Z5func2PdS_:
 	#movq	%rax, -48(%rbp) # v2[i*8] -> -48rbp
 	#movsd	-48(%rbp), %xmm0
 	addq	-32(%rbp), %rdx
-	movsd	%rdx, %xmm0
+	movsd	(%rdx), %xmm0
 	call	cos # cos(v2[i*8])
 	mulsd	-40(%rbp), %xmm0 # xmm0 = cos(v2[i*8]) * sin(v1[i*8]) * const1
 	movsd	-8(%rbp), %xmm1 # xmm1 = k
