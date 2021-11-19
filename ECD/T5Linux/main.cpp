@@ -1,11 +1,9 @@
 #define ACCURACITY 10
 #define SIZE 2048
-#include <processthreadsapi.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <timezoneapi.h>
-
 void TransposeMatrix(int size, float** matrix);
 float GetMaxSumFromRows(int size, float** matrix);
 float GetMaxSumFromColumns(int size, float** matrix);
@@ -35,45 +33,27 @@ float* ConvertMatrixToBlas(int size, float** matrix);
 void FreeBlasMatrix(float* matrix);
 
 int main() {
-  struct _FILETIME lpCreationTime, lpExitTime, lpKernelTime, lpUserTime;
-  HANDLE hThread = GetCurrentThread();
-  struct _SYSTEMTIME start;
-  struct _SYSTEMTIME end;
+  struct timespec start, end;
 
   float** Amatrix = CreateZeroMatrix(SIZE);
   FillMatrixWithRandom(SIZE, Amatrix);
   float** Bmatrix = CreateBMatrix(SIZE, Amatrix);
   float** Imatrix = CreateIdentityMatrix(SIZE);
   float** Rmatrix = CreateRMatrix(SIZE, Amatrix, Bmatrix, Imatrix);
-
-  GetThreadTimes(hThread, &lpCreationTime, &lpExitTime, &lpKernelTime,
-                 &lpUserTime);
-  FileTimeToSystemTime(&lpUserTime, &start);
+  clock_gettime(CLOCK_MONOTONIC_RAW, &start);
   float** inverse_matrix =
       CreateInverseMatrix(ACCURACITY, SIZE, Imatrix, Rmatrix);
-  GetThreadTimes(hThread, &lpCreationTime, &lpExitTime, &lpKernelTime,
-                 &lpUserTime);
-  FileTimeToSystemTime(&lpUserTime, &end);
-
-  double total_time =
-      ((double)end.wMinute * 60 - start.wMinute * 60) +
-      ((double)end.wSecond - start.wSecond) +
-      ((double)end.wMilliseconds / 1000 - start.wMilliseconds / 1000);
-  printf("FST %lf sec\n", total_time);
+  clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+  printf(
+      "FST Time taken: %lf sec.\n",
+      end.tv_sec - start.tv_sec + 0.000000001 * (end.tv_nsec - start.tv_nsec));
   FreeMatrix(SIZE, inverse_matrix);
-
-  GetThreadTimes(hThread, &lpCreationTime, &lpExitTime, &lpKernelTime,
-                 &lpUserTime);
-  FileTimeToSystemTime(&lpUserTime, &start);
+  clock_gettime(CLOCK_MONOTONIC_RAW, &start);
   inverse_matrix = CreateInverseMatrixOPT(ACCURACITY, SIZE, Imatrix, Rmatrix);
-  GetThreadTimes(hThread, &lpCreationTime, &lpExitTime, &lpKernelTime,
-                 &lpUserTime);
-  FileTimeToSystemTime(&lpUserTime, &end);
-  total_time = ((double)end.wMinute * 60 - start.wMinute * 60) +
-               ((double)end.wSecond - start.wSecond) +
-               ((double)end.wMilliseconds / 1000 - start.wMilliseconds / 1000);
-  printf("SCD %lf sec\n", total_time);
-  // BLAS
+  clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+  printf(
+      "SND Time taken: %lf sec.\n",
+      end.tv_sec - start.tv_sec + 0.000000001 * (end.tv_nsec - start.tv_nsec));
   float* Imatrix_blas = ConvertMatrixToBlas(SIZE, Imatrix);
   float* Rmatrix_blas = ConvertMatrixToBlas(SIZE, Rmatrix);
   FreeMatrix(SIZE, Amatrix);
@@ -239,22 +219,6 @@ float** CreateInverseMatrix(int accuracity, int size, float** Imatrix,
 
 float** CreateInverseMatrixOPT(int accuracity, int size, float** Imatrix,
                                float** Rmatrix) {
-  float** Rmatrix_in_pow = CreateZeroMatrix(size);
-  ;
-  float** result = CreateZeroMatrix(size);
-  CopyMatrixToMatrix(size, Rmatrix, Rmatrix_in_pow);
-  AddMatrixToMatrix(size, result, Imatrix);
-  while (accuracity) {
-    AddMatrixToMatrixOPT(size, result, Rmatrix_in_pow);
-    MultMatrixOnMatrixOPT(size, Rmatrix_in_pow, Rmatrix);
-    accuracity--;
-  }
-  FreeMatrix(size, Rmatrix_in_pow);
-  return result;
-}
-
-float** CreateInverseMatrixBlas(int accuracity, int size, float* Imatrix,
-                                float* Rmatrix) {
   float** Rmatrix_in_pow = CreateZeroMatrix(size);
   ;
   float** result = CreateZeroMatrix(size);
