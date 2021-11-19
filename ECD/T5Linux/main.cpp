@@ -1,6 +1,7 @@
 #define ACCURACITY 10
 #define SIZE 2048
 
+#include <cblas.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -29,8 +30,15 @@ float** CreateInverseMatrixOPT(int accuracity, int size, float** Imatrix,
 void AddMatrixToMatrixOPT(int size, float** matrix_origin,
                           float** matrix_to_add);
 void MultMatrixOnMatrixOPT(int size, float** matrix_to_mult, float** matrix_on);
+float* CreateZeroMatrixBlas(int size);
+void FreeMatrixBlas(float* matrix);
+void CopyMatrixToMatrixBlas(int size, float* matrix_from, float* matrix_to);
 float* ConvertMatrixToBlas(int size, float** matrix);
-void FreeBlasMatrix(float* matrix);
+void AddMatrixToMatrixBlas(int size, float* matrix_origin,
+                           float* matrix_to_add);
+float* CreateInverseMatrixBlas(int accuracity, int size, float* Imatrix,
+                               float* Rmatrix, timespec* start, timespec* end);
+void PrintMatrixBlas(int size, float* matrix);
 
 int main() {
   struct timespec start, end;
@@ -56,6 +64,14 @@ int main() {
       end.tv_sec - start.tv_sec + 0.000000001 * (end.tv_nsec - start.tv_nsec));
   float* Imatrix_blas = ConvertMatrixToBlas(SIZE, Imatrix);
   float* Rmatrix_blas = ConvertMatrixToBlas(SIZE, Rmatrix);
+  float* inverse_matrixBlas = CreateInverseMatrixBlas(
+      ACCURACITY, SIZE, Imatrix_blas, Rmatrix_blas, &start, &end);
+  printf(
+      "TRD Time taken: %lf sec.\n",
+      end.tv_sec - start.tv_sec + 0.000000001 * (end.tv_nsec - start.tv_nsec));
+  FreeMatrixBlas(Imatrix_blas);
+  FreeMatrixBlas(Rmatrix_blas);
+  FreeMatrixBlas(inverse_matrixBlas);
   FreeMatrix(SIZE, Amatrix);
   FreeMatrix(SIZE, Bmatrix);
   FreeMatrix(SIZE, Imatrix);
@@ -68,6 +84,11 @@ float** CreateZeroMatrix(int size) {
   for (int row = 0; row < size; row++) {
     matrix[row] = (float*)calloc(sizeof(float), size);
   }
+  return matrix;
+}
+
+float* CreateZeroMatrixBlas(int size) {
+  float* matrix = (float*)calloc(size * size, sizeof(float*));
   return matrix;
 }
 
@@ -106,8 +127,8 @@ float** CreateRMatrix(int size, float** Amatrix, float** Bmatrix,
 void FillMatrixWithRandom(int size, float** matrix) {
   for (int row = 0; row < size; row++) {
     for (int column = 0; column < size; column++) {
-      matrix[row][column] = rand();
-      // matrix[row][column] = column;
+      // matrix[row][column] = rand();
+      matrix[row][column] = column;
     }
   }
 }
@@ -158,6 +179,16 @@ void PrintMatrix(int size, float** matrix) {
     printf("\n");
   }
 }
+void PrintMatrixBlas(int size, float* matrix) {
+  int index_for_print = 1;
+  int max = size * size;
+  for (int cur = 0; cur < max; cur++, index_for_print++) {
+    printf("%0.0f ", matrix[cur]);
+    if (index_for_print % size == 0) {
+      printf("\n");
+    }
+  }
+}
 
 void FreeMatrix(int size, float** matrix) {
   for (int row = 0; row < size; row++) {
@@ -166,7 +197,7 @@ void FreeMatrix(int size, float** matrix) {
   free(matrix);
 }
 
-void FreeBlasMatrix(float* matrix) { free(matrix); }
+void FreeMatrixBlas(float* matrix) { free(matrix); }
 
 void CopyMatrixToMatrix(int size, float** matrix_from, float** matrix_to) {
   for (int row = 0; row < size; row++) {
@@ -176,11 +207,26 @@ void CopyMatrixToMatrix(int size, float** matrix_from, float** matrix_to) {
   }
 }
 
+void CopyMatrixToMatrixBlas(int size, float* matrix_from, float* matrix_to) {
+  int max = size * size;
+  for (int cur = 0; cur < max; cur++) {
+    matrix_to[cur] = matrix_from[cur];
+  }
+}
+
 void AddMatrixToMatrix(int size, float** matrix_origin, float** matrix_to_add) {
   for (int row = 0; row < size; row++) {
     for (int column = 0; column < size; column++) {
       matrix_origin[row][column] += matrix_to_add[row][column];
     }
+  }
+}
+
+void AddMatrixToMatrixBlas(int size, float* matrix_origin,
+                           float* matrix_to_add) {
+  int max = size * size;
+  for (int cur = 0; cur < max; cur++) {
+    matrix_origin[cur] += matrix_to_add[cur];
   }
 }
 
@@ -210,6 +256,7 @@ float** CreateInverseMatrix(int accuracity, int size, float** Imatrix,
   AddMatrixToMatrix(size, result, Imatrix);
   while (accuracity) {
     AddMatrixToMatrix(size, result, Rmatrix_in_pow);
+    // MultMatrixOnMatrix(size, Rmatrix_in_pow, Rmatrix);
     MultMatrixOnMatrix(size, Rmatrix_in_pow, Rmatrix);
     accuracity--;
   }
@@ -230,6 +277,38 @@ float** CreateInverseMatrixOPT(int accuracity, int size, float** Imatrix,
     accuracity--;
   }
   FreeMatrix(size, Rmatrix_in_pow);
+  return result;
+}
+
+float* CreateInverseMatrixBlas(int accuracity, int size, float* Imatrix,
+                               float* Rmatrix, timespec* start, timespec* end) {
+  int max = size * size;
+  float* Rmatrix_in_pow1 = CreateZeroMatrixBlas(size);
+  float* Rmatrix_in_pow2 = CreateZeroMatrixBlas(size);
+  float* result = CreateZeroMatrixBlas(size);
+  CopyMatrixToMatrixBlas(size, Rmatrix, Rmatrix_in_pow1);
+  CopyMatrixToMatrixBlas(size, Rmatrix, Rmatrix_in_pow2);
+  AddMatrixToMatrixBlas(size, result, Imatrix);
+  clock_gettime(CLOCK_MONOTONIC_RAW, start);
+  while (accuracity) {
+    if (accuracity % 2) {
+      cblas_saxpy(max, 1.0, Rmatrix_in_pow1, 1, result, 1);
+      AddMatrixToMatrixBlas(size, result, Rmatrix_in_pow1);
+      cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, size, size, size,
+                  1.0, Rmatrix_in_pow1, size, Rmatrix, size, 0.0,
+                  Rmatrix_in_pow2, size);
+    } else {
+      cblas_saxpy(max, 1.0, Rmatrix_in_pow2, 1, result, 1);
+      cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, size, size, size,
+                  1.0, Rmatrix_in_pow2, size, Rmatrix, size, 0.0,
+                  Rmatrix_in_pow1, size);
+    }
+    // MultMatrixOnMatrix(size, Rmatrix_in_pow, Rmatrix);
+    accuracity--;
+  }
+  clock_gettime(CLOCK_MONOTONIC_RAW, end);
+  FreeMatrixBlas(Rmatrix_in_pow1);
+  FreeMatrixBlas(Rmatrix_in_pow2);
   return result;
 }
 
@@ -300,4 +379,5 @@ float* ConvertMatrixToBlas(int size, float** matrix) {
       counter++;
     }
   }
+  return blas_matrix;
 }
