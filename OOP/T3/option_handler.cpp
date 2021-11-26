@@ -31,10 +31,15 @@ void OptionHandler::ChooseScript() {
     exit(EXIT_SUCCESS);
   }
   if (num_of_options_ == 0) {
+    
   }
 }
 
 GameSession& OptionHandler::CreateGameSessionIfPossible() {
   CheckParser();
   ChooseScript();
+}
+
+GameSession& OptionHandler::CreateDefaultGameSession() {
+
 }

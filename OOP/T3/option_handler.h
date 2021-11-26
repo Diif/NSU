@@ -7,7 +7,8 @@
 #include "game_session.h"
 #include "optionparser.h"
 
-enum optionIndex { UNKNOWN, HELP, PLUS };
+enum OptionIndex { UNKNOWN, HELP, PLUS };
+
 static const option::Descriptor usage[] = {
     {HELP, 0, "h", "help", option::Arg::None,
      "  --help,   -h \tPrint options and exit."},
@@ -33,6 +34,7 @@ class OptionHandler {
   option::Parser parse_;
   void CheckParser();
   void ChooseScript();
+  GameSession& CreateDefaultGameSession();
 
  public:
   GameSession& CreateGameSessionIfPossible();
