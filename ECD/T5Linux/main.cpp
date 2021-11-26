@@ -1,5 +1,5 @@
 #define ACCURACITY 10
-#define SIZE 2048
+#define SIZE 8
 
 #include <cblas.h>
 #include <stdio.h>
@@ -46,7 +46,11 @@ int main() {
   srand(time(0));
   float** Amatrix = CreateZeroMatrix(SIZE);
   FillMatrixWithRandom(SIZE, Amatrix);
+  PrintMatrix(SIZE, Amatrix);
   float** Bmatrix = CreateBMatrix(SIZE, Amatrix);
+  printf("---------\n");
+  PrintMatrix(SIZE, Bmatrix);
+  printf("---------\n");
   float** Imatrix = CreateIdentityMatrix(SIZE);
   float** Rmatrix = CreateRMatrix(SIZE, Amatrix, Bmatrix, Imatrix);
   clock_gettime(CLOCK_MONOTONIC_RAW, &start);
@@ -57,27 +61,25 @@ int main() {
       "FST Time taken: %lf sec.\n",
       end.tv_sec - start.tv_sec + 0.000000001 * (end.tv_nsec - start.tv_nsec));
   PrintMatrix(SIZE, inverse_matrix);
-  FreeMatrix(SIZE, inverse_matrix);
-  clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-  inverse_matrix =
-      CreateInverseMatrixOPT(ACCURACITY, SIZE, Imatrix, Rmatrix, Bmatrix);
-  clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-  printf(
-      "SND Time taken: %lf sec.\n",
-      end.tv_sec - start.tv_sec + 0.000000001 * (end.tv_nsec - start.tv_nsec));
-  PrintMatrix(SIZE, inverse_matrix);
-  float* Imatrix_blas = ConvertMatrixToBlas(SIZE, Imatrix);
-  float* Rmatrix_blas = ConvertMatrixToBlas(SIZE, Rmatrix);
-  float* Bmatrix_blas = ConvertMatrixToBlas(SIZE, Bmatrix);
-  float* inverse_matrixBlas = CreateInverseMatrixBlas(
-      ACCURACITY, SIZE, Imatrix_blas, Rmatrix_blas, Bmatrix_blas, &start, &end);
-  printf(
-      "TRD Time taken: %lf sec.\n",
-      end.tv_sec - start.tv_sec + 0.000000001 * (end.tv_nsec - start.tv_nsec));
-  PrintMatrixBlas(SIZE, inverse_matrixBlas);
-  FreeMatrixBlas(Imatrix_blas);
-  FreeMatrixBlas(Rmatrix_blas);
-  FreeMatrixBlas(inverse_matrixBlas);
+  // FreeMatrix(SIZE, inverse_matrix);
+  // clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+  // inverse_matrix =
+  //  CreateInverseMatrixOPT(ACCURACITY, SIZE, Imatrix, Rmatrix, Bmatrix);
+  // clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+  // printf(
+  // "SND Time taken: %lf sec.\n",
+  // end.tv_sec - start.tv_sec + 0.000000001 * (end.tv_nsec - start.tv_nsec));
+  // PrintMatrix(SIZE, inverse_matrix);
+  /* float* Imatrix_blas = ConvertMatrixToBlas(SIZE, Imatrix);
+   float* Rmatrix_blas = ConvertMatrixToBlas(SIZE, Rmatrix);
+   float* Bmatrix_blas = ConvertMatrixToBlas(SIZE, Bmatrix);
+   float* inverse_matrixBlas = CreateInverseMatrixBlas(
+       ACCURACITY, SIZE, Imatrix_blas, Rmatrix_blas, Bmatrix_blas, &start,
+   &end); printf( "TRD Time taken: %lf sec.\n", end.tv_sec - start.tv_sec +
+   0.000000001 * (end.tv_nsec - start.tv_nsec)); PrintMatrixBlas(SIZE,
+   inverse_matrixBlas); FreeMatrixBlas(Imatrix_blas);
+   FreeMatrixBlas(Rmatrix_blas);
+   FreeMatrixBlas(inverse_matrixBlas);*/
   FreeMatrix(SIZE, Amatrix);
   FreeMatrix(SIZE, Bmatrix);
   FreeMatrix(SIZE, Imatrix);
@@ -131,17 +133,22 @@ float** CreateRMatrix(int size, float** Amatrix, float** Bmatrix,
 }
 
 void FillMatrixWithRandom(int size, float** matrix) {
+  int counter = 1;
   for (int row = 0; row < size; row++) {
     for (int column = 0; column < size; column++) {
-      if (row == column) {
+      // matrix[row][column] = counter;
+      // counter++;
+      /*if (row == column) {
         matrix[row][column] = 5;
-      }
-      // matrix[row][column] = rand();
+      } else if (row == 0) {
+        matrix[row][column] = 5;
+      }*/
+
+      matrix[row][column] = rand();
       // matrix[row][column] = column;
     }
   }
 }
-
 void TransposeMatrix(int size, float** matrix) {
   for (int row = 0; row < size; row++) {
     for (int column = row; column < size; column++) {
