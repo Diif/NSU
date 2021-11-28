@@ -7,8 +7,8 @@
 
 #define SIZE 100
 #define MAX_SIZE 5000100
-#define STEP 1.2
-#define REPEAT 3
+#define STEP 1.1
+#define REPEAT 4
 
 void FillArrayDirect(int* arr, int size);
 void FillArrayBackward(int* arr, int size);
@@ -80,7 +80,7 @@ unsigned long long TestMemoryAccessAndGetTicks(int size, int* arr) {
   MultMatrixOnMatrix(100, Imat, Zmat);
   int max = size * REPEAT;
   int k, i;
-  for (i = 0, k = 0; i < max; i++) k = arr[k];  // warping up
+  for (i = 0, k = 0; i < size; i++) k = arr[k];  // warping up
   if (k == -1 || Zmat[0][0] == -1) {
     printf("Gotcha!");
   }
