@@ -20,6 +20,11 @@ void RecreateArrayWithNewSize(int** arr, int size);
 void TestDirect(int size);
 void TestRandom(int size);
 void TestBackward(int size);
+float** CreateIdentityMatrix(int size);
+void FreeMatrix(int size, float** matrix);
+void MultMatrixOnMatrix(int size, float** matrix_to_mult, float** matrix_on);
+float** CreateZeroMatrix(int size);
+void CopyMatrixToMatrix(int size, float** matrix_from, float** matrix_to);
 
 int main() {
   TestDirect(SIZE);
@@ -70,13 +75,19 @@ void TestBackward(int size) {
 }
 
 unsigned long long TestMemoryAccessAndGetTicks(int size, int* arr) {
+  float** Imat = CreateIdentityMatrix(100);
+  float** Zmat = CreateZeroMatrix(100);
+  MultMatrixOnMatrix(100, Imat, Zmat);
   int max = size * REPEAT;
-  int k;
-  for (int i = 0, k = 0; i < max; i++) k = arr[k];  // warping up
+  int k, i;
+  for (i = 0, k = 0; i < max; i++) k = arr[k];  // warping up
+  if (k == -1 || Zmat[0][0] == -1) {
+    printf("Gotcha!");
+  }
   unsigned long long start = __rdtsc();
-  for (int i = 0, k = 0; i < max; i++) k = arr[k];
+  for (i = 0, k = 0; i < max; i++) k = arr[k];
   unsigned long long end = __rdtsc();
-  if (k == -1) {
+  if (k == -1 || Zmat[0][0] == -1) {
     printf("Gotcha!");
   }
   return end - start;
@@ -140,4 +151,50 @@ void PrintByFilled(int* arr, int size) {
     k = arr[k];
   }
   printf("\n");
+}
+
+float** CreateIdentityMatrix(int size) {
+  float** matrix = (float**)malloc(sizeof(float*) * size);
+  for (int row = 0; row < size; row++) {
+    matrix[row] = (float*)calloc(sizeof(float), size);
+    matrix[row][row] = 1;
+  }
+  return matrix;
+}
+
+void FreeMatrix(int size, float** matrix) {
+  for (int row = 0; row < size; row++) {
+    free(matrix[row]);
+  }
+  free(matrix);
+}
+
+void MultMatrixOnMatrix(int size, float** matrix_to_mult, float** matrix_on) {
+  float** result = CreateZeroMatrix(size);
+  for (int row_mat1 = 0; row_mat1 < size; row_mat1++) {
+    for (int col_mat1 = 0; col_mat1 < size; col_mat1++) {
+      float mult_koef = matrix_to_mult[row_mat1][col_mat1];
+      for (int col_mat2 = 0; col_mat2 < size; col_mat2++) {
+        result[row_mat1][col_mat2] += mult_koef * matrix_on[col_mat1][col_mat2];
+      }
+    }
+  }
+  CopyMatrixToMatrix(size, result, matrix_to_mult);
+  FreeMatrix(size, result);
+}
+
+float** CreateZeroMatrix(int size) {
+  float** matrix = (float**)malloc(sizeof(float*) * size);
+  for (int row = 0; row < size; row++) {
+    matrix[row] = (float*)calloc(sizeof(float), size);
+  }
+  return matrix;
+}
+
+void CopyMatrixToMatrix(int size, float** matrix_from, float** matrix_to) {
+  for (int row = 0; row < size; row++) {
+    for (int column = 0; column < size; column++) {
+      matrix_to[row][column] = matrix_from[row][column];
+    }
+  }
 }
