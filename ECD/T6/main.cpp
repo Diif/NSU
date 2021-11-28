@@ -34,7 +34,7 @@ int main() {
 
 void TestDirect(int size) {
   FILE* out = fopen("out_direct.csv", "w");
-  for (double cur_size = size; cur_size <= MAX_SIZE; cur_size *= 1.2) {
+  for (double cur_size = size; cur_size <= MAX_SIZE; cur_size *= STEP) {
     int cur_size_int = (int)floor((double)cur_size);
     int* arr = (int*)malloc(sizeof(int) * cur_size_int);
     FillArrayDirect(arr, cur_size_int);
@@ -49,7 +49,7 @@ void TestDirect(int size) {
 }
 void TestRandom(int size) {
   FILE* out = fopen("out_random.csv", "w");
-  for (double cur_size = size; cur_size <= MAX_SIZE; cur_size *= 1.2) {
+  for (double cur_size = size; cur_size <= MAX_SIZE; cur_size *= STEP) {
     int cur_size_int = (int)floor((double)cur_size);
     int* arr = (int*)malloc(sizeof(int) * cur_size_int);
     FillArrayRandom(arr, cur_size_int);
@@ -62,7 +62,7 @@ void TestRandom(int size) {
 }
 void TestBackward(int size) {
   FILE* out = fopen("out_backward.csv", "w");
-  for (double cur_size = size; cur_size <= MAX_SIZE; cur_size *= 1.2) {
+  for (double cur_size = size; cur_size <= MAX_SIZE; cur_size *= STEP) {
     int cur_size_int = (int)floor((double)cur_size);
     int* arr = (int*)malloc(sizeof(int) * cur_size_int);
     FillArrayBackward(arr, cur_size_int);
