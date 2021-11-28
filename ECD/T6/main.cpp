@@ -6,7 +6,7 @@
 #include <x86intrin.h>
 
 #define SIZE 100
-#define MAX_SIZE 10000100
+#define MAX_SIZE 5000100
 #define STEP 1.2
 #define REPEAT 3
 
@@ -49,8 +49,6 @@ void TestRandom(int size) {
     int* arr = (int*)malloc(sizeof(int) * cur_size_int);
     FillArrayRandom(arr, cur_size_int);
     unsigned long long time = TestMemoryAccessAndGetTicks(cur_size_int, arr);
-    // fprintf(out, "%d,%.2lf\n", cur_size_int,
-    // time / ((double)cur_size_int * REPEAT));
     fprintf(out, "%d,%.02lf\n", cur_size_int,
             (double)time / (cur_size_int * REPEAT));
     free(arr);
@@ -64,8 +62,6 @@ void TestBackward(int size) {
     int* arr = (int*)malloc(sizeof(int) * cur_size_int);
     FillArrayBackward(arr, cur_size_int);
     unsigned long long time = TestMemoryAccessAndGetTicks(cur_size_int, arr);
-    // fprintf(out, "%d,%.2lf\n", cur_size_int,
-    // time / ((double)cur_size_int * REPEAT));
     fprintf(out, "%d,%.02lf\n", cur_size_int,
             (double)time / (cur_size_int * REPEAT));
     free(arr);
@@ -75,16 +71,15 @@ void TestBackward(int size) {
 
 unsigned long long TestMemoryAccessAndGetTicks(int size, int* arr) {
   int max = size * REPEAT;
+  int k;
   for (int i = 0, k = 0; i < max; i++) k = arr[k];  // warping up
   unsigned long long start = __rdtsc();
   for (int i = 0, k = 0; i < max; i++) k = arr[k];
   unsigned long long end = __rdtsc();
+  if (k == -1) {
+    printf("Gotcha!");
+  }
   return end - start;
-}
-
-void RecreateArrayWithNewSize(int** arr, int size) {
-  free(*arr);
-  (*arr) = (int*)malloc(SIZE * sizeof(int));
 }
 
 void FillArrayDirect(int* arr, int size) {
