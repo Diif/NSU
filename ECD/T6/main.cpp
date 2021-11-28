@@ -6,7 +6,7 @@
 #include <x86intrin.h>
 
 #define SIZE 100
-#define MAX_SIZE 5000100
+#define MAX_SIZE 10000100
 #define STEP 1.2
 #define REPEAT 3
 
@@ -75,7 +75,7 @@ void TestBackward(int size) {
 
 unsigned long long TestMemoryAccessAndGetTicks(int size, int* arr) {
   int max = size * REPEAT;
-  for (int i = 0, k = 0; i < size; i++) k = arr[k];  // warping up
+  for (int i = 0, k = 0; i < max; i++) k = arr[k];  // warping up
   unsigned long long start = __rdtsc();
   for (int i = 0, k = 0; i < max; i++) k = arr[k];
   unsigned long long end = __rdtsc();
