@@ -6,7 +6,7 @@
 #include <x86intrin.h>
 
 #define SIZE 100
-#define MAX_SIZE 2000100
+#define MAX_SIZE 5000100
 #define STEP 1.2
 #define REPEAT 3
 
@@ -20,6 +20,7 @@ void RecreateArrayWithNewSize(int** arr, int size);
 void TestDirect(int size);
 void TestRandom(int size);
 void TestBackward(int size);
+
 int main() {
   TestDirect(SIZE);
   TestBackward(SIZE);
@@ -35,7 +36,8 @@ void TestDirect(int size) {
     unsigned long long time = TestMemoryAccessAndGetTicks(cur_size_int, arr);
     // fprintf(out, "%d,%.2lf\n", cur_size_int,
     // time / ((double)cur_size_int * REPEAT));
-    fprintf(out, "%d,%llu\n", cur_size_int, time);
+    fprintf(out, "%d,%.02lf\n", cur_size_int,
+            (double)time / (cur_size_int * REPEAT));
     free(arr);
   }
   fclose(out);
@@ -49,7 +51,8 @@ void TestRandom(int size) {
     unsigned long long time = TestMemoryAccessAndGetTicks(cur_size_int, arr);
     // fprintf(out, "%d,%.2lf\n", cur_size_int,
     // time / ((double)cur_size_int * REPEAT));
-    fprintf(out, "%d,%llu\n", cur_size_int, time);
+    fprintf(out, "%d,%.02lf\n", cur_size_int,
+            (double)time / (cur_size_int * REPEAT));
     free(arr);
   }
   fclose(out);
@@ -63,7 +66,8 @@ void TestBackward(int size) {
     unsigned long long time = TestMemoryAccessAndGetTicks(cur_size_int, arr);
     // fprintf(out, "%d,%.2lf\n", cur_size_int,
     // time / ((double)cur_size_int * REPEAT));
-    fprintf(out, "%d,%llu\n", cur_size_int, time);
+    fprintf(out, "%d,%.02lf\n", cur_size_int,
+            (double)time / (cur_size_int * REPEAT));
     free(arr);
   }
   fclose(out);
@@ -71,6 +75,7 @@ void TestBackward(int size) {
 
 unsigned long long TestMemoryAccessAndGetTicks(int size, int* arr) {
   int max = size * REPEAT;
+  for (int i = 0, k = 0; i < size; i++) k = arr[k];  // warping up
   unsigned long long start = __rdtsc();
   for (int i = 0, k = 0; i < max; i++) k = arr[k];
   unsigned long long end = __rdtsc();
