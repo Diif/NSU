@@ -6,7 +6,7 @@
 #include <x86intrin.h>
 
 #define SIZE 100
-#define MAX_SIZE 5000100
+#define MAX_SIZE 10000100
 #define STEP 1.1
 #define REPEAT 4
 
