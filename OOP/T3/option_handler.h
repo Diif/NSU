@@ -1,6 +1,8 @@
 #ifndef OPTION_SELECTOR_H_
 #define OPTION_SELECTOR_H_
 
+#include <string.h>
+
 #include <iostream>
 #include <new>
 
@@ -9,21 +11,27 @@
 
 enum OptionIndex { UNKNOWN, HELP, PLUS };
 
+struct Arg : public option::Arg {
+  static option::ArgStatus Rounds(const option::Option& option, bool msg);
+  static option::ArgStatus PlayerType(const option::Option& option, bool msg);
+};
+
 static const option::Descriptor usage[] = {
-    {HELP, 0, "h", "help", option::Arg::None,
+    {HELP, 0, "h", "help", Arg::None,
      "  --help,   -h \tPrint options and exit."},
-    {PLUS, 0, "c", "count", option::Arg::None,
+    {PLUS, 1, "c", "count", Arg::Rounds,
      "  --count,  -c [num] \tSet number of rounds.   \tDefault: 1."},
-    {PLUS, 0, "f", "first", option::Arg::None,
-     "  --first,  -f [rand|smrt|plr] \tSet type of 1st player. \tDefault: "
+    {PLUS, 2, "f", "first", Arg::PlayerType,
+     "  --first,  -f [rand|smrt|player] \tSet type of 1st player. \tDefault: "
      "random."},
-    {PLUS, 0, "s", "second", option::Arg::None,
-     "  --second, -s [rand|smrt] \tSet type of 2nd player. \tDefault: random."},
+    {PLUS, 3, "s", "second", Arg::PlayerType,
+     "  --second, -s [rand|smrt] \tSet type of 2nd player. \tDefault: "
+     "random."},
     {UNKNOWN, 0, "", "", option::Arg::None,
      "\nExamples:\n"
      "  set_battle.exe -h\n"
      "  see_battle.exe \n"
-     "  see_battle.exe -c 2 -f plr -s smart\n"},
+     "  see_battle.exe -c 2 -f player -s smrt\n"},
     {0, 0, 0, 0, 0, 0}};
 
 class OptionHandler {
@@ -32,8 +40,11 @@ class OptionHandler {
   option::Stats stats_;
   option::Option *options_, *buffer_;
   option::Parser parse_;
+
   void CheckParser();
-  void ChooseScript();
+  void CheckHelpAndUnknownOptions();
+  PlayerType ConvertCharsToPlayerType(const char* arg);
+  GameSession& GenerateSessionByOptions();
   GameSession& CreateDefaultGameSession();
 
  public:
