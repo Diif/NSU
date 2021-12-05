@@ -17,7 +17,7 @@ void FillArrayRandom(int* arr, int size);
 void PrintByFilled(int* arr, int size);
 unsigned long long TestMemoryAccessAndGetTicks(int size, int* arr);
 void RecreateArrayWithNewSize(int** arr, int size);
-void TestDirect(int size);
+void TestCache(int size);
 void TestRandom(int size);
 void TestBackward(int size);
 float** CreateIdentityMatrix(int size);
@@ -27,12 +27,12 @@ float** CreateZeroMatrix(int size);
 void CopyMatrixToMatrix(int size, float** matrix_from, float** matrix_to);
 
 int main() {
-  TestDirect(SIZE);
+  TestCache(SIZE);
   TestBackward(SIZE);
   TestRandom(SIZE);
 }
 
-void TestDirect(int size) {
+void TestCache(int size) {
   FILE* out = fopen("out_direct.csv", "w");
   for (double cur_size = size; cur_size <= MAX_SIZE; cur_size *= STEP) {
     int cur_size_int = (int)floor((double)cur_size);
