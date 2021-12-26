@@ -9,12 +9,10 @@ class Ship {
  public:
   Ship(int size);
   ~Ship();
+  int GetSize();
+  int GetAngle();
   void RotateClockwise();
   void RotateCounterClockwise();
 };
-
-Ship::Ship(int size) : size(size), angle(0) {}
-
-Ship::~Ship() {}
 
 #endif  // SHIPS_H_

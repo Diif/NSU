@@ -6,7 +6,7 @@
 #include <windows.h>
 #include <x86intrin.h>
 
-#define OFFSET_IN_INTEGERS 65536
+#define OFFSET_IN_INTEGERS 8192
 #define MAX_FRAGMENTS 32
 #define REPEAT 100000
 

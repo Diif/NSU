@@ -7,9 +7,9 @@ class GameMaster {
  private:
   Player& player1_;
   Player& player2_;
-  
+
  public:
-  GameMaster(/* args */) = default;
+  GameMaster(Player& player1, Player& player2);
   ~GameMaster();
 };
 
