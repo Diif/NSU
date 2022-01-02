@@ -7,17 +7,18 @@
 
 class GameSession {
  public:
-  static const int field_size_ = 10;
   int num_of_rounds_;
-  int player1_score_;
-  int player2_score_;
+  int player1_score_ = 0;
+  int player2_score_ = 0;
 
-  GameMaster *game_master;
+  GameMaster *game_master_;
   //  public:
   GameSession() = delete;
   GameSession(int num_of_rounds, PlayerType player1, PlayerType player2);
-  ~GameSession() = default;
+  ~GameSession();
   void StartNewRound();
+  void StartSession();
+  void PrintSessionResult();
 };
 
 // GameSession::~GameSession() {}

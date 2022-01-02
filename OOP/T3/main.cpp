@@ -1,21 +1,26 @@
 
 #include "option_handler.h"
 //
+
 #include "game_field.h"
 //
+#include "player.h"
 
 int main(int argc, char** argv) {
-  // OptionHandler option_handler(argc, argv);
-  // GameSession& session = option_handler.CreateGameSessionIfPossible();
-  GameField field{10};
+  /*OptionHandler option_handler(argc, argv);
+  GameSession& session = option_handler.CreateGameSessionIfPossible();
+  session.StartSession();
+  session.PrintSessionResult();
+  delete &session;*/
+
+  GameField field{};
+  field.PrintMainFieldBorder();
+  field.PrintBothBorder();
+  /*
   Ship ship(3);
-  Coordinates coords;
-  // int x, y;
-  // std::cin >> x >> y;
-  int x = 5, y = 5;
-  coords.SetAbsCoordinates(x, y);
-  field.TryToPutShip(ship, coords);
-  field.PrintField();
-  field.TryToRemoveShip(ship, coords);
-  field.PrintField();
+  RealPlayer p{};
+  p.PlaceShip(ship, field);
+  ship.ChangeShip(Ship::BATTLESHIP);
+  p.PlaceShip(ship, field);
+  */
 }

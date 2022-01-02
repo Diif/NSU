@@ -8,7 +8,7 @@ include_directories(include)
 include_directories(src)
 
 
-add_executable(see_battle main.cpp include/ship.h src/ship.cpp src/option_handler.cpp src/game_master.cpp src/game_field.cpp src/game_session.cpp src/coordinates.cpp include/option_handler.h include/game_session.h include/game_master.h  include/player.h include/game_field.h include/optionparser.h include/coordinates.h)
+add_executable(see_battle main.cpp include/dynamic_input.h src/dynamic_input.cpp include/ship.h src/ship.cpp src/player.cpp src/option_handler.cpp src/game_master.cpp src/game_field.cpp src/game_session.cpp src/coordinates.cpp include/option_handler.h include/game_session.h include/game_master.h  include/player.h include/game_field.h include/optionparser.h include/coordinates.h)
 target_include_directories(see_battle PUBLIC include)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
