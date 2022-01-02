@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <ctime>
+#include <exception>
 
 #include "coordinates.h"
 #include "dynamic_input.h"
@@ -14,47 +15,47 @@ class Player {
  public:
   virtual void PrepareForNewRound() = 0;
   virtual void PlaceShip(Ship& ship, GameField& field) = 0;
-  virtual void MakeTurn() = 0;
+  virtual void MakeTurn(GameField& own_field, GameField& enemy_field) = 0;
   virtual bool IsSuccessfulShot() = 0;
   virtual ~Player(){};
 };
 
 class RealPlayer : public Player {
  private:
-  bool successful_shot_ = false;
+  bool successful_shot_;
 
  public:
   RealPlayer();
   ~RealPlayer();
   void PrepareForNewRound() override;
   void PlaceShip(Ship& ship, GameField& field) override;
-  void MakeTurn() override;
+  void MakeTurn(GameField& own_field, GameField& enemy_field) override;
   bool IsSuccessfulShot() override;
 };
 
 class SmartPlayer : public Player {
  private:
-  bool successful_shot_ = false;
+  bool successful_shot_;
 
  public:
   SmartPlayer();
   ~SmartPlayer();
   void PrepareForNewRound() override;
   void PlaceShip(Ship& ship, GameField& field) override;
-  void MakeTurn() override;
+  void MakeTurn(GameField& own_field, GameField& enemy_field) override;
   bool IsSuccessfulShot() override;
 };
 
 class RandomPlayer : public Player {
  private:
-  bool successful_shot_ = false;
+  bool successful_shot_;
 
  public:
   RandomPlayer();
   ~RandomPlayer();
   void PrepareForNewRound() override;
   void PlaceShip(Ship& ship, GameField& field) override;
-  void MakeTurn() override;
+  void MakeTurn(GameField& own_field, GameField& enemy_field) override;
   bool IsSuccessfulShot() override;
 };
 

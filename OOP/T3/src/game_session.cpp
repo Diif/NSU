@@ -19,7 +19,10 @@ void GameSession::StartSession() {
     if (result) {
       player1_score_++;
     } else {
-      player2_score_++;
+      result = game_master_->DidSecondPlayerWin();
+      if (result) {
+        player2_score_++;
+      }
     }
     cur_round++;
   }
@@ -32,12 +35,12 @@ void GameSession::StartNewRound() {
 
 void GameSession::PrintSessionResult() {
   if (player1_score_ > player2_score_) {
-    std::cout << "The first player won!";
+    std::cout << "The first player won!\n";
   }
   if (player1_score_ < player2_score_) {
-    std::cout << "The second player won!";
+    std::cout << "The second player won!\n";
   }
   if (player1_score_ == player2_score_) {
-    std::cout << "Draw!";
+    std::cout << "Draw!\n";
   }
 }

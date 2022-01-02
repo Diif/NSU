@@ -65,7 +65,7 @@ GameSession& OptionHandler::GenerateSessionByOptions() {
   const int PLAYER1 = usage[2].type;
   const int PLAYER2 = usage[3].type;
   int num_of_rounds = 1;
-  PlayerType player1_type = PlayerType::RANDOM,
+  PlayerType player1_type = PlayerType::PLAYER,
              player2_type = PlayerType::RANDOM;
   // if (num_of_options_ == 0) {
   //   return *(new GameSession{});

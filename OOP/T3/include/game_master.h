@@ -5,7 +5,8 @@
 #include "player.h"
 class GameMaster {
  private:
-  bool first_player_won_ = false;
+  bool first_player_won_;
+  bool second_player_won_;
   Player& player1_;
   Player& player2_;
   GameField field_p1_;
@@ -16,6 +17,7 @@ class GameMaster {
   ~GameMaster();
   void StartRound();
   bool DidFirstPlayerWin();
+  bool DidSecondPlayerWin();
   // private
   void PrepareForNewRound();
   void PlaceShips();
