@@ -10,6 +10,8 @@ class Coordinates {
   ~Coordinates();
   void SetCoordinates(char clmn, int row);
   void SetAbsCoordinates(int column, int row);
+  void SetByTitle(int title);
+  int GetTitleByCoords();
   int GetX();
   int GetY();
 };

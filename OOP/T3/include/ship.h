@@ -21,6 +21,7 @@ class Ship {
   void ChangeShip(ShipType type);
   void RotateClockwise();
   void RotateCounterClockwise();
+  void RestoreAngle();
 };
 
 #endif  // SHIPS_H_

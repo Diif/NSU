@@ -15,23 +15,24 @@ option::ArgStatus Arg::PlayerType(const option::Option& option, bool msg) {
   return option::ARG_ILLEGAL;
 }
 
-OptionHandler::OptionHandler(int argc, char** argv)
-    : stats_(usage, argc, argv), num_of_options_{argc} {
+OptionHandler::OptionHandler(int argc, char** argv) {
   argc -= (argc > 0);
   argv += (argc > 0);  // skip program name argv[0] if present
-  options_ = new option::Option[stats_.options_max];
-  buffer_ = new option::Option[stats_.buffer_max];
-
-  new (&parse_) option::Parser(usage, argc, argv, options_, buffer_);
+  stats_ = new option::Stats{usage, argc, argv};
+  options_ = new option::Option[stats_->options_max];
+  buffer_ = new option::Option[stats_->options_max];
+  parse_ = new option::Parser(usage, argc, argv, options_, buffer_);
 }
 
 OptionHandler::~OptionHandler() {
   delete[] options_;
   delete[] buffer_;
+  delete stats_;
+  delete parse_;
 }
 
 void OptionHandler::CheckParser() {
-  if (parse_.error()) {
+  if (parse_->error()) {
     throw(std::runtime_error("Invalid arguments!"));
   }
 }
@@ -65,7 +66,7 @@ GameSession& OptionHandler::GenerateSessionByOptions() {
   const int PLAYER1 = usage[2].type;
   const int PLAYER2 = usage[3].type;
   int num_of_rounds = 1;
-  PlayerType player1_type = PlayerType::PLAYER,
+  PlayerType player1_type = PlayerType::RANDOM,
              player2_type = PlayerType::RANDOM;
   // if (num_of_options_ == 0) {
   //   return *(new GameSession{});

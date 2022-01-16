@@ -36,10 +36,9 @@ static const option::Descriptor usage[] = {
 
 class OptionHandler {
  private:
-  int num_of_options_;
-  option::Stats stats_;
+  option::Stats* stats_;
   option::Option *options_, *buffer_;
-  option::Parser parse_;
+  option::Parser* parse_;
 
   void CheckParser();
   void CheckHelpAndUnknownOptions();
