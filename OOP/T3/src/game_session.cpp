@@ -35,15 +35,15 @@ void GameSession::StartNewRound() {
 
 void GameSession::PrintSessionResult() {
   if (player1_score_ > player2_score_) {
-    std::cout << "The first player won!\n Score: " << player1_score_
-              << std::endl;
+    // std::cout << "The first player won!\n Score: " << player1_score_
+    // << std::endl;
   }
   if (player1_score_ < player2_score_) {
-    std::cout << "The second player won!\n Score: " << player2_score_
-              << std::endl;
+    // std::cout << "The second player won!\n Score: " << player2_score_
+    // << std::endl;
   }
   if (player1_score_ == player2_score_) {
-    std::cout << "Draw!\n Score: " << player1_score_ << " " << player2_score_
-              << std::endl;
+    // std::cout << "Draw!\n Score: " << player1_score_ << " " << player2_score_
+    // << std::endl;
   }
 }

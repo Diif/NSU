@@ -41,18 +41,18 @@ void GameMaster::StartRound() {
       }
     }
   }
-  system("clear");
+  // system("clear");
   if (num_of_live_titles_p1) {
-    field_p1_.PrintBothBorder();
+    // field_p1_.PrintBothBorder();
     first_player_won_ = true;
     second_player_won_ = false;
   } else if (num_of_live_titles_p2) {
-    field_p2_.PrintBothBorder();
+    // field_p2_.PrintBothBorder();
     first_player_won_ = false;
     second_player_won_ = true;
   } else {
-    field_p1_.PrintBothBorder();
-    field_p2_.PrintBothBorder();
+    // field_p1_.PrintBothBorder();
+    // field_p2_.PrintBothBorder();
     first_player_won_ = false;
     second_player_won_ = false;
   }

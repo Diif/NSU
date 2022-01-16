@@ -17,7 +17,10 @@ GameField::GameField() {
   }
 }
 
-GameField::~GameField() { delete[] field_; }
+GameField::~GameField() {
+  delete[] field_;
+  delete[] shoot_field_;
+}
 
 inline int GameField::GetMaxCoordIndex() { return field_size_ - 1; }
 
@@ -28,41 +31,48 @@ inline int GameField::GetRowAndColumnSize() { return field_size_; }
 bool GameField::TryToPutShip(Ship &ship, Coordinates &coords,
                              bool is_shoot_field) {
   int was_put = 0;
-  if (NoShipsAround(ship, coords, is_shoot_field)) {
-    if (ship.GetAngle() == 0) {
-      if (coords.GetX() + ship.GetSize() - 1 <= GetMaxCoordIndex() &&
-          coords.GetX() >= GetMinCoordIndex() &&
-          coords.GetY() <= GetMaxCoordIndex() &&
-          coords.GetY() >= GetMinCoordIndex()) {
+  if (ship.GetAngle() == 0) {
+    if (coords.GetX() + ship.GetSize() - 1 <= GetMaxCoordIndex() &&
+        coords.GetX() >= GetMinCoordIndex() &&
+        coords.GetY() <= GetMaxCoordIndex() &&
+        coords.GetY() >= GetMinCoordIndex()) {
+      if (NoShipsAround(ship, coords, is_shoot_field)) {
         was_put = 1;
         PutShip(ship, coords, is_shoot_field);
       }
-    } else if (ship.GetAngle() == 90) {
-      if (coords.GetX() <= GetMaxCoordIndex() &&
-          coords.GetX() >= GetMinCoordIndex() &&
-          coords.GetY() - ship.GetSize() + 1 >= GetMinCoordIndex() &&
-          coords.GetY() <= GetMaxCoordIndex()) {
+    }
+  } else if (ship.GetAngle() == 90) {
+    if (coords.GetX() <= GetMaxCoordIndex() &&
+        coords.GetX() >= GetMinCoordIndex() &&
+        coords.GetY() - ship.GetSize() + 1 >= GetMinCoordIndex() &&
+        coords.GetY() <= GetMaxCoordIndex()) {
+      if (NoShipsAround(ship, coords, is_shoot_field)) {
         was_put = 1;
         PutShip(ship, coords, is_shoot_field);
       }
-    } else if (ship.GetAngle() == 180) {
-      if (coords.GetX() - ship.GetSize() + 1 >= GetMinCoordIndex() &&
-          coords.GetX() <= GetMaxCoordIndex() &&
-          coords.GetY() <= GetMaxCoordIndex() &&
-          coords.GetY() >= GetMinCoordIndex()) {
+    }
+  } else if (ship.GetAngle() == 180) {
+    if (coords.GetX() - ship.GetSize() + 1 >= GetMinCoordIndex() &&
+        coords.GetX() <= GetMaxCoordIndex() &&
+        coords.GetY() <= GetMaxCoordIndex() &&
+        coords.GetY() >= GetMinCoordIndex()) {
+      if (NoShipsAround(ship, coords, is_shoot_field)) {
         was_put = 1;
         PutShip(ship, coords, is_shoot_field);
       }
-    } else if (ship.GetAngle() == 270) {
-      if (coords.GetX() <= GetMaxCoordIndex() &&
-          coords.GetX() >= GetMinCoordIndex() &&
-          coords.GetY() + ship.GetSize() - 1 <= GetMaxCoordIndex() &&
-          coords.GetY() >= GetMinCoordIndex()) {
+    }
+  } else if (ship.GetAngle() == 270) {
+    if (coords.GetX() <= GetMaxCoordIndex() &&
+        coords.GetX() >= GetMinCoordIndex() &&
+        coords.GetY() + ship.GetSize() - 1 <= GetMaxCoordIndex() &&
+        coords.GetY() >= GetMinCoordIndex()) {
+      if (NoShipsAround(ship, coords, is_shoot_field)) {
         was_put = 1;
         PutShip(ship, coords, is_shoot_field);
       }
     }
   }
+
   return was_put;
 }
 
@@ -301,6 +311,9 @@ bool GameField::NoShipsAroundVertical(Ship &ship, Coordinates &coords,
     field = shoot_field_;
   } else {
     field = field_;
+  }
+  if (y_start < 0 || x_start < 0 || x_end < 0 || y_end < 0) {
+    int sd = 4;
   }
   for (int y = y_start; y <= y_end; y++) {
     int row = y * row_len;
