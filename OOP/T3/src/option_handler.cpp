@@ -15,6 +15,10 @@ option::ArgStatus Arg::PlayerType(const option::Option& option, bool msg) {
   return option::ARG_ILLEGAL;
 }
 
+option::ArgStatus Arg::Unknown(const option::Option& option, bool msg) {
+  return option::ARG_ILLEGAL;
+}
+
 OptionHandler::OptionHandler(int argc, char** argv) {
   argc -= (argc > 0);
   argv += (argc > 0);  // skip program name argv[0] if present

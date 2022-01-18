@@ -41,7 +41,7 @@ void GameMaster::StartRound() {
       }
     }
   }
-  // system("clear");
+  system("clear");
   if (num_of_live_titles_p1) {
     // field_p1_.PrintBothBorder();
     first_player_won_ = true;

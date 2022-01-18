@@ -14,6 +14,7 @@ enum OptionIndex { UNKNOWN, HELP, PLUS };
 struct Arg : public option::Arg {
   static option::ArgStatus Rounds(const option::Option& option, bool msg);
   static option::ArgStatus PlayerType(const option::Option& option, bool msg);
+  static option::ArgStatus Unknown(const option::Option& option, bool msg);
 };
 
 static const option::Descriptor usage[] = {
@@ -27,7 +28,7 @@ static const option::Descriptor usage[] = {
     {PLUS, 3, "s", "second", Arg::PlayerType,
      "  --second, -s [rand|smrt] \tSet type of 2nd player. \tDefault: "
      "random."},
-    {UNKNOWN, 0, "", "", option::Arg::None,
+    {UNKNOWN, 0, "", "", Arg::Unknown,
      "\nExamples:\n"
      "  set_battle.exe -h\n"
      "  see_battle.exe \n"
