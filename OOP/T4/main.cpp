@@ -8,7 +8,7 @@ struct Printer {
   static std::basic_ostream<Ch, Tr>& tuple_print(
       std::basic_ostream<Ch, Tr>& os, std::tuple<Args...> const& tuple) {
     Printer<Ch, Tr, last_tuple_num - 1, Args...>::tuple_print(os, tuple);
-    return os << std::get<last_tuple_num - 1>(tuple);
+    return os << std::get<last_tuple_num - 1>(tuple) << '|';
   }
 };
 
@@ -16,7 +16,7 @@ template <typename Ch, typename Tr, typename... Args>
 struct Printer<Ch, Tr, 1, Args...> {
   static std::basic_ostream<Ch, Tr>& tuple_print(
       std::basic_ostream<Ch, Tr>& os, std::tuple<Args...> const& tuple) {
-    return os << std::get<0>(tuple);
+    return os << std::get<0>(tuple) << '|';
   }
 };
 
@@ -33,9 +33,22 @@ std::basic_ostream<Ch, Tr>& operator<<(std::basic_ostream<Ch, Tr>& os,
 }
 
 int main(int, char**) {
-  // std::tuple<int, int, int, int> test(20, 30, 40, 60);
-  // std::cout << test;
-  CSVParser<> parser{};
+  //  std::tuple<int, int, int, int> test(20, 30, 40, 60);
+  //  std::cout << test;
+  std::ifstream file("test.txt");
+  CSVParser<int, double, std::string> parser(file, 0, ',', '!');
+  // parser.ReadNewTuple();
+  // std::cout << parser.tuple_;
+  // parser.ReadNewTuple();
+  // std::cout << parser.tuple_;
+  // for (auto member : parser) {
+  //   std::cout << member << '\n';
+  // }
+
+  for (auto start = parser.begin(), end = parser.end(); start != end; ++start) {
+    auto val = *start;
+    std::cout << val << '\n';
+  }
 
   return 0;
 }
