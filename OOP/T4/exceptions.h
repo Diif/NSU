@@ -6,7 +6,7 @@ class BadFile : public std::exception {
 };
 
 const char* BadFile::what() const noexcept {
-  return "\nFile has bad state (not eof)!";
+  return "\nFile has bad state/falis (not eof)!";
 }
 
 class InvalidDataFormat : public std::exception {

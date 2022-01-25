@@ -33,22 +33,26 @@ std::basic_ostream<Ch, Tr>& operator<<(std::basic_ostream<Ch, Tr>& os,
 }
 
 int main(int, char**) {
-  //  std::tuple<int, int, int, int> test(20, 30, 40, 60);
-  //  std::cout << test;
-  std::ifstream file("test.txt");
-  CSVParser<int, double, std::string> parser(file, 0, ',', '!');
-  // parser.ReadNewTuple();
-  // std::cout << parser.tuple_;
-  // parser.ReadNewTuple();
-  // std::cout << parser.tuple_;
-  // for (auto member : parser) {
+  std::ifstream file6("test6.txt");
+  CSVParser<std::string, std::string> parser6(file6, 0, 'd', 'n', 'e');
+
+  for (std::tuple<std::string, std::string> member : parser6) {
+    std::cout << member << '\n';
+  }
+
+  // std::ifstream file5("test5.txt");
+  // CSVParser<int, std::string> parser2(file5, 2);
+
+  // for (std::tuple<int, std::string> member : parser2) {
   //   std::cout << member << '\n';
   // }
 
-  for (auto start = parser.begin(), end = parser.end(); start != end; ++start) {
-    auto val = *start;
-    std::cout << val << '\n';
-  }
+  // std::ifstream file("test4.txt");
+  // CSVParser<int, double, std::string> parser(file, 0, ',', '!');
+
+  // for (std::tuple<int, double, std::string> member : parser) {
+  //   std::cout << member << '\n';
+  // }
 
   return 0;
 }

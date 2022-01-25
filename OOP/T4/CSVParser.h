@@ -269,8 +269,7 @@ void CSVParser<Args...>::ReadNewTuple() {
   }
   cur_line_by_words_.push_back(cur_word_);
   if (cur_column_ != arg_count_) {
-    throw(InvalidCountOfArgs{cur_row_, cur_column_ - 1, cur_column_ - 1,
-                             arg_count_});
+    throw(InvalidCountOfArgs{cur_row_, cur_column_, cur_column_, arg_count_});
   }
   tuple_ = ParserHelper::ConvertVectorToTuple<Args...>(
       cur_line_by_words_, std::make_index_sequence<arg_count_>{}, cur_row_);
@@ -279,7 +278,7 @@ void CSVParser<Args...>::ReadNewTuple() {
 
 template <typename... Args>
 void CSVParser<Args...>::CheckFile() {
-  if (file_.bad()) {
+  if (file_.bad() || file_.fail()) {
     throw(BadFile{});
   }
 }
