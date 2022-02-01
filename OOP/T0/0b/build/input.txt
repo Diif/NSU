@@ -1,5 +1,0 @@
-Use Built-In Method empty() t	o Check if String Is
- Empty in C++ The std::string class has a built-in
- method empty() to check if the given string is empty 
- or not. This method is of type bool and ret	urns true 
- when the object does not contain characters.
