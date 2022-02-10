@@ -1,4 +1,4 @@
-#define ACCURACITY 10
+#define ACCURACITY 5
 #define SIZE 8
 
 #include <cblas.h>
@@ -138,13 +138,13 @@ void FillMatrixWithRandom(int size, float** matrix) {
     for (int column = 0; column < size; column++) {
       // matrix[row][column] = counter;
       // counter++;
-      /*if (row == column) {
+      if (row == column) {
         matrix[row][column] = 5;
-      } else if (row == 0) {
-        matrix[row][column] = 5;
-      }*/
+      } else {
+        matrix[row][column] = 2;
+      }
 
-      matrix[row][column] = rand();
+      // matrix[row][column] = rand();
       // matrix[row][column] = column;
     }
   }

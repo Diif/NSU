@@ -39,7 +39,7 @@ double MakeMeasurementAndGetTimeSec(long long num_of_intervals) {
   long long clocks_per_sec = sysconf(_SC_CLK_TCK);
   long long clocks;
   double result;
-  cout << "Num of intervals: " << num_of_intervals << endl << "    res:  ";
+  cout << "Num of intervals: " << num_of_intervals << endl << "res:  ";
   times(&start);
   result = CalculateIntegral(num_of_intervals);
   times(&end);
