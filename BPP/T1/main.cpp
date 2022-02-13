@@ -6,9 +6,9 @@
 #include <exception>
 #include <iostream>
 
-#define MATRIX_DATA_POINTER float*
-#define MATRIX_DATA float
-#define N 10
+#define MATRIX_DATA_POINTER double*
+#define MATRIX_DATA double
+#define N 1000
 
 struct Matrix {
   MATRIX_DATA_POINTER matrix = NULL;
@@ -27,7 +27,7 @@ void UpdateX(Matrix& x_n, Matrix& z_n, MATRIX_DATA alpha_n_plus1);
 void UpdateR(Matrix& r_n, Matrix& A, Matrix& z_n, MATRIX_DATA alpha_n_plus1);
 void UpdateZ(Matrix& z_n, Matrix& r_n_plus1, MATRIX_DATA beta_n_plus1);
 void FormAMatrix(Matrix& mat);
-void FormOneMatrix(Matrix& mat);
+void FormRandMatrix(Matrix& mat);
 void FormZeroMatrix(Matrix& mat);
 MATRIX_DATA ScalarMult(Matrix& vec1, Matrix& vec2);
 MATRIX_DATA GetNorm(Matrix& vector);
@@ -47,20 +47,14 @@ int main(int, char**) {
   Matrix A_mat = CreateZeroMatrix(N, N);
   FormAMatrix(A_mat);
   Matrix vec_b = CreateZeroMatrix(N, 1);
-  FormOneMatrix(vec_b);
+  FormRandMatrix(vec_b);
   Matrix vec_x_n = CreateZeroMatrix(N, 1);
   Matrix r_n = Get_r0(vec_b, vec_x_n, A_mat);
   Matrix r_prev = Get_r0(vec_b, vec_x_n, A_mat);
   Matrix z_n = Get_z0(r_n);
 
-  // get n = 1
-  MATRIX_DATA aplha_n = GetNextAlpha(r_n, A_mat, z_n);
-  UpdateX(vec_x_n, z_n, aplha_n);
-  UpdateR(r_n, A_mat, z_n, aplha_n);
-  MATRIX_DATA beta_n = GetNextBeta(r_prev, r_n);
-  UpdateR(r_prev, A_mat, z_n, aplha_n);
-  UpdateZ(z_n, r_n, beta_n);
-
+  MATRIX_DATA aplha_n;
+  MATRIX_DATA beta_n;
   MATRIX_DATA vec_b_norme = GetNorm(vec_b);
   int streak = 0;
   const MATRIX_DATA epsilon = 1e-5;
@@ -79,11 +73,6 @@ int main(int, char**) {
     UpdateZ(z_n, r_n, beta_n);
   }
 
-  MultMatrixOnMatrix(buffer, A_mat, vec_x_n);
-  PrintMatrix(vec_b);
-  std::cout << "-----------------------\n";
-  PrintMatrix(buffer);
-
   FreeMatrix(A_mat);
   FreeMatrix(vec_b);
   FreeMatrix(vec_x_n);
@@ -95,10 +84,8 @@ int main(int, char**) {
 
 Matrix Get_r0(Matrix& vec_b, Matrix& vec_x0, Matrix& A_mat) {
   Matrix r0 = CreateZeroMatrix(A_mat.rows, vec_x0.columns);
-  Matrix buf;
-  MultMatrixOnMatrix(buf, A_mat, vec_x0);
-  SubMatrixFromMatrix(r0, vec_b, buf);
-  FreeMatrix(buf);
+  MultMatrixOnMatrix(buffer, A_mat, vec_x0);
+  SubMatrixFromMatrix(r0, vec_b, buffer);
   return r0;
 }
 Matrix Get_z0(Matrix& r0) {
@@ -145,10 +132,10 @@ MATRIX_DATA GetNorm(Matrix& vector) {
   return sqrt(result);
 }
 
-void FormOneMatrix(Matrix& mat) {  // TODO remove
+void FormRandMatrix(Matrix& mat) {
   int size = mat.rows * mat.columns;
   for (int i = 0; i < size; i++) {
-    mat.matrix[i] = -1 * rand() % 101;
+    mat.matrix[i] = rand() % 101;
   }
 }
 
@@ -187,7 +174,7 @@ void CopyMatrixToMatrix(Matrix& matrix_from, Matrix& matrix_to) {
     throw(std::invalid_argument("Can't copy matrices."));
   }
   int size = matrix_from.rows * matrix_to.columns;
-  memcpy(matrix_to.matrix, matrix_from.matrix, sizeof(float) * size);
+  memcpy(matrix_to.matrix, matrix_from.matrix, sizeof(MATRIX_DATA) * size);
 }
 
 Matrix CreateZeroMatrix(int rows, int columns) {
@@ -197,7 +184,7 @@ Matrix CreateZeroMatrix(int rows, int columns) {
   if (rows * columns == 0) {
     throw(std::invalid_argument("Invalid matrix size."));
   }
-  mat.matrix = new float[rows * columns]();
+  mat.matrix = new MATRIX_DATA[rows * columns]();
   return mat;
 }
 
@@ -223,10 +210,10 @@ void MultMatrixOnMatrix(Matrix& matrix_for_result, Matrix& matrix_to_mult,
   MATRIX_DATA_POINTER p_result = matrix_for_result.matrix;
   for (int m1_row = 0; m1_row < m1_rows; m1_row++) {
     for (int m1_col = 0; m1_col < m1_columns; m1_col++) {
-      float mult_koef = p_matrix_to_mult[m1_row * m1_columns + m1_col];
+      MATRIX_DATA mult_koef = p_matrix_to_mult[m1_row * m1_columns + m1_col];
       int m2_row = m1_col;
       for (int m2_col = 0; m2_col < m2_columns; m2_col++) {
-        p_result[m2_row * m2_columns + m2_col] +=
+        p_result[m1_row * m2_columns + m2_col] +=
             mult_koef * p_matrix_on[m2_row * m2_columns + m2_col];
       }
     }

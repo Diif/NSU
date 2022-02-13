@@ -4,6 +4,8 @@ project(iterationGrad VERSION 0.1.0)
 include(CTest)
 enable_testing()
 
+add_compile_options(-Wall -Wextra -O3)
+
 add_executable(iterationGrad main.cpp)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
