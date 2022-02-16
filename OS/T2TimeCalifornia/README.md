@@ -1,4 +1,4 @@
-#California time
+# California time
 #### Задача
 Print California time.
 #### Решение
