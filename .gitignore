@@ -7,3 +7,7 @@ playground
 test
 *.sh
 *.bash
+.idea
+*.iml
+*.txt
+out
