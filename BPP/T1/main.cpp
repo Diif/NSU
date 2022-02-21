@@ -8,7 +8,7 @@
 
 #define MATRIX_DATA_POINTER double*
 #define MATRIX_DATA double
-#define N 1000
+#define N 100
 
 struct Matrix {
   MATRIX_DATA_POINTER matrix = NULL;
@@ -58,13 +58,14 @@ int main(int, char**) {
   MATRIX_DATA vec_b_norme = GetNorm(vec_b);
   int streak = 0;
   const MATRIX_DATA epsilon = 1e-5;
-
+  int counter = 0;
   while (streak != 5) {
     if (GetNorm(r_n) / vec_b_norme < epsilon) {
       streak++;
     } else {
       streak = 0;
     }
+    counter++;
     aplha_n = GetNextAlpha(r_n, A_mat, z_n);
     UpdateX(vec_x_n, z_n, aplha_n);
     UpdateR(r_n, A_mat, z_n, aplha_n);
@@ -72,7 +73,7 @@ int main(int, char**) {
     UpdateR(r_prev, A_mat, z_n, aplha_n);
     UpdateZ(z_n, r_n, beta_n);
   }
-
+  printf("%d", counter);
   FreeMatrix(A_mat);
   FreeMatrix(vec_b);
   FreeMatrix(vec_x_n);
@@ -147,7 +148,7 @@ void FormAMatrix(Matrix& mat) {
   if (mat.columns != mat.rows) {
     throw(std::invalid_argument("Matrix can't be done symmetric."));
   }
-  srand(time(NULL));
+  srand(1000);
   int rows = mat.rows;
   int columns = mat.columns;
   MATRIX_DATA_POINTER matrix = mat.matrix;
