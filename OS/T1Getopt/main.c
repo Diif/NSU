@@ -24,7 +24,7 @@ void ParseEnvVar(char* arg, char* o_name, char* o_val, int max_name_size,
                  int max_val_size);
 int IsDigit(char* word);
 
-int main(int argc, char* argv[]) {
+int main(int argc, char** argv) {
   const char options[] = "ispuU:cC:dvV:"; /* valid options */
   char** reversed_argv = GetReverseArgv(argv, argc);
   char opt;
@@ -45,6 +45,8 @@ int main(int argc, char* argv[]) {
       case 'U':
         if (!IsDigit(optarg)) {
           fprintf(stderr, "Wrong value for ulimit");
+        } else {
+          SetLimit(optarg);
         }
         break;
       case 'c':
@@ -53,8 +55,9 @@ int main(int argc, char* argv[]) {
       case 'C':
         if (!IsDigit(optarg)) {
           fprintf(stderr, "Wrong value for ulimit");
+        } else {
+          SetCoreLimit(optarg);
         }
-        SetCoreLimit(optarg);
         break;
       case 'd':
         PrintCwd();
@@ -179,8 +182,11 @@ void SetLimit(char* limit) {
 int IsDigit(char* word) {
   char* p = word;
   while (*p != '\0') {
-    if (*p <= '0' || *p >= '9') {
-      return 0;
+    if (*p < '0' || *p > '9') {
+      if (*p != '\0') {
+        printf("WRONG CHAR %c\n", *p);
+        return 0;
+      }
     }
     p++;
   }
