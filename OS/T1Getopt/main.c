@@ -83,7 +83,7 @@ char** GetReverseArgv(char** argv, int argc) {
 void PrintLimit() {
   struct rlimit file_lim;
   if (getrlimit(RLIMIT_FSIZE, &file_lim) == 0) {
-    printf("Maximum process file size: %ld\n", file_lim.rlim_max);
+    printf("\tMaximum process file size: %lu\n", file_lim.rlim_cur);
   } else {
     fprintf(stderr, "Can't get file limit.\n");
     exit(1);
@@ -98,9 +98,7 @@ void PrintIds() {
 }
 
 void SetLeader() {
-  printf("BEFORE %d %d\n", getpgid(0), getpgrp());
   setpgid(0, getpgrp());
-  printf("NOW %d\n", getpgid(0));
 }
 
 void PrintProcessIds() {
@@ -116,7 +114,7 @@ void PrintProcessIds() {
 void PrintCoreSize() {
   struct rlimit core_lim;
   if (getrlimit(RLIMIT_CORE, &core_lim) == 0) {
-    printf("\tProcess core file size: %ld\n", core_lim.rlim_cur);
+    printf("\tProcess core file size: %lu\n", core_lim.rlim_cur);
   } else {
     fprintf(stderr, "Can't get core limit.\n");
     exit(1);
@@ -124,9 +122,9 @@ void PrintCoreSize() {
 }
 
 void PrintCwd() {
-  char* cwd = getcwd(NULL, 0);
+  char* cwd = getcwd(NULL, 100);
   if (cwd) {
-    printf("%s\n", cwd);
+    printf("\t%s\n", cwd);
     free(cwd);
   } else {
     fprintf(stderr, "Can't print cwd.\n");
