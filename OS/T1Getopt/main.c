@@ -98,7 +98,7 @@ char** GetReverseArgv(char** argv, int argc) {
 void PrintLimit() {
   struct rlimit file_lim;
   if (getrlimit(RLIMIT_FSIZE, &file_lim) == 0) {
-    printf("\tMaximum process file size: %lu\n", file_lim.rlim_cur);
+    printf("\tMaximum process file size: %lu\n", file_lim.rlim_max);
   } else {
     fprintf(stderr, "Can't get file limit.\n");
     exit(1);
@@ -109,7 +109,7 @@ void PrintIds() {
   printf(
       "\tReal user id: %d\n\tReal group id: %d\n\tEffective user id: "
       "%d\n\tEffective group id: %d\n",
-      getuid(), getgid(), getegid(), geteuid());
+      getuid(), getgid(), geteuid(), geteuid());
 }
 
 void SetLeader() { setpgid(0, getpgrp()); }
