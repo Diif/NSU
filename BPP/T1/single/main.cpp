@@ -7,7 +7,7 @@
 
 #define MATRIX_DATA_POINTER double*
 #define MATRIX_DATA double
-#define N 10
+#define N 2000
 
 struct Matrix {
   MATRIX_DATA_POINTER matrix = NULL;
@@ -21,7 +21,7 @@ Matrix CreateZeroMatrix(int rows, int columns);
 Matrix CreateUnfilledMatrix(int rows, int columns);
 Matrix Get_r0(Matrix& vec_b, Matrix& vec_x0, Matrix& A_mat);
 Matrix Get_z0(Matrix& r0);
-MATRIX_DATA GetNextAlpha(Matrix& r_n, Matrix& A, Matrix& z_n);
+MATRIX_DATA GetNextAlpha(Matrix& A, Matrix& z_n);
 MATRIX_DATA GetNextBeta(Matrix& r_n_plus1);
 void UpdateX(Matrix& x_n, Matrix& z_n, MATRIX_DATA alpha_n_plus1);
 void UpdateR(Matrix& r_n, Matrix& A, Matrix& z_n, MATRIX_DATA alpha_n_plus1);
@@ -47,15 +47,12 @@ void FreeMatrix(Matrix& matrix);
 MATRIX_DATA cur_rn_scalar;
 
 int main(int, char**) {
-  time_t start = time(NULL);
-
   Matrix A_mat = CreateUnfilledMatrix(N, N);
   FormAMatrix(A_mat);
   Matrix vec_b = CreateUnfilledMatrix(N, 1);
   FormRandMatrix(vec_b);
   Matrix vec_x_n = CreateZeroMatrix(N, 1);
   Matrix r_n = Get_r0(vec_b, vec_x_n, A_mat);
-  Matrix r_prev = Get_r0(vec_b, vec_x_n, A_mat);
   Matrix z_n = Get_z0(r_n);
 
   MATRIX_DATA alpha_n;
@@ -64,6 +61,7 @@ int main(int, char**) {
   int streak = 0;
   const MATRIX_DATA epsilon = (1e-5) * (1e-5) * squered_vec_b_norme;
   int counter = 0;
+
   while (streak != 5) {
     if ((cur_rn_scalar = GetSqueredNorm(r_n)) < epsilon) {
       streak++;
@@ -71,11 +69,10 @@ int main(int, char**) {
       streak = 0;
     }
     counter++;
-    alpha_n = GetNextAlpha(r_n, A_mat, z_n);
+    alpha_n = GetNextAlpha(A_mat, z_n);
     UpdateX(vec_x_n, z_n, alpha_n);
     UpdateR(r_n, A_mat, z_n, alpha_n);
     beta_n = GetNextBeta(r_n);
-    CopyMatrixToMatrix(r_n, r_prev);
     UpdateZ(z_n, r_n, beta_n);
   }
 
@@ -83,12 +80,10 @@ int main(int, char**) {
   FreeMatrix(vec_b);
   FreeMatrix(vec_x_n);
   FreeMatrix(r_n);
-  FreeMatrix(r_prev);
   FreeMatrix(z_n);
   FreeMatrix(buffer);
 
-  time_t end = time(NULL);
-  printf("%ld\n", end - start);
+  return 0;
 }
 
 Matrix Get_r0(Matrix& vec_b, Matrix& vec_x0, Matrix& A_mat) {
@@ -103,9 +98,9 @@ Matrix Get_z0(Matrix& r0) {
   return z0;
 }
 
-MATRIX_DATA GetNextAlpha(Matrix& r_n, Matrix& A, Matrix& z_n) {
+MATRIX_DATA GetNextAlpha(Matrix& A, Matrix& z_n) {
   MultMatrixOnMatrix(buffer, A, z_n);
-  cur_rn_scalar / ScalarMult(buffer, z_n);
+  return cur_rn_scalar / ScalarMult(buffer, z_n);
 }
 
 MATRIX_DATA GetNextBeta(Matrix& r_n_plus1) {
@@ -197,7 +192,6 @@ void MultMatrixOnMatrix(Matrix& matrix_for_result, Matrix& matrix_to_mult,
                         Matrix& matrix_on) {
   int m1_rows = matrix_to_mult.rows;
   int m1_columns = matrix_to_mult.columns;
-  int m2_rows = matrix_on.rows;
   int m2_columns = matrix_on.columns;
   MATRIX_DATA_POINTER p_matrix_to_mult = matrix_to_mult.matrix;
   MATRIX_DATA_POINTER p_matrix_on = matrix_on.matrix;
@@ -302,7 +296,7 @@ void PrintMatrix(Matrix& mat) {
   const int max_columns = mat.columns;
   int index_for_print = 1;
   for (int cur = 0; cur < size; cur++, index_for_print++) {
-    printf("%0.1f ", matrix[cur]);
+    printf("%0.5f ", matrix[cur]);
     if (index_for_print % max_columns == 0) {
       printf("\n");
     }

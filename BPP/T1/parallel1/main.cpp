@@ -10,7 +10,7 @@
 #define MATRIX_DATA_POINTER double*
 #define MATRIX_DATA double
 #define MPI_MATRIX_DATA MPI_DOUBLE
-#define N 1000
+#define N 2000
 
 struct Matrix {
   MATRIX_DATA_POINTER matrix = NULL;
@@ -26,8 +26,8 @@ Matrix CreateUnfilledMatrix(int rows, int columns);
 Matrix Get_local_Ax(Matrix& vec_b, Matrix& vec_x0, Matrix& local_A_mat);
 Matrix Get_r0(Matrix& vec_b, Matrix& vec_x0, Matrix& local_A_mat);
 Matrix Get_z0(Matrix& r0);
-MATRIX_DATA GetNextAlpha(Matrix& r_n, Matrix& local_A_mat, Matrix& z_n);
-MATRIX_DATA GetNextBeta(Matrix& r_n, Matrix& r_n_plus1);
+MATRIX_DATA GetNextAlpha(Matrix& local_A_mat, Matrix& z_n);
+MATRIX_DATA GetNextBeta(Matrix& r_n_plus1);
 void UpdateX(Matrix& x_n, Matrix& z_n, MATRIX_DATA alpha_n_plus1);
 void UpdateR(Matrix& r_n, Matrix& local_A_mat, Matrix& z_n,
              MATRIX_DATA alpha_n_plus1);
@@ -92,8 +92,6 @@ int main(int argc, char** argv) {
 
   Matrix r_n = Get_r0(vec_b, vec_x_n, local_A_mat);
   Matrix z_n = Get_z0(r_n);
-  Matrix r_prev = CreateUnfilledMatrix(r_n.rows, r_n.columns);
-  CopyMatrixToMatrix(r_n, r_prev);
 
   MATRIX_DATA alpha_n;
   MATRIX_DATA beta_n;
@@ -109,25 +107,18 @@ int main(int argc, char** argv) {
       streak = 0;
     }
     counter++;
-    alpha_n = GetNextAlpha(r_n, local_A_mat, z_n);
+    alpha_n = GetNextAlpha(local_A_mat, z_n);
     UpdateX(vec_x_n, z_n, alpha_n);
     UpdateR(r_n, local_A_mat, z_n, alpha_n);
-    beta_n = GetNextBeta(r_prev, r_n);
-    CopyMatrixToMatrix(r_n, r_prev);
+    beta_n = GetNextBeta(r_n);
     UpdateZ(z_n, r_n, beta_n);
   }
   if (!rank) {
-    printf("%d\n", num_of_proc);
-    PrintMatrix(vec_b);
-    printf("-----------------\n");
-    MultMatrixOnMatrix(buffer, A_mat, vec_x_n);
-    PrintMatrix(buffer);
     FreeMatrix(A_mat);
   }
   FreeMatrix(vec_b);
   FreeMatrix(vec_x_n);
   FreeMatrix(r_n);
-  FreeMatrix(r_prev);
   FreeMatrix(z_n);
   FreeMatrix(buffer);
   FreeMatrix(vector_buffer);
@@ -148,7 +139,7 @@ Matrix Get_r0(Matrix& vec_b, Matrix& vec_x0, Matrix& local_A_mat) {
                  r0.matrix, sizes_for_scatter, displs, MPI_MATRIX_DATA,
                  MPI_COMM_WORLD);
   MultMatrixOnScalar(r0, r0, -1);
-  AddMatrixToMatrix(r0, r0, vec_b);
+  SubMatrixFromMatrix(r0, vec_b, r0);
   return r0;
 }
 
@@ -165,7 +156,7 @@ Matrix Get_z0(Matrix& r0) {
   return z0;
 }
 
-MATRIX_DATA GetNextAlpha(Matrix& r_n, Matrix& local_A_mat, Matrix& z_n) {
+MATRIX_DATA GetNextAlpha(Matrix& local_A_mat, Matrix& z_n) {
   MultMatrixOnMatrix(buffer, local_A_mat, z_n);
   MPI_Allgatherv(buffer.matrix, sizes_for_scatter[rank], MPI_MATRIX_DATA,
                  vector_buffer.matrix, sizes_for_scatter, displs,
@@ -173,7 +164,7 @@ MATRIX_DATA GetNextAlpha(Matrix& r_n, Matrix& local_A_mat, Matrix& z_n) {
   return cur_rn_scalar / ScalarMult(vector_buffer, z_n);
 }
 
-MATRIX_DATA GetNextBeta(Matrix& r_n, Matrix& r_n_plus1) {
+MATRIX_DATA GetNextBeta(Matrix& r_n_plus1) {
   return ScalarMult(r_n_plus1, r_n_plus1) / cur_rn_scalar;
 }
 
@@ -227,7 +218,7 @@ void FormAMatrix(Matrix& mat) {
   MATRIX_DATA_POINTER matrix = mat.matrix;
   for (int row = 0; row < rows; row++) {
     for (int column = 0; column <= row; column++) {
-      if (rand() % 2 == 0) {  // TODO
+      if (rand() % 2 == 0) {
         matrix[row * columns + column] = (rand() % 101) * -1;
       } else {
         matrix[row * columns + column] = (rand() % 101);
@@ -267,7 +258,6 @@ void MultMatrixOnMatrix(Matrix& matrix_for_result, Matrix& matrix_to_mult,
                         Matrix& matrix_on) {
   int m1_rows = matrix_to_mult.rows;
   int m1_columns = matrix_to_mult.columns;
-  int m2_rows = matrix_on.rows;
   int m2_columns = matrix_on.columns;
   MATRIX_DATA_POINTER p_matrix_to_mult = matrix_to_mult.matrix;
   MATRIX_DATA_POINTER p_matrix_on = matrix_on.matrix;
@@ -392,7 +382,7 @@ void CalculateSizesAndDisplsForScatter(int num_of_proc, int max_rows,
   int* p_dispils = *displs;
   int offset = 0;
   for (int i = 0; i < num_of_proc; i++) {
-    p_dispils[i] = offset;  // TODO offset, not 0
+    p_dispils[i] = offset;
     p_sizes[i] = base * max_columns;
     offset += base * max_columns;
     if (remainder) {
