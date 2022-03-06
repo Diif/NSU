@@ -7,7 +7,6 @@
 
 #define MATRIX_DATA_POINTER double*
 #define MATRIX_DATA double
-#define N 2000
 
 struct Matrix {
   MATRIX_DATA_POINTER matrix = NULL;
@@ -45,8 +44,12 @@ void PrintMatrix(Matrix& mat);
 void FreeMatrix(Matrix& matrix);
 
 MATRIX_DATA cur_rn_scalar;
+unsigned N;
 
-int main(int, char**) {
+int main(int argc, char** argv) {
+  N = atoi(argv[1]);
+  time_t start = time(NULL);
+
   Matrix A_mat = CreateUnfilledMatrix(N, N);
   FormAMatrix(A_mat);
   Matrix vec_b = CreateUnfilledMatrix(N, 1);
@@ -69,13 +72,19 @@ int main(int, char**) {
       streak = 0;
     }
     counter++;
+    if (counter > 10000) {
+      fprintf(stderr, "FAILURE\n");
+      exit(EXIT_FAILURE);
+    }
     alpha_n = GetNextAlpha(A_mat, z_n);
     UpdateX(vec_x_n, z_n, alpha_n);
     UpdateR(r_n, A_mat, z_n, alpha_n);
     beta_n = GetNextBeta(r_n);
     UpdateZ(z_n, r_n, beta_n);
   }
-
+  time_t end = time(NULL);
+  printf("\tVersion: single\n\tSeed: %ld\n\tSize: %u\n\tResult: %ld\n", start,
+         N, end - start);
   FreeMatrix(A_mat);
   FreeMatrix(vec_b);
   FreeMatrix(vec_x_n);

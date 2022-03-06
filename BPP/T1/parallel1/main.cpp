@@ -10,7 +10,6 @@
 #define MATRIX_DATA_POINTER double*
 #define MATRIX_DATA double
 #define MPI_MATRIX_DATA MPI_DOUBLE
-#define N 2000
 
 struct Matrix {
   MATRIX_DATA_POINTER matrix = NULL;
@@ -61,16 +60,21 @@ int num_of_proc, rank;
 int local_start_index_in_vec;
 int local_end_index_in_vec;
 MATRIX_DATA cur_rn_scalar;
-
+unsigned N;
 int main(int argc, char** argv) {
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &num_of_proc);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  double start;
+  time_t seed;
+  if (!rank) {
+    seed = time(NULL);
+    start = MPI_Wtime();
+    N = atoi(argv[1]);
+  }
+  MPI_Bcast(&N, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
 
   Matrix A_mat;
-  time_t start;
-  start = time(NULL);
-
   if (!rank) {
     A_mat = CreateUnfilledMatrix(N, N);
     FormAMatrix(A_mat);
@@ -107,13 +111,22 @@ int main(int argc, char** argv) {
       streak = 0;
     }
     counter++;
+    if (counter > 10000) {
+      fprintf(stderr, "FAILURE\n");
+      exit(EXIT_FAILURE);
+    }
     alpha_n = GetNextAlpha(local_A_mat, z_n);
     UpdateX(vec_x_n, z_n, alpha_n);
     UpdateR(r_n, local_A_mat, z_n, alpha_n);
     beta_n = GetNextBeta(r_n);
     UpdateZ(z_n, r_n, beta_n);
   }
+  double end;
   if (!rank) {
+    end = MPI_Wtime();
+    printf(
+        "\tVersion: parallel1, np %d\n\tSeed: %ld\n\tSize: %u\n\tResult: %lf\n",
+        num_of_proc, seed, N, end - start);
     FreeMatrix(A_mat);
   }
   FreeMatrix(vec_b);
@@ -124,10 +137,7 @@ int main(int argc, char** argv) {
   FreeMatrix(vector_buffer);
   free(sizes_for_scatter);
   free(displs);
-  if (!rank) {
-    time_t end = time(NULL);
-    printf("%ld\n", end - start);
-  }
+
   MPI_Finalize();
   return 0;
 }
