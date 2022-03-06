@@ -1,11 +1,10 @@
 #include <memory.h>
 #include <mpi.h>
+#include <stdio.h>
 #include <time.h>
 
 #include <cmath>
 #include <cstdlib>
-#include <exception>
-#include <iostream>
 
 #define MATRIX_DATA_POINTER double*
 #define MATRIX_DATA double

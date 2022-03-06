@@ -1,11 +1,10 @@
 #include <memory.h>
 #include <mpi.h>
+#include <stdio.h>
 #include <time.h>
 
 #include <cmath>
 #include <cstdlib>
-#include <exception>
-#include <iostream>
 
 #define MATRIX_DATA_POINTER double*
 #define MATRIX_DATA double
@@ -178,7 +177,6 @@ MATRIX_DATA GetNextAlpha(Matrix& local_A_mat, Matrix& local_z_n) {
   MPI_Reduce(buffer.matrix, vector_buffer.matrix, vector_buffer.rows,
              MPI_MATRIX_DATA, MPI_SUM, 0, MPI_COMM_WORLD);
 
-  MPI_Barrier(MPI_COMM_WORLD);
   MPI_Scatterv(vector_buffer.matrix, sizes_for_scatter, displs, MPI_MATRIX_DATA,
                sized_vector_buffer.matrix, sizes_for_scatter[rank],
                MPI_MATRIX_DATA, 0, MPI_COMM_WORLD);

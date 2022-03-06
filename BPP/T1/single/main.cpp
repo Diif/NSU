@@ -1,9 +1,8 @@
 #include <memory.h>
+#include <stdio.h>
 #include <time.h>
 
 #include <cstdlib>
-#include <exception>
-#include <iostream>
 
 #define MATRIX_DATA_POINTER double*
 #define MATRIX_DATA double
