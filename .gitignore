@@ -6,8 +6,13 @@ playground
 *.out
 test
 *.sh
-*.bash
+*.bash*
 .idea
 *.iml
 *.txt
 out
+.gitconfig
+.vim*
+.profile
+.ssh
+
