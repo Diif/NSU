@@ -283,9 +283,10 @@ void MultMatrixOnMatrix(Matrix& matrix_for_result, Matrix& matrix_to_mult,
     for (int m1_col = 0; m1_col < m1_columns; m1_col++) {
       MATRIX_DATA mult_koef = p_matrix_to_mult[m1_row * m1_columns + m1_col];
       int m2_row = m1_col;
+      int place1 = m1_row * m2_columns;
+      int place2 = m2_row * m2_columns;
       for (int m2_col = 0; m2_col < m2_columns; m2_col++) {
-        p_result[m1_row * m2_columns + m2_col] +=
-            mult_koef * p_matrix_on[m2_row * m2_columns + m2_col];
+        p_result[place1 + m2_col] += mult_koef * p_matrix_on[place2 + m2_col];
       }
     }
   }
