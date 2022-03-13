@@ -117,5 +117,6 @@ int main(int argc, char **argv) {
     line--;
     PrintLine(dsc, line);
   }
+  close(dsc);
   return 0;
 }
