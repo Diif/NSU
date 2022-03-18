@@ -3,6 +3,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
 import java.util.HashMap;
+import java.lang.reflect.InvocationTargetException;
 import commands.*;
 
 public class Fabric {
@@ -19,10 +20,20 @@ public class Fabric {
 
     public HashMap<String, Command> CreateCommands(){
         HashMap<String, Command> map = new HashMap<String, Command>();
+        int counter = 1;
         while(configScanner.hasNextLine()){
             String line = configScanner.nextLine();
             String[] key_and_val = line.split("=");
-            map.put(key_and_val)
+            try {
+                Class c1 = Class.forName("commands." + key_and_val[1]);
+                map.put(key_and_val[0], (Command)c1.getDeclaredConstructor().newInstance());
+            } catch (ArrayIndexOutOfBoundsException e){
+                System.out.println("Incorrect command line. Ignored.\n\t" + counter + ": " + line);
+            } catch (ClassNotFoundException e){
+                System.out.println("Class doesn't exists in commands package. + \n\t" + counter + ": " + line + "\n\t" + e.getLocalizedMessage());
+            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException  | InvocationTargetException e){
+                System.out.println("Internal error.\n\t" + counter + ": " + line + "\n\t" + e.getLocalizedMessage());
+            }
         }
 
     }
