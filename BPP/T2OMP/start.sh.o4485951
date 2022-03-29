@@ -1,0 +1,273 @@
+Version: single
+	Seed: 1647671560
+	Size: 2000
+	Result: 118
+Version: single
+	Seed: 1647671678
+	Size: 2000
+	Result: 118
+Version: omp, np: 2
+	Seed: 143201.462013
+	Size: 2000
+	Result: 71.042202
+Version: omp, np: 3
+	Seed: 143272.510531
+	Size: 2000
+	Result: 47.815269
+Version: omp, np: 4
+	Seed: 143320.331947
+	Size: 2000
+	Result: 35.955460
+Version: omp, np: 5
+	Seed: 143356.293589
+	Size: 2000
+	Result: 31.220577
+Version: omp, np: 6
+	Seed: 143387.520383
+	Size: 2000
+	Result: 28.608653
+Version: omp, np: 7
+	Seed: 143416.135382
+	Size: 2000
+	Result: 21.996211
+Version: omp, np: 8
+	Seed: 143438.137880
+	Size: 2000
+	Result: 26.308568
+Version: omp, np: 9
+	Seed: 143464.452517
+	Size: 2000
+	Result: 21.239833
+Version: omp, np: 10
+	Seed: 143485.698391
+	Size: 2000
+	Result: 19.492088
+Version: omp, np: 11
+	Seed: 143505.196873
+	Size: 2000
+	Result: 15.532281
+Version: omp, np: 12
+	Seed: 143520.733199
+	Size: 2000
+	Result: 20.912634
+Version: omp, np: 2
+	Seed: 143541.649683
+	Size: 2000
+	Result: 70.562466
+Version: omp, np: 3
+	Seed: 143612.218623
+	Size: 2000
+	Result: 48.019512
+Version: omp, np: 4
+	Seed: 143660.244871
+	Size: 2000
+	Result: 36.492696
+Version: omp, np: 5
+	Seed: 143696.743524
+	Size: 2000
+	Result: 30.656818
+Version: omp, np: 6
+	Seed: 143727.406449
+	Size: 2000
+	Result: 25.611706
+Version: omp, np: 7
+	Seed: 143753.024461
+	Size: 2000
+	Result: 29.443862
+Version: omp, np: 8
+	Seed: 143782.474751
+	Size: 2000
+	Result: 20.999595
+Version: omp, np: 9
+	Seed: 143803.480529
+	Size: 2000
+	Result: 20.422788
+Version: omp, np: 10
+	Seed: 143823.907384
+	Size: 2000
+	Result: 20.590901
+Version: omp, np: 11
+	Seed: 143844.504580
+	Size: 2000
+	Result: 16.166736
+Version: omp, np: 12
+	Seed: 143860.675293
+	Size: 2000
+	Result: 14.747951
+Version: omp, np: 2
+	Seed: 143875.427234
+	Size: 2000
+	Result: 71.536170
+Version: omp, np: 3
+	Seed: 143946.969539
+	Size: 2000
+	Result: 47.631554
+Version: omp, np: 4
+	Seed: 143994.607135
+	Size: 2000
+	Result: 37.043929
+Version: omp, np: 5
+	Seed: 144031.657352
+	Size: 2000
+	Result: 35.773291
+Version: omp, np: 6
+	Seed: 144067.436735
+	Size: 2000
+	Result: 29.875680
+Version: omp, np: 7
+	Seed: 144097.318684
+	Size: 2000
+	Result: 23.576949
+Version: omp, np: 8
+	Seed: 144120.902024
+	Size: 2000
+	Result: 20.328644
+Version: omp, np: 9
+	Seed: 144141.236820
+	Size: 2000
+	Result: 26.626146
+Version: omp, np: 10
+	Seed: 144167.869066
+	Size: 2000
+	Result: 35.573374
+Version: omp, np: 11
+	Seed: 144203.448451
+	Size: 2000
+	Result: 15.771478
+Version: omp, np: 12
+	Seed: 144219.223999
+	Size: 2000
+	Result: 18.217503
+Version: omp2, np: 2
+	Seed: 144237.445461
+	Size: 2000
+	Result: 55.921779
+ Version: omp2, np: 3
+	Seed: 144293.373207
+	Size: 2000
+	Result: 45.601987
+ Version: omp2, np: 4
+	Seed: 144338.981529
+	Size: 2000
+	Result: 31.859476
+ Version: omp2, np: 5
+	Seed: 144370.847223
+	Size: 2000
+	Result: 32.583707
+ Version: omp2, np: 6
+	Seed: 144403.437084
+	Size: 2000
+	Result: 23.332782
+ Version: omp2, np: 7
+	Seed: 144426.776140
+	Size: 2000
+	Result: 20.349265
+ Version: omp2, np: 8
+	Seed: 144447.131342
+	Size: 2000
+	Result: 26.319974
+ Version: omp2, np: 9
+	Seed: 144473.457517
+	Size: 2000
+	Result: 14.151908
+ Version: omp2, np: 10
+	Seed: 144487.615193
+	Size: 2000
+	Result: 13.193887
+ Version: omp2, np: 11
+	Seed: 144500.815268
+	Size: 2000
+	Result: 12.538594
+ Version: omp2, np: 12
+	Seed: 144513.360161
+	Size: 2000
+	Result: 12.179543
+ Version: omp2, np: 2
+	Seed: 144525.543644
+	Size: 2000
+	Result: 56.297709
+ Version: omp2, np: 3
+	Seed: 144581.847387
+	Size: 2000
+	Result: 38.030755
+ Version: omp2, np: 4
+	Seed: 144619.884538
+	Size: 2000
+	Result: 28.788119
+ Version: omp2, np: 5
+	Seed: 144648.679011
+	Size: 2000
+	Result: 24.320069
+ Version: omp2, np: 6
+	Seed: 144673.005318
+	Size: 2000
+	Result: 20.682178
+ Version: omp2, np: 7
+	Seed: 144693.693777
+	Size: 2000
+	Result: 19.793908
+ Version: omp2, np: 8
+	Seed: 144713.493903
+	Size: 2000
+	Result: 16.332569
+ Version: omp2, np: 9
+	Seed: 144729.832370
+	Size: 2000
+	Result: 14.232998
+ Version: omp2, np: 10
+	Seed: 144744.071392
+	Size: 2000
+	Result: 16.485410
+ Version: omp2, np: 11
+	Seed: 144760.562992
+	Size: 2000
+	Result: 13.742581
+ Version: omp2, np: 12
+	Seed: 144774.309762
+	Size: 2000
+	Result: 12.545649
+ Version: omp2, np: 2
+	Seed: 144786.859440
+	Size: 2000
+	Result: 55.879999
+ Version: omp2, np: 3
+	Seed: 144842.745660
+	Size: 2000
+	Result: 39.779579
+ Version: omp2, np: 4
+	Seed: 144882.531455
+	Size: 2000
+	Result: 42.152264
+ Version: omp2, np: 5
+	Seed: 144924.690040
+	Size: 2000
+	Result: 45.093382
+ Version: omp2, np: 6
+	Seed: 144969.789433
+	Size: 2000
+	Result: 20.394719
+ Version: omp2, np: 7
+	Seed: 144990.190243
+	Size: 2000
+	Result: 18.063060
+ Version: omp2, np: 8
+	Seed: 145008.259515
+	Size: 2000
+	Result: 18.766327
+ Version: omp2, np: 9
+	Seed: 145027.032106
+	Size: 2000
+	Result: 14.491796
+ Version: omp2, np: 10
+	Seed: 145041.530013
+	Size: 2000
+	Result: 12.919428
+ Version: omp2, np: 11
+	Seed: 145054.455513
+	Size: 2000
+	Result: 15.982741
+ Version: omp2, np: 12
+	Seed: 145070.442317
+	Size: 2000
+	Result: 11.777981
+ 

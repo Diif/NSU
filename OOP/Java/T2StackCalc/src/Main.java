@@ -1,20 +1,50 @@
-import commands.Test;
+
+import calculator.StackCalculator;
+import tests.FabricTest;
+
+import java.io.*;
+import java.util.logging.*;
 
 public class Main {
-    public static void main(String[] args) {
-        Class c1 = null;
-        Test comma = null;
-        try {
-             c1 = Class.forName("commands.Test");
-        } catch (ClassNotFoundException e){
-            System.err.println("Not found");
-        }
-        System.out.println(c1.toString() + " pack " + c1.getPackageName() + " name " + c1.getName());
-        try{
-             comma = (Test)c1.newInstance();
-        }catch (Throwable e){
 
+    private static void setupGlobalLogger(){
+        Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+        FileHandler fileHandler = null;
+        try {
+            fileHandler = new FileHandler("log.txt");
+        } catch (IOException e){
+            System.err.println("Can't create file logger.");
         }
-        comma.sayHi();
+        assert fileHandler != null;
+        fileHandler.setFormatter(new SimpleFormatter());
+
+        Logger rootLogger = Logger.getLogger("");
+        Handler[] handlers = rootLogger.getHandlers();
+        if (handlers[0] instanceof ConsoleHandler) {
+            rootLogger.removeHandler(handlers[0]);
+        }
+
+        logger.addHandler(fileHandler);
     }
+
+    public static void main(String[] args) {
+        setupGlobalLogger();
+        Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+        logger.info("Main logger was created.");
+        FabricTest fabricTest = new FabricTest();
+        fabricTest.testMethods();
+//        InputStream stream = System.in;
+//        if (args.length > 0) {
+//            try {
+//                stream = new FileInputStream(new File((args[0])));
+//            } catch (FileNotFoundException e){
+//                logger.info("Can't find input file. Using standard input...");
+//                stream = System.in;
+//            }
+//        }
+//
+//        StackCalculator calculator = new StackCalculator("config.conf");
+//        calculator.calculate(stream);
+    }
+
 }
