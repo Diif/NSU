@@ -97,11 +97,11 @@ void CutAmatrix(int* o_total_local_A_size, int dimy, Matrix A,
   // if (test == 0) {
   //   PrintMatrix(A);
   // }
-  if (world_rank == 0) {
-    int sz;
-    MPI_Comm_size(subgrid_cols, &sz);
-    fprintf(stderr, "size %d\n", sz);
-  }
+  // if (world_rank == 0) {
+  //   int sz;
+  //   MPI_Comm_size(subgrid_cols, &sz);
+  //   fprintf(stderr, "size %d\n", sz);
+  // }
   MPI_Scatter(A.matrix, N1 * N2, MPI_MATRIX_DATA, uninit_local_A->matrix,
               *o_total_local_A_size, MPI_MATRIX_DATA, 0, subgrid_cols);
 }
