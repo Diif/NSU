@@ -12,7 +12,7 @@
 // #define N3 2304
 #define N1 12
 #define N2 12
-#define N3 12
+#define N3 18
 
 struct Matrix {
   MATRIX_DATA_POINTER matrix = NULL;
@@ -72,8 +72,8 @@ void GetFullCoords(MPI_Comm grid, int* dims, int* x, int* y) {
   *x = coords[1];
 }
 
-void GetRootWorldRank(int* root_rank, int x, int y, MPI_Comm grid,
-                      int world_rank) {
+void GetGridRootRank(int* root_rank, int x, int y, MPI_Comm grid,
+                     int world_rank) {
   if (x == 0 && y == 0) {
     MPI_Comm_rank(grid, root_rank);
     MPI_Send(root_rank, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
@@ -85,25 +85,94 @@ void GetRootWorldRank(int* root_rank, int x, int y, MPI_Comm grid,
   MPI_Bcast(root_rank, 1, MPI_INT, 0, MPI_COMM_WORLD);
 }
 
-void CutAmatrix(int* o_total_local_A_size, int dimy, Matrix A,
-                Matrix* uninit_local_A, MPI_Comm subgrid_cols, int world_rank) {
+void CutAmatrix(Matrix A, Matrix local_A, MPI_Comm subgrid_cols) {
+  int local_size = local_A.columns * local_A.rows;
+  MPI_Scatter(A.matrix, local_size, MPI_MATRIX_DATA, local_A.matrix, local_size,
+              MPI_MATRIX_DATA, 0, subgrid_cols);
+}
+
+void CutBMatrix(Matrix B, Matrix local_B, MPI_Comm subgrid_rows, int dimx,
+                int grid_rank, int grid_root_rank) {
+  int local_cols = local_B.columns;
+  int local_size = local_cols * local_B.rows;
+  MPI_Datatype col_type;
+
+  MPI_Type_vector(N2, local_B.columns, N3, MPI_MATRIX_DATA, &col_type);
+  MPI_Type_commit(&col_type);
+
+  int offset = 0;
+  for (int i = 0; i < dimx; i++) {
+    if (grid_rank == grid_root_rank) {
+      MPI_Send(B.matrix + offset, 1, col_type, i, 0, subgrid_rows);
+      offset += local_cols;
+    }
+    if (grid_rank == i) {
+      MPI_Recv(local_B.matrix, local_size, MPI_MATRIX_DATA, grid_root_rank, 0,
+               subgrid_rows, MPI_STATUS_IGNORE);
+    }
+  }
+
+  MPI_Type_free(&col_type);
+}
+
+void AllocateMemoryForLocalMatrices(Matrix* local_A, Matrix* local_B, int dimx,
+                                    int dimy) {
   int row_count = N1 / dimy;
-  *o_total_local_A_size = row_count * N2;
-  *uninit_local_A = CreateUnfilledMatrix(row_count, N2);
-  int test;
-  // MPI_Comm_rank(subgrid_cols, &test);
-  // fprintf(stderr, "world rank %d and col %d sizes %d %d\n", world_rank, test,
-  //         uninit_local_A->rows, uninit_local_A->columns);
-  // if (test == 0) {
-  //   PrintMatrix(A);
-  // }
-  // if (world_rank == 0) {
-  //   int sz;
-  //   MPI_Comm_size(subgrid_cols, &sz);
-  //   fprintf(stderr, "size %d\n", sz);
-  // }
-  MPI_Scatter(A.matrix, N1 * N2, MPI_MATRIX_DATA, uninit_local_A->matrix,
-              *o_total_local_A_size, MPI_MATRIX_DATA, 0, subgrid_cols);
+  *local_A = CreateUnfilledMatrix(row_count, N2);
+  int cols_count = N3 / dimx;
+  *local_B = CreateUnfilledMatrix(N2, cols_count);
+}
+
+void AllocateAndFillMainMatrices(Matrix* A, Matrix* B, Matrix* result) {
+  *A = CreateUnfilledMatrix(N1, N2);
+  *B = CreateUnfilledMatrix(N2, N3);
+  FormRandMatrix(*A);
+  FormRandMatrix(*B);
+  *result = CreateUnfilledMatrix(N1, N3);
+}
+
+void BroadcastLocalMatrices(Matrix local_A, Matrix local_B,
+                            MPI_Comm subgrid_rows, MPI_Comm subgrid_cols) {
+  MPI_Bcast(local_A.matrix, local_A.columns * local_A.rows, MPI_MATRIX_DATA, 0,
+            subgrid_rows);
+  MPI_Bcast(local_B.matrix, local_B.columns * local_B.rows, MPI_MATRIX_DATA, 0,
+            subgrid_cols);
+}
+
+void CollectResultMatrix(Matrix result, Matrix local_result, int dimx, int dimy,
+                         int x, int y, int grid_rank, int grid_root_rank,
+                         MPI_Comm grid) {
+  int local_cols = local_result.columns;
+  int local_rows = local_result.rows;
+  int total_parts = dimx * dimy;
+  int local_total_size = local_cols * local_rows;
+
+  MPI_Datatype matrix_part_type;
+
+  MPI_Type_vector(local_rows, local_cols, result.columns, MPI_MATRIX_DATA,
+                  &matrix_part_type);
+  MPI_Type_commit(&matrix_part_type);
+
+  for (int i = 0; i < total_parts; i++) {
+    MPI_Barrier(grid);
+    if (grid_rank == i) {
+      MPI_Send(local_result.matrix, local_total_size, MPI_MATRIX_DATA,
+               grid_root_rank, 0, grid);
+      MPI_Send(&x, 1, MPI_INT, grid_root_rank, 1, grid);
+      MPI_Send(&y, 1, MPI_INT, grid_root_rank, 2, grid);
+    }
+    if (grid_rank == grid_root_rank) {
+      int cur_x, cur_y;
+
+      MPI_Recv(&cur_x, 1, MPI_INT, MPI_ANY_SOURCE, 1, grid, MPI_STATUS_IGNORE);
+      MPI_Recv(&cur_y, 1, MPI_INT, MPI_ANY_SOURCE, 2, grid, MPI_STATUS_IGNORE);
+      MPI_Recv(
+          result.matrix + cur_x * local_cols + cur_y * dimx * local_total_size,
+          1, matrix_part_type, MPI_ANY_SOURCE, 0, grid, MPI_STATUS_IGNORE);
+    }
+  }
+
+  MPI_Type_free(&matrix_part_type);
 }
 
 int main(int argc, char** argv) {
@@ -116,80 +185,50 @@ int main(int argc, char** argv) {
   MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
   PrepareSizes(&dimx, &dimy, dims, argc, argv, &size);
 
-  // if (!world_rank) {
-  //   printf("size %d\ndimx %d\ndimy %d\ndims %d %d\n", size, dimx, dimy,
-  //   dims[0],
-  //          dims[1]);
-  // }
-
   MPI_Comm grid, subgrid_rows, subgrid_cols;
   CreateTopologies(&grid, &subgrid_rows, &subgrid_cols, dims);
 
   int x, y;
   GetFullCoords(grid, dims, &x, &y);
 
-  int root_rank;
+  int grid_root_rank;
   int grid_rank;
   MPI_Comm_rank(grid, &grid_rank);
-  GetRootWorldRank(&root_rank, x, y, grid, world_rank);
-
-  // for (size_t i = 0; i < size; i++) {
-  //   MPI_Barrier(MPI_COMM_WORLD);
-  //   if (world_rank == i) {
-  //     printf("World %d and grid %d, x %d, y %d and root %d\n", world_rank,
-  //            grid_rank, x, y, root_rank);
-  //   }
-  // }
+  GetGridRootRank(&grid_root_rank, x, y, grid, world_rank);
 
   Matrix A;
   Matrix local_A;
   Matrix B;
   Matrix local_B;
-
-  if (grid_rank == root_rank) {
-    A = CreateUnfilledMatrix(N1, N2);
-    B = CreateUnfilledMatrix(N2, N3);
-    FormRandMatrix(A);
-    FormRandMatrix(B);
+  Matrix result;
+  if (grid_rank == grid_root_rank) {
+    AllocateAndFillMainMatrices(&A, &B, &result);
   }
-  int local_A_size;
-  // if (!world_rank) {
-  //   int t1, t2;
-  //   MPI_Comm_size(subgrid_cols, &t2);
-  //   MPI_Comm_size(subgrid_rows, &t1);
-  //   printf("World %d cols %d rows %d\n", size, t1, t2);
-  // }
-  // int row_test = -1;
-  // MPI_Comm_rank(subgrid_rows, &row_test);
-  // if (row_test != -1) {
-  //   int sz;
-  //   MPI_Comm_size(subgrid_rows, &sz);
-  //   for (size_t i = 0; i < sz; i++) {
-  //     MPI_Barrier(subgrid_rows);
-  //     if (i == row_test) {
-  //       fprintf(stderr, "x %d y %d rank %d\n", x, y, row_test);
-  //     }
-  //   }
-  // }
-  if (x == 0)
-    CutAmatrix(&local_A_size, dimy, A, &local_A, subgrid_cols, world_rank);
-  // if (root_rank == grid_rank) {
-  //   printf("--------00---------\n");
-  //   PrintMatrix(local_A);
-  // }
-  // if (x == 0 && y == 1) {
-  //   printf("--------01---------\n");
-  //   PrintMatrix(local_A);
-  // }
-  // if (root_rank == grid_rank) {
-  //   PrintMatrix(A);
-  // }
+  AllocateMemoryForLocalMatrices(&local_A, &local_B, dimx, dimy);
 
-  // if (grid_rank == root_rank) {
-  //   FreeMatrix(A);
-  //   FreeMatrix(B);
-  // }
+  if (x == 0) {
+    CutAmatrix(A, local_A, subgrid_cols);
+  }
+  if (y == 0) {
+    CutBMatrix(B, local_B, subgrid_rows, dimx, grid_rank, grid_root_rank);
+  }
+  BroadcastLocalMatrices(local_A, local_B, subgrid_rows, subgrid_cols);
 
+  Matrix local_result;
+  local_result.matrix = NULL;
+  MultMatrixOnMatrix(local_result, local_A, local_B);
+  CollectResultMatrix(result, local_result, dimx, dimy, x, y, grid_rank,
+                      grid_root_rank, grid);
+
+  if (grid_root_rank == grid_rank) {
+    PrintMatrix(result);
+    //   FreeMatrix(A);
+    //   FreeMatrix(B);
+    //   FreeMatrix(result);
+  }
+  // FreeMatrix(local_A);
+  // FreeMatrix(local_B);
+  // FreeMatrix(local_result);
   MPI_Finalize();
 }
 
@@ -260,9 +299,9 @@ void PrintMatrix(Matrix& mat) {
   const int max_columns = mat.columns;
   int index_for_print = 1;
   for (int cur = 0; cur < size; cur++, index_for_print++) {
-    printf("%0.1f ", matrix[cur]);
+    fprintf(stdout, "%0.1f ", matrix[cur]);
     if (index_for_print % max_columns == 0) {
-      printf("\n");
+      fprintf(stdout, "\n");
     }
   }
 }
