@@ -4,7 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#define MIN_TABLE_SIZE 10
+#define MIN_TABLE_SIZE 20
 
 static long *offset_table;
 static long *len_table;
@@ -28,8 +28,15 @@ int Resize(int old_size, int new_size, long **table) {
   return 0;
 }
 
+int HasNewLine(char *str, int last_ind) {
+  for (size_t i = 0; i <= last_ind; i++) {
+    if (str[i] == '\n') return 1;
+  }
+  return 0;
+}
+
 int FillTable(int dsc, long *o_total_lines) {
-  char c;
+  char c[11];
   long len = 0;
   long offset = 0;
   long ind = 0;
@@ -40,13 +47,11 @@ int FillTable(int dsc, long *o_total_lines) {
   if (offset_table == NULL || len_table == NULL) {
     return -1;
   }
-  while ((read(dsc, &c, 1)) != 0) {
-    offset++;
-    if (c != '\n') {
-      len++;
-      continue;
-    }
-    if (ind >= cur_size - 1) {
+
+  int rec_bytes = 0;
+  offset_table[ind] = 0;
+  while ((rec_bytes = (read(dsc, &c, 10))) != 0) {
+    if (ind + 10 > cur_size) {
       if (Resize(cur_size, cur_size * 1.5, &offset_table) == -1) {
         return -1;
       }
@@ -54,14 +59,20 @@ int FillTable(int dsc, long *o_total_lines) {
         return -1;
       }
     }
-    if (ind == 0) {
-      offset_table[ind] = 0;
+
+    c[rec_bytes] = '\0';
+    for (int i = 0; i < rec_bytes; i++) {
+      offset++;
+      if (c[i] == '\n') {
+        offset_table[ind + 1] = offset;
+        len_table[ind] = len + 1;
+        ind++;
+        lines++;
+        len = 0;
+        continue;
+      }
+      len++;
     }
-    offset_table[ind + 1] = offset;
-    len_table[ind] = len;
-    len = 0;
-    ind++;
-    lines++;
   }
   (*o_total_lines) = lines;
   return 0;
@@ -75,7 +86,7 @@ int PrintLine(int dsc, int line) {
     return -1;
   }
   buf[len] = '\0';
-  printf("%s\n", buf);
+  printf("%s", buf);
   free(buf);
 
   return 0;
@@ -104,12 +115,12 @@ int main(int argc, char **argv) {
 
   while (1) {
     printf("Enter line num: ");
-    if (scanf("%d", &line) == 0) {
+    if (scanf("%ld", &line) == 0) {
       printf("Incorrect value.\n");
       return -1;
     }
     if (line > max_lines || line < 0) {
-      printf("Line with num %d does not exists.", line);
+      printf("Line with num %ld does not exists.\n", line);
     }
     if (line == 0) {
       break;
