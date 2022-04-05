@@ -7,12 +7,12 @@
 #define MATRIX_DATA double
 #define MPI_MATRIX_DATA MPI_DOUBLE
 
-// #define N1 13824
-// #define N2 1728
-// #define N3 2304
-#define N1 12
-#define N2 12
-#define N3 18
+#define N1 13824
+#define N2 1728
+#define N3 2304
+// #define N1 1200
+// #define N2 1200
+// #define N3 1800
 
 struct Matrix {
   MATRIX_DATA_POINTER matrix = NULL;
@@ -75,8 +75,9 @@ void GetFullCoords(MPI_Comm grid, int* dims, int* x, int* y) {
 void GetGridRootRank(int* root_rank, int x, int y, MPI_Comm grid,
                      int world_rank) {
   if (x == 0 && y == 0) {
+    MPI_Request reqs;
     MPI_Comm_rank(grid, root_rank);
-    MPI_Send(root_rank, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
+    MPI_Isend(root_rank, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, &reqs);
   }
   if (world_rank == 0) {
     MPI_Recv(root_rank, 1, MPI_INT, MPI_ANY_SOURCE, 1, MPI_COMM_WORLD,
@@ -101,12 +102,19 @@ void CutBMatrix(Matrix B, Matrix local_B, MPI_Comm subgrid_rows, int dimx,
   MPI_Type_commit(&col_type);
 
   int offset = 0;
+  if (grid_rank == grid_root_rank) {
+    MPI_Request reqs;
+    MPI_Isend(B.matrix, 1, col_type, grid_root_rank, 0, subgrid_rows, &reqs);
+    MPI_Recv(local_B.matrix, local_size, MPI_MATRIX_DATA, grid_root_rank, 0,
+             subgrid_rows, MPI_STATUS_IGNORE);
+    offset += local_cols;
+  }
   for (int i = 0; i < dimx; i++) {
-    if (grid_rank == grid_root_rank) {
+    if (grid_rank == grid_root_rank && i != grid_root_rank) {
       MPI_Send(B.matrix + offset, 1, col_type, i, 0, subgrid_rows);
       offset += local_cols;
     }
-    if (grid_rank == i) {
+    if (grid_rank == i && grid_rank != grid_root_rank) {
       MPI_Recv(local_B.matrix, local_size, MPI_MATRIX_DATA, grid_root_rank, 0,
                subgrid_rows, MPI_STATUS_IGNORE);
     }
@@ -153,15 +161,29 @@ void CollectResultMatrix(Matrix result, Matrix local_result, int dimx, int dimy,
                   &matrix_part_type);
   MPI_Type_commit(&matrix_part_type);
 
+  if (grid_root_rank == grid_rank) {
+    MPI_Request reqs;
+    MPI_Isend(local_result.matrix, local_total_size, MPI_MATRIX_DATA,
+              grid_root_rank, 0, grid, &reqs);
+    MPI_Isend(&x, 1, MPI_INT, grid_root_rank, 1, grid, &reqs);
+    MPI_Isend(&y, 1, MPI_INT, grid_root_rank, 2, grid, &reqs);
+    int cur_x, cur_y;
+    MPI_Recv(&cur_x, 1, MPI_INT, MPI_ANY_SOURCE, 1, grid, MPI_STATUS_IGNORE);
+    MPI_Recv(&cur_y, 1, MPI_INT, MPI_ANY_SOURCE, 2, grid, MPI_STATUS_IGNORE);
+    MPI_Recv(
+        result.matrix + cur_x * local_cols + cur_y * dimx * local_total_size, 1,
+        matrix_part_type, MPI_ANY_SOURCE, 0, grid, MPI_STATUS_IGNORE);
+  }
+
   for (int i = 0; i < total_parts; i++) {
     MPI_Barrier(grid);
-    if (grid_rank == i) {
-      MPI_Send(local_result.matrix, local_total_size, MPI_MATRIX_DATA,
-               grid_root_rank, 0, grid);
+    if (grid_rank == i && grid_rank != grid_root_rank) {
       MPI_Send(&x, 1, MPI_INT, grid_root_rank, 1, grid);
       MPI_Send(&y, 1, MPI_INT, grid_root_rank, 2, grid);
+      MPI_Send(local_result.matrix, local_total_size, MPI_MATRIX_DATA,
+               grid_root_rank, 0, grid);
     }
-    if (grid_rank == grid_root_rank) {
+    if (grid_rank == grid_root_rank && i != grid_root_rank) {
       int cur_x, cur_y;
 
       MPI_Recv(&cur_x, 1, MPI_INT, MPI_ANY_SOURCE, 1, grid, MPI_STATUS_IGNORE);
@@ -221,14 +243,14 @@ int main(int argc, char** argv) {
                       grid_root_rank, grid);
 
   if (grid_root_rank == grid_rank) {
-    PrintMatrix(result);
-    //   FreeMatrix(A);
-    //   FreeMatrix(B);
-    //   FreeMatrix(result);
+    // PrintMatrix(result);
+    FreeMatrix(A);
+    FreeMatrix(B);
+    FreeMatrix(result);
   }
-  // FreeMatrix(local_A);
-  // FreeMatrix(local_B);
-  // FreeMatrix(local_result);
+  FreeMatrix(local_A);
+  FreeMatrix(local_B);
+  FreeMatrix(local_result);
   MPI_Finalize();
 }
 
@@ -269,9 +291,8 @@ void MultMatrixOnMatrix(Matrix& matrix_for_result, Matrix& matrix_to_mult,
   for (int m1_row = 0; m1_row < m1_rows; m1_row++) {
     for (int m1_col = 0; m1_col < m1_columns; m1_col++) {
       MATRIX_DATA mult_koef = p_matrix_to_mult[m1_row * m1_columns + m1_col];
-      int m2_row = m1_col;
       int place1 = m1_row * m2_columns;
-      int place2 = m2_row * m2_columns;
+      int place2 = m1_col * m2_columns;
       for (int m2_col = 0; m2_col < m2_columns; m2_col++) {
         p_result[place1 + m2_col] += mult_koef * p_matrix_on[place2 + m2_col];
       }

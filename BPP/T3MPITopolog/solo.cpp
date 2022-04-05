@@ -5,12 +5,12 @@
 #define MATRIX_DATA_POINTER double*
 #define MATRIX_DATA double
 
-// #define N1 13824
-// #define N2 1728
-// #define N3 2304
-#define N1 12
-#define N2 12
-#define N3 18
+#define N1 13824
+#define N2 1728
+#define N3 2304
+// #define N1 1200
+// #define N2 1200
+// #define N3 1800
 
 struct Matrix {
   MATRIX_DATA_POINTER matrix = NULL;
@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
 
   AllocateAndFillMainMatrices(&A, &B, &result);
   MultMatrixOnMatrix(result, A, B);
-  PrintMatrix(result);
+  // PrintMatrix(result);
   FreeMatrix(A);
   FreeMatrix(B);
   FreeMatrix(result);
