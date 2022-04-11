@@ -10,13 +10,17 @@ int main() {
   }
 
   if (pid == 0) {
-    if (system("cat test.txt") == 1) {
-      exit(EXIT_FAILURE);
-    }
-    exit(EXIT_SUCCESS);
+    // if (system("cat test.txt") == -1) {
+    //   exit(EXIT_FAILURE);
+    // }
+    execlp("cat", "cat", "test.txt", NULL);
+    exit(EXIT_FAILURE);
   } else {
     int stat;
     wait(&stat);
+    if (stat == -1) {
+      exit(EXIT_FAILURE);
+    }
     printf("Some text for parent process...\n");
   }
   return 0;
