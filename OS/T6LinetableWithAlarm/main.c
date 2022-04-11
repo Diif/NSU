@@ -108,6 +108,7 @@ void sigHandler(int sgn) {
     str[rec_bytes] = '\0';
     printf("%s", str);
   }
+  fclose(dsc);
   exit(EXIT_SUCCESS);
 }
 
