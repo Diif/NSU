@@ -14,8 +14,8 @@ public class Define implements Command{
             args = (String[]) context.lookup("args");
             params = (HashMap<String,Double>) context.lookup("params");
         } catch (NamingException e){
-            logger.severe("Can't find args/params in context. Can't continue.\n" + e.getLocalizedMessage());
-            System.exit(-1);
+            logger.severe("Can't find args/params in context.\n" + e.getLocalizedMessage());
+            throw new RuntimeException("No args/params.");
         }
         assert args != null;
         assert params != null;

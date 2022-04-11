@@ -15,8 +15,8 @@ public interface Command {
         try {
             stack = (Stack<Double>) context.lookup("stack");
         } catch (NamingException e){
-            logger.severe("Can't find stack in context. Can't continue.\n" + e.getLocalizedMessage());
-            System.exit(-1);
+            logger.severe("Can't find stack in context.\n" + e.getLocalizedMessage());
+            throw new RuntimeException("No stack.");
         }
         assert stack != null;
         return stack;

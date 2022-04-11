@@ -17,8 +17,8 @@ public class Push implements Command {
             stack = (Stack<Double>) context.lookup("stack");
             params = (HashMap<String,Double>) context.lookup("params");
         } catch (NamingException e){
-            logger.severe("Can't find args/params/stack in context. Can't continue.\n" + e.getLocalizedMessage());
-            System.exit(-1);
+            logger.severe("Can't find args/params/stack in context.\n" + e.getLocalizedMessage());
+            throw new RuntimeException("No args/params/stack.");
         }
         assert stack != null;
         assert args != null;

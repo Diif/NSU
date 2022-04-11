@@ -1,5 +1,7 @@
 
 import calculator.StackCalculator;
+import tests.CalculatorTest;
+import tests.CommandsTest;
 import tests.FabricTest;
 
 import java.io.*;
@@ -33,6 +35,10 @@ public class Main {
         logger.info("Main logger was created.");
         FabricTest fabricTest = new FabricTest();
         fabricTest.testMethods();
+        CommandsTest commandsTest = new CommandsTest();
+        commandsTest.testExecution();
+        CalculatorTest calculatorTest = new CalculatorTest();
+        calculatorTest.testCalculator();
 //        InputStream stream = System.in;
 //        if (args.length > 0) {
 //            try {
