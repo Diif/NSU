@@ -97,11 +97,18 @@ int PrintLine(int dsc, int line) {
   return 0;
 }
 
+int dsc;
+
 void sigHandler(int sgn) {
-  if (exec_flag == 0) {
-    printf("\nOut of time.\n");
-    exit(EXIT_SUCCESS);
+  lseek(dsc, 0, SEEK_SET);
+  printf("\n");
+  int rec_bytes = 0;
+  char str[11];
+  while ((rec_bytes = (read(dsc, &str, 10))) != 0) {
+    str[rec_bytes] = '\0';
+    printf("%s", str);
   }
+  exit(EXIT_SUCCESS);
 }
 
 int main(int argc, char **argv) {
@@ -115,7 +122,6 @@ int main(int argc, char **argv) {
     filename = "test.txt";
   }
 
-  int dsc;
   if ((dsc = open(filename, O_RDWR)) < 0) {
     fprintf(stderr, "Can't open file %s\n", filename);
     return -1;
@@ -129,12 +135,10 @@ int main(int argc, char **argv) {
   while (1) {
     printf("Enter line num: ");
     alarm(5);
-    exec_flag = 0;
     if (scanf("%ld", &line) == 0) {
       printf("Incorrect value.\n");
       return -1;
     }
-    exec_flag = 1;
     if (line > max_lines || line < 0) {
       printf("Line with num %ld does not exists.\n", line);
     }
