@@ -100,19 +100,24 @@ int PrintLine(int dsc, int line) {
 int dsc;
 
 void sigHandler(int sgn) {
-  lseek(dsc, 0, SEEK_SET);
   printf("\n");
+  kill(0, SIGPROF);
+  lseek(dsc, 0, SEEK_SET);
   int rec_bytes = 0;
   char str[11];
   while ((rec_bytes = (read(dsc, &str, 10))) != 0) {
     str[rec_bytes] = '\0';
     printf("%s", str);
   }
-  fclose(dsc);
+  close(dsc);
   exit(EXIT_SUCCESS);
 }
 
 int main(int argc, char **argv) {
+  sigset_t set;
+  sigemptyset(&set);
+  sigaddset(&set, SIGPROF);
+  sigprocmask(SIG_BLOCK, &set, NULL);
   signal(SIGALRM, sigHandler);
   char *filename;
   long line = 1;
@@ -123,10 +128,11 @@ int main(int argc, char **argv) {
     filename = "test.txt";
   }
 
-  if ((dsc = open(filename, O_RDWR)) < 0) {
-    fprintf(stderr, "Can't open file %s\n", filename);
-    return -1;
-  }
+  // if ((dsc = open(filename, O_RDWR)) < 0) {
+  //   fprintf(stderr, "Can't open file %s\n", filename);
+  //   return -1;
+  // }
+  dsc = 0;
 
   if (FillTable(dsc, &max_lines) < 0) {
     fprintf(stderr, "Can't fill table.\n");
@@ -134,7 +140,7 @@ int main(int argc, char **argv) {
   }
 
   while (1) {
-    printf("Enter line num: ");
+    fprintf(stderr, "Enter line num: ");
     alarm(5);
     if (scanf("%ld", &line) == 0) {
       printf("Incorrect value.\n");
