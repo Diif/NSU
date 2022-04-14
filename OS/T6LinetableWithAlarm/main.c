@@ -128,11 +128,10 @@ int main(int argc, char **argv) {
     filename = "test.txt";
   }
 
-  // if ((dsc = open(filename, O_RDWR)) < 0) {
-  //   fprintf(stderr, "Can't open file %s\n", filename);
-  //   return -1;
-  // }
-  dsc = 0;
+  if ((dsc = open(filename, O_RDWR)) < 0) {
+    fprintf(stderr, "Can't open file %s\n", filename);
+    return -1;
+  }
 
   if (FillTable(dsc, &max_lines) < 0) {
     fprintf(stderr, "Can't fill table.\n");
