@@ -8,8 +8,8 @@
 #define MPI_MATRIX_DATA MPI_DOUBLE
 
 #define N1 13824
-#define N2 1728
-#define N3 2304
+#define N2 6912
+#define N3 4608
 // #define N1 1200
 // #define N2 1200
 // #define N3 1800
@@ -51,8 +51,8 @@ void PrepareSizes(int* dimx, int* dimy, int* dims, int argc, char** argv,
   }
 }
 
-void CreateTopologies(MPI_Comm* grid, MPI_Comm* subgrid_rows,
-                      MPI_Comm* subgrid_cols, int* dims) {
+void CreateComms(MPI_Comm* grid, MPI_Comm* subgrid_rows, MPI_Comm* subgrid_cols,
+                 int* dims) {
   int periods[2] = {0, 0};
   int reoder = 1;
   int remain_dims[2] = {0, 1};
@@ -74,14 +74,17 @@ void GetFullCoords(MPI_Comm grid, int* dims, int* x, int* y) {
 
 void GetGridRootRank(int* root_rank, int x, int y, MPI_Comm grid,
                      int world_rank) {
+  MPI_Request reqs;
   if (x == 0 && y == 0) {
-    MPI_Request reqs;
     MPI_Comm_rank(grid, root_rank);
     MPI_Isend(root_rank, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, &reqs);
   }
   if (world_rank == 0) {
     MPI_Recv(root_rank, 1, MPI_INT, MPI_ANY_SOURCE, 1, MPI_COMM_WORLD,
              MPI_STATUS_IGNORE);
+  }
+  if (x == 0 && y == 0) {
+    MPI_Wait(&reqs, MPI_STATUS_IGNORE);
   }
   MPI_Bcast(root_rank, 1, MPI_INT, 0, MPI_COMM_WORLD);
 }
@@ -107,6 +110,7 @@ void CutBMatrix(Matrix B, Matrix local_B, MPI_Comm subgrid_rows, int dimx,
     MPI_Isend(B.matrix, 1, col_type, grid_root_rank, 0, subgrid_rows, &reqs);
     MPI_Recv(local_B.matrix, local_size, MPI_MATRIX_DATA, grid_root_rank, 0,
              subgrid_rows, MPI_STATUS_IGNORE);
+    MPI_Wait(&reqs, MPI_STATUS_IGNORE);
     offset += local_cols;
   }
   for (int i = 0; i < dimx; i++) {
@@ -165,14 +169,13 @@ void CollectResultMatrix(Matrix result, Matrix local_result, int dimx, int dimy,
     MPI_Request reqs;
     MPI_Isend(local_result.matrix, local_total_size, MPI_MATRIX_DATA,
               grid_root_rank, 0, grid, &reqs);
-    MPI_Isend(&x, 1, MPI_INT, grid_root_rank, 1, grid, &reqs);
-    MPI_Isend(&y, 1, MPI_INT, grid_root_rank, 2, grid, &reqs);
     int cur_x, cur_y;
-    MPI_Recv(&cur_x, 1, MPI_INT, MPI_ANY_SOURCE, 1, grid, MPI_STATUS_IGNORE);
-    MPI_Recv(&cur_y, 1, MPI_INT, MPI_ANY_SOURCE, 2, grid, MPI_STATUS_IGNORE);
+    cur_x = x;
+    cur_y = y;
     MPI_Recv(
         result.matrix + cur_x * local_cols + cur_y * dimx * local_total_size, 1,
         matrix_part_type, MPI_ANY_SOURCE, 0, grid, MPI_STATUS_IGNORE);
+    MPI_Wait(&reqs, MPI_STATUS_IGNORE);
   }
 
   for (int i = 0; i < total_parts; i++) {
@@ -208,7 +211,7 @@ int main(int argc, char** argv) {
   PrepareSizes(&dimx, &dimy, dims, argc, argv, &size);
 
   MPI_Comm grid, subgrid_rows, subgrid_cols;
-  CreateTopologies(&grid, &subgrid_rows, &subgrid_cols, dims);
+  CreateComms(&grid, &subgrid_rows, &subgrid_cols, dims);
 
   int x, y;
   GetFullCoords(grid, dims, &x, &y);
