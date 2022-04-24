@@ -13,9 +13,9 @@ int main() {
     execlp("cat", "cat", "test.txt", NULL);
     exit(EXIT_FAILURE);
   } else {
-    int stat;
-    wait(&stat);
-    if (stat == -1) {
+    int stat, res;
+    res = wait(&stat);
+    if (res == -1) {
       exit(EXIT_FAILURE);
     }
     printf("Some text for parent process...\n");
