@@ -73,12 +73,12 @@ int main(int argc, char **argv) {
   }
   MAX_ROWS = atoi(argv[1]);
   MAX_COLUMNS = atoi(argv[2]);
-  if (MAX_ROWS < 100 || MAX_COLUMNS < 100) {
-    if (!rank) {
-      printf("Field is too small.\n");
-    }
-    exit(EXIT_FAILURE);
-  }
+  // if (MAX_ROWS < 100 || MAX_COLUMNS < 100) {
+  //   if (!rank) {
+  //     printf("Field is too small.\n");
+  //   }
+  //   exit(EXIT_FAILURE);
+  // }
 
   CreateGame(MAX_ROWS, MAX_COLUMNS);
   MPI_Finalize();
@@ -131,9 +131,13 @@ void GameProcess(char *matrix_main, char *matrix_next, char *matrix_main_loop,
                  char *matrix_next_loop, int l_max_rows, int max_columns) {
   int loop_found = 0, counter = 0;
   int total_loops = 0;
+
+  char *total_matrix;
+  if (!rank) {
+    total_matrix = (char *)malloc(sizeof(char) * MAX_COLUMNS * MAX_ROWS);
+  }
   CopyMatrixToMatrixSkipShadowLines(matrix_main, matrix_main_loop, l_max_rows,
                                     max_columns);
-
   while (!loop_found) {
     counter++;
     UpdateMain(matrix_main, matrix_next, l_max_rows, max_columns);
@@ -196,8 +200,8 @@ void UpdateLevelState(char *matrix_main, char *matrix_next, int max_rows,
   MPI_Isend(matrix_main + shadow_shift, max_columns, MPI_CHAR, prev_rank, 0,
             MPI_COMM_WORLD, &send_first);
   MPI_Isend(matrix_main + (max_rows * max_columns), max_columns, MPI_CHAR,
-            next_rank, 0, MPI_COMM_WORLD, &send_last);
-  MPI_Irecv(matrix_main, max_columns, MPI_CHAR, prev_rank, 0, MPI_COMM_WORLD,
+            next_rank, 1, MPI_COMM_WORLD, &send_last);
+  MPI_Irecv(matrix_main, max_columns, MPI_CHAR, prev_rank, 1, MPI_COMM_WORLD,
             &rec_first);
   MPI_Irecv(matrix_main + (max_rows * max_columns) + shadow_shift, max_columns,
             MPI_CHAR, next_rank, 0, MPI_COMM_WORLD, &rec_last);
@@ -421,7 +425,7 @@ int CheckAndInitMatrix(char **matrix, int size, int no_error) {
 }
 
 void PrintMatrix(char *matrix, int max_rows, int max_columns) {
-  Green();
+  // Green();
   for (int y = 0; y < max_rows; y++) {
     int shift = y * max_columns;
     for (int x = 0; x < max_columns; x++) {
@@ -429,7 +433,7 @@ void PrintMatrix(char *matrix, int max_rows, int max_columns) {
     }
     printf("\n");
   }
-  ResetColor();
+  // ResetColor();
   printf("\n");
 }
 
@@ -504,3 +508,12 @@ void CalculateSizesAndDisplsForScatter(int num_of_proc, int max_rows,
     }
   }
 }
+
+// MPI_Gatherv(matrix_main + shadow_shift, sizes_for_scatter[rank], MPI_CHAR,
+//             total_matrix, sizes_for_scatter, displs, MPI_CHAR, 0,
+//             MPI_COMM_WORLD);
+// if (rank == 0) {
+//   printf("-------------MAIN--------------\n");
+//   PrintMatrix(total_matrix, MAX_ROWS, MAX_COLUMNS);
+//   PrintMatrix(matrix_main + shadow_shift, l_max_rows, max_columns);
+// }

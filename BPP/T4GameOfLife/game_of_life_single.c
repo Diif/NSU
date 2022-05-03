@@ -387,7 +387,7 @@ int CheckAndInitMatrix(char **matrix, int max_rows, int max_columns,
 }
 
 void PrintMatrix(char *matrix, int max_rows, int max_columns) {
-  Green();
+  // Green();
   for (int y = 0; y < max_rows; y++) {
     int shift = y * max_columns;
     for (int x = 0; x < max_columns; x++) {
@@ -395,7 +395,7 @@ void PrintMatrix(char *matrix, int max_rows, int max_columns) {
     }
     printf("\n");
   }
-  ResetColor();
+  // ResetColor();
   printf("\n");
 }
 
