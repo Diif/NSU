@@ -22,9 +22,12 @@ int main() {
       const char CTRL_W = 23;
       const int size = sizeof(char);
 
-      while (read(STDIN_FILENO, &c, size) > 0) {
-        write(STDIN_FILENO, &c, size);
+      // while (read(STDIN_FILENO, &c, size) > 0) {
+      // write(STDIN_FILENO, &c, size);
+      while (scanf("%c", &c) > 0) {
+        printf("%d\n", c);
       }
+      // }
     }
   }
 }
