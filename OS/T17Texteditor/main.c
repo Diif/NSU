@@ -24,7 +24,6 @@ void deleteWordAndSpaces(char* buf, int* line_position) {
     if (space_was_found) {
       break;
     }
-    buf[position] = ' ';
     position--;
     if (position < 0) {
       *line_position = 0;
@@ -53,6 +52,7 @@ int main() {
       const char NEW_LINE = '\n';
       const char CARRIAGE_RETURN = '\r';
       const char BEL = 7;
+      const char CLEAR_LINE_SEQ[] = {27, '[', '1', 'K'};
       const int size = sizeof(char);
       int line_position = 0;
 
@@ -62,26 +62,23 @@ int main() {
             continue;
           }
           line_position--;
-          buf[line_position] = ' ';
-          write(STDIN_FILENO, &CARRIAGE_RETURN, size);
-          write(STDIN_FILENO, buf, (line_position + 1) * size);
+          write(STDIN_FILENO, CLEAR_LINE_SEQ, size * 4);
           write(STDIN_FILENO, &CARRIAGE_RETURN, size);
           write(STDIN_FILENO, buf, line_position * size);
         } else if (c == KILL) {
-          memset(buf, ' ', sizeof(char) * MAX_LEN);
-          write(STDIN_FILENO, &CARRIAGE_RETURN, size);
-          write(STDIN_FILENO, &buf, size * MAX_LEN);
+          write(STDIN_FILENO, CLEAR_LINE_SEQ, size * 4);
           write(STDIN_FILENO, &CARRIAGE_RETURN, size);
           line_position = 0;
         } else if (c == CTRL_W) {
-          int o_position = line_position;
           deleteWordAndSpaces(buf, &line_position);
-          write(STDIN_FILENO, &CARRIAGE_RETURN, size);
-          write(STDIN_FILENO, buf, o_position * size);
+          write(STDIN_FILENO, CLEAR_LINE_SEQ, size * 4);
           write(STDIN_FILENO, &CARRIAGE_RETURN, size);
           write(STDIN_FILENO, buf, line_position * size);
         } else if (c == CTRL_D) {
           if (line_position == 0) {
+            term.c_lflag |= ICANON;
+            term.c_lflag |= ECHO;
+            tcsetattr(STDIN_FILENO, TCSANOW, &term);
             exit(EXIT_SUCCESS);
           }
         } else if ((c < 31 || c > 127) && c != NEW_LINE) {
