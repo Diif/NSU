@@ -36,6 +36,7 @@ void deleteWordAndSpaces(char* buf, int* line_position) {
 int main() {
   struct termios term;
   if (!tcgetattr(STDIN_FILENO, &term)) {
+    tcflag_t oflags = term.c_cflag;
     term.c_lflag &= ~ICANON;
     term.c_lflag &= ~ECHO;
     term.c_cc[VMIN] = 1;
@@ -76,12 +77,11 @@ int main() {
           write(STDIN_FILENO, buf, line_position * size);
         } else if (c == CTRL_D) {
           if (line_position == 0) {
-            term.c_lflag |= ICANON;
-            term.c_lflag |= ECHO;
+            term.c_lflag = oflags;
             tcsetattr(STDIN_FILENO, TCSANOW, &term);
             exit(EXIT_SUCCESS);
           }
-        } else if ((c < 31 || c > 127) && c != NEW_LINE) {
+        } else if ((c <= 31 || c >= 127) && c != NEW_LINE) {
           write(STDIN_FILENO, &BEL, size);
           continue;
         } else {
@@ -98,8 +98,7 @@ int main() {
           }
         }
       }
-      term.c_lflag |= ICANON;
-      term.c_lflag |= ECHO;
+      term.c_lflag = oflags;
       tcsetattr(STDIN_FILENO, TCSANOW, &term);
     }
   }
