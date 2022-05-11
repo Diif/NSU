@@ -100,9 +100,6 @@ int PrintLine(int dsc, int line) {
 int dsc;
 
 void sigHandler(int sgn) {
-  printf("Sig..\n");
-  kill(0, SIGPROF);
-  sleep(4);
   lseek(dsc, 0, SEEK_SET);
   int rec_bytes = 0;
   char str[11];
@@ -151,7 +148,6 @@ int main(int argc, char **argv) {
   while (1) {
     fprintf(stderr, "Enter line num: ");
     alarm(5);
-    alarm(7);
     if (scanf("%ld", &line) == 0) {
       printf("Incorrect value.\n");
       return -1;
