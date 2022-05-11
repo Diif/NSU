@@ -2,27 +2,49 @@ package logic.model;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class GameModel{
     public enum StateType{
-        DEFEAT, ACTION, VICTORY
+        ACTION, DEFEAT, VICTORY, CLOSED
     }
-
 
     private int gameTime;
     private int fieldSizeX;
     private int fieldSizeY;
-    private int numBombs;
     private int baseScore;
     private double curScore;
     private int titlesForWin;
     private boolean isFirstClick;
+    private boolean timerClosed;
+    private final String aboutInfo;
     private StateType gameState;
     private GameField field;
     private Timer timer;
-    private PropertyChangeSupport changeSupport;
+    private final PropertyChangeSupport changeSupport;
+    private final ScoreTable scores;
+
+
+    public GameModel(){
+        aboutInfo = "\t\tWelcome to Minesweeper!\n\t1) Click on titles to open them.\n\t2) Numbers show count of bombs around (3x3 area).\n\t3) Try not to blow up!";
+        changeSupport = new PropertyChangeSupport(this);
+        timerClosed = true;
+        scores = new ScoreTable();
+        scores.initScores();
+    }
+
+    public void closeTimer(){
+        timerClosed = true;
+        timer.cancel();
+        timer.purge();
+    }
+
+    public void setStateAndNotify(StateType state){
+        gameState = state;
+        changeSupport.firePropertyChange("stateChange", null, state);
+    }
 
     public void addListener(PropertyChangeListener listener){
         changeSupport.addPropertyChangeListener(listener);
@@ -33,10 +55,9 @@ public class GameModel{
     }
 
     public void startNewGame(int fieldLen, int fieldHeight, int numBombs) throws IncorectGameOptions {
-        if(fieldLen <= 0 || fieldHeight <= 0 || numBombs <= 0 || fieldHeight * fieldLen <= numBombs){
+        if(fieldLen <= 0 || fieldHeight <= 0 || numBombs <= 0 || fieldHeight * fieldLen <= numBombs + 1 || fieldLen > 58 || fieldHeight > 34){
             throw new IncorectGameOptions(fieldLen, fieldHeight, numBombs);
         }
-        gameTime = 0;
         gameState = StateType.ACTION;
         fieldSizeX = fieldLen;
         fieldSizeY = fieldHeight;
@@ -44,44 +65,87 @@ public class GameModel{
         baseScore =  fieldSizeX * fieldSizeY - numBombs;
         curScore = baseScore;
         isFirstClick = true;
-        this.numBombs = numBombs;
 
+        if(!timerClosed){
+            closeTimer();
+        }
         timer = new Timer();
+        gameTime = 0;
         field = new GameField(fieldSizeX, fieldSizeY);
         field.generateGameField(numBombs);
-
+        setStateAndNotify(StateType.ACTION);
     }
 
-    public void processClick(int x, int y){
+    private boolean canIgnoreClick(int x, int y){
         if(x < 0 || y < 0 || x >= fieldSizeX || y >= fieldSizeY || gameState != StateType.ACTION){
-            return;
+            changeSupport.firePropertyChange("nothingChange", null, null);
+            return true;
         }
         Title title = field.getTitle(x,y);
-        if(!title.isTerraIncognita()){
-            return;
+        if(!title.isTerraIncognita() || title.isFlag()){
+            changeSupport.firePropertyChange("nothingChange", null, null);
+            return true;
         }
-        baseScore--;
+        return false;
+    }
+
+    private boolean isVictory(){
+        if (titlesForWin == 0){
+            gameState = StateType.VICTORY;
+            field.openTitles();
+            closeTimer();
+            setStateAndNotify(StateType.VICTORY);
+            return true;
+        }
+        return false;
+    }
+
+    private void clickTitle(Title title){
         if(title.getType() == Title.TitleType.BOMB){
-            if(isFirstClick){
-                field.moveBomb(x,y);
+            if(isFirstClick) {
+                field.moveBomb(title);
             } else {
-                gameState = StateType.DEFEAT;
-                field.openTitles();
-                changeSupport.firePropertyChange("gameState", StateType.ACTION, StateType.DEFEAT);
+                clickBomb();
                 return;
             }
         }
+        int x = title.getX();
+        int y = title.getY();
         openLocality(x,y);
         if(isFirstClick) {
             startGameTimer();
             isFirstClick = false;
         }
-        if (titlesForWin == 0){
-            gameState = StateType.VICTORY;
+        if(!isVictory()) {
+            changeSupport.firePropertyChange("fieldChange", null, title);
+        }
+    }
+
+    private void clickBomb(){
             field.openTitles();
-            changeSupport.firePropertyChange("gameState", StateType.ACTION, StateType.VICTORY);
+            setStateAndNotify(StateType.DEFEAT);
+            closeTimer();
+    }
+
+    public void changeFlag(int x, int y){
+        Title title =field.getTitle(x,y);
+        title.changeFlag();
+        changeSupport.firePropertyChange("flagChange", null, title);
+    }
+
+    public ScoreTable getScoreTable() {
+        return scores;
+    }
+
+    public void processClick(int x, int y){
+        boolean canIgnore = canIgnoreClick(x,y);
+        if(canIgnore){
+            return;
         }
 
+        Title title = field.getTitle(x,y);
+        baseScore--;
+        clickTitle(title);
     }
 
     private void recalculateScore(){
@@ -89,6 +153,7 @@ public class GameModel{
     }
 
     private void startGameTimer(){
+        timerClosed = false;
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
@@ -97,18 +162,22 @@ public class GameModel{
                 changeSupport.firePropertyChange("timerTick", 0, gameTime);
             }
         };
-        timer.schedule(task, 1,1);
+        timer.schedule(task, 1000,1000);
     }
 
-    private void openLocality(int titleX, int titleY){
+    private void recursiveOpenNeighbors(int titleX, int titleY, ArrayList<Title> titleArrayList){
         if(titleX < 0 || titleY < 0 || titleX >= fieldSizeX || titleY >= fieldSizeY){
             return;
         }
         Title title = field.getTitle(titleX, titleY);
-        if (title.isWasChecked()){
+        if (title.wasChecked()){
             return;
         }
         title.setWasChecked(true);
+        titleArrayList.add(title);
+        if(title.isBomb() || !title.isTerraIncognita()){
+            return;
+        }
         title.setTerraIncognita(false);
         changeSupport.firePropertyChange("titleChange", null, title);
         titlesForWin--;
@@ -117,10 +186,17 @@ public class GameModel{
         }
         for(int y = titleY - 1, i = 0; i < 3; i++, y++){
             for (int x = titleX -1, j = 0; j < 3; j++, x++){
-                openLocality(x,y);
+                recursiveOpenNeighbors(x,y, titleArrayList);
             }
         }
-        title.setWasChecked(false);
+    }
+
+    private void openLocality(int titleX, int titleY){
+        ArrayList<Title> titleArrayList = new ArrayList<>();
+        recursiveOpenNeighbors(titleX,titleY, titleArrayList);
+        for (Title t : titleArrayList) {
+            t.setWasChecked(false);
+        }
     }
 
     public double getCurScore() {
@@ -137,5 +213,8 @@ public class GameModel{
 
     public StateType getGameState() {
         return gameState;
+    }
+    public String getAboutInfo() {
+        return aboutInfo;
     }
 }

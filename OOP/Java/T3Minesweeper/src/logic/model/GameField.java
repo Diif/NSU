@@ -14,7 +14,7 @@ public class GameField {
         this.size = sizeX*sizeY;
         titles = new Title[size];
     for (int i = 0; i < size; i++){
-        titles[i] = new Title(i % sizeY, i / sizeY);
+        titles[i] = new Title(i % sizeX, i / sizeX);
         }
     }
 
@@ -22,11 +22,8 @@ public class GameField {
         if (numBombs > size){
             numBombs = size;
         }
-        Random rand = new Random();
         for (int i = 0; i < numBombs; i++){
-            int place =rand.nextInt(size);
-            titles[place].setType(Title.TitleType.BOMB);
-            addBombToNeighbors(place % sizeY, place / sizeY);
+            addBombToNewRandomPlace();
         }
     }
 
@@ -43,23 +40,34 @@ public class GameField {
         return titles[x + y*sizeX];
     }
 
+    private void addBombToNewRandomPlace(){
+        Random rand = new Random();
+        Title title;
+        int place, x, y;
+        while(true) {
+            place = rand.nextInt(size);
+            x = place % sizeX;
+            y = place / sizeX;
+            title = this.getTitle(x,y);
+            if(!title.isBomb()){
+                title.setType(Title.TitleType.BOMB);
+                addBombToNeighbors(x, y);
+                break;
+            }
+        }
+    }
+
     public void moveBomb(int x, int y){
+        addBombToNewRandomPlace();
         Title title = this.getTitle(x,y);
         title.setType(Title.TitleType.GROUND);
         removeBombFromNeighbors(x,y);
+    }
 
-        Random rand = new Random();
-        int place = rand.nextInt(size);
-        int newX = place % sizeY, newY = place / sizeY;
-        title = this.getTitle(newX,newY);
-        while ((newX == x && newY == y) || title.getType() == Title.TitleType.BOMB){
-            place = rand.nextInt(size);
-            newX = place % sizeY;
-            newY = place / sizeY;
-            title = this.getTitle(newX,newY);
-        }
-        title.setType(Title.TitleType.BOMB);
-        addBombToNeighbors(newX, newY);
+    public void moveBomb(Title title){
+        addBombToNewRandomPlace();
+        title.setType(Title.TitleType.GROUND);
+        removeBombFromNeighbors(title.getX(),title.getY());
     }
 
     private void addBombToNeighbors(int x, int y){
@@ -116,5 +124,18 @@ public class GameField {
             }
             x = startX;
         }
+    }
+
+
+    public int getSizeX() {
+        return sizeX;
+    }
+
+    public int getSizeY() {
+        return sizeY;
+    }
+
+    public int getSize() {
+        return size;
     }
 }

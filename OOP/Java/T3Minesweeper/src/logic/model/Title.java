@@ -7,11 +7,12 @@ public class Title {
     }
 
     private TitleType type;
-    int x;
-    int y;
+    private int x;
+    private int y;
     private int numBombsAround;
     private boolean isTerraIncognita;
     private boolean wasChecked;
+    private boolean isFlag;
 
     public Title(int x, int y){
         this.type = TitleType.GROUND;
@@ -20,6 +21,7 @@ public class Title {
         isTerraIncognita = true;
         numBombsAround = 0;
         wasChecked = false;
+        isFlag = false;
     }
 
     public TitleType getType(){
@@ -34,9 +36,13 @@ public class Title {
         return isTerraIncognita;
     }
 
-    public boolean isWasChecked() {
+    public boolean wasChecked() {
         return wasChecked;
     }
+    public boolean isBomb(){return type == TitleType.BOMB;}
+    public boolean isFlag(){return isFlag;}
+    public void setFlag(boolean flag){isFlag = flag;}
+    public void changeFlag(){isFlag = !isFlag;}
     public void setType(TitleType type) {
         this.type = type;
     }
