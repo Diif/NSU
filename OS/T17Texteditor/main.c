@@ -63,18 +63,34 @@ int main() {
             continue;
           }
           line_position--;
-          write(STDIN_FILENO, CLEAR_LINE_SEQ, size * 4);
-          write(STDIN_FILENO, &CARRIAGE_RETURN, size);
-          write(STDIN_FILENO, buf, line_position * size);
+          if (write(STDIN_FILENO, CLEAR_LINE_SEQ, size * 4) == -1) {
+            exit(EXIT_FAILURE);
+          }
+          if (write(STDIN_FILENO, &CARRIAGE_RETURN, size) == -1) {
+            exit(EXIT_FAILURE);
+          }
+          if (write(STDIN_FILENO, buf, line_position * size) == -1) {
+            exit(EXIT_FAILURE);
+          }
         } else if (c == KILL) {
-          write(STDIN_FILENO, CLEAR_LINE_SEQ, size * 4);
-          write(STDIN_FILENO, &CARRIAGE_RETURN, size);
+          if (write(STDIN_FILENO, CLEAR_LINE_SEQ, size * 4) == -1) {
+            exit(EXIT_FAILURE);
+          }
+          if (write(STDIN_FILENO, &CARRIAGE_RETURN, size) == -1) {
+            exit(EXIT_FAILURE);
+          }
           line_position = 0;
         } else if (c == CTRL_W) {
           deleteWordAndSpaces(buf, &line_position);
-          write(STDIN_FILENO, CLEAR_LINE_SEQ, size * 4);
-          write(STDIN_FILENO, &CARRIAGE_RETURN, size);
-          write(STDIN_FILENO, buf, line_position * size);
+          if (write(STDIN_FILENO, CLEAR_LINE_SEQ, size * 4) == -1) {
+            exit(EXIT_FAILURE);
+          }
+          if (write(STDIN_FILENO, &CARRIAGE_RETURN, size) == -1) {
+            exit(EXIT_FAILURE);
+          }
+          if (write(STDIN_FILENO, buf, line_position * size) == -1) {
+            exit(EXIT_FAILURE);
+          }
         } else if (c == CTRL_D) {
           if (line_position == 0) {
             term.c_lflag = oflags;
@@ -82,24 +98,32 @@ int main() {
             exit(EXIT_SUCCESS);
           }
         } else if ((c <= 31 || c >= 127) && c != NEW_LINE) {
-          write(STDIN_FILENO, &BEL, size);
+          if (write(STDIN_FILENO, &BEL, size) == -1) {
+            exit(EXIT_FAILURE);
+          }
           continue;
         } else {
           if (line_position < MAX_LEN) {
-            write(STDIN_FILENO, &c, size);
+            if (write(STDIN_FILENO, &c, size) == -1) {
+              exit(EXIT_FAILURE);
+            }
             buf[line_position] = c;
             line_position++;
             if (c == NEW_LINE) {
               line_position = 0;
             }
           } else {
-            write(STDIN_FILENO, &NEW_LINE, size);
+            if (write(STDIN_FILENO, &NEW_LINE, size) == -1) {
+              exit(EXIT_FAILURE);
+            }
             line_position = 0;
           }
         }
       }
       term.c_lflag = oflags;
-      tcsetattr(STDIN_FILENO, TCSANOW, &term);
+      if (tcsetattr(STDIN_FILENO, TCSANOW, &term)) {
+        exit(EXIT_FAILURE);
+      }
     }
   }
 }
