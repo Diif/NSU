@@ -25,7 +25,12 @@ int main() {
   }
 
   while (1) {
-    scanf("%255s", buf);
+    int t;
+    t = scanf("%255s", buf);
+    if (t <= 0) {
+      exit(EXIT_FAILURE);
+    }
+
     int n = send(client_socket, buf, strlen(buf), 0);
     if (n < 0) {
       printf("Message error\n");
