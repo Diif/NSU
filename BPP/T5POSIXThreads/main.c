@@ -6,8 +6,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define L 3000
-#define MAX_ITERS 100
+#define L 2500
+#define MAX_ITERS 50
 
 #define RECEIVER_TAG 1
 #define END_THREAD 2
@@ -129,11 +129,13 @@ void AskForTasks() {
   pthread_mutex_unlock(&mutex);
 }
 
-void ProcessRes(double work_time) {
+void ProcessRes(double work_time, int num_tasks) {
   MPI_Gather(&work_time, 1, MPI_DOUBLE, iteration_work_time, 1, MPI_DOUBLE, 0,
              MPI_COMM_WORLD);
+  double min_time, max_time;
   if (rank == 0) {
-    double min_time = iteration_work_time[0], max_time = iteration_work_time[0];
+    min_time = iteration_work_time[0];
+    max_time = iteration_work_time[0];
     for (int i = 0; i < size; i++) {
       if (min_time > iteration_work_time[i]) {
         min_time = iteration_work_time[i];
@@ -142,11 +144,23 @@ void ProcessRes(double work_time) {
         max_time = iteration_work_time[i];
       }
     }
-    fprintf(stderr,
-            "Iteration %d, global res %lf, max %lf, min %lf, disb_time %lf, "
-            "disb_part %lf%%\n",
-            global_iter, global_res, max_time, min_time, max_time - min_time,
-            (max_time - min_time) / max_time * 100);
+  }
+
+  if (rank == 0) {
+    fprintf(
+        stderr,
+        "\t\tIteration %d, global res %lf, max %lf, min %lf, disb_time %lf, "
+        "disb_part %lf%%\n",
+        global_iter, global_res, max_time, min_time, max_time - min_time,
+        (max_time - min_time) / max_time * 100);
+  }
+
+  for (int i = 0; i < size; i++) {
+    MPI_Barrier(MPI_COMM_WORLD);
+    if (i == rank) {
+      fprintf(stderr, "Proc %d, global res %lf, work time %lf, tasks %d\n",
+              rank, global_res, work_time, num_tasks);
+    }
   }
 }
 
@@ -155,6 +169,7 @@ void WorkerThreadJob() {
   while (global_iter < MAX_ITERS) {
     pthread_mutex_lock(&mutex);
     CreateNewTasks();
+    int tasks_on_iter = 0;
     cur_task = 0;
     last_task = list_size - 1;
     pthread_mutex_unlock(&mutex);
@@ -179,6 +194,7 @@ void WorkerThreadJob() {
           local_res += 1;  // sin(i);
         }
         pthread_mutex_lock(&mutex);
+        tasks_on_iter++;
         cur_task++;
         pthread_mutex_unlock(&mutex);
       }
@@ -189,7 +205,7 @@ void WorkerThreadJob() {
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Allreduce(&local_res, &global_res, 1, MPI_DOUBLE, MPI_SUM,
                   MPI_COMM_WORLD);
-    ProcessRes(work_time);
+    ProcessRes(work_time, tasks_on_iter);
     MPI_Barrier(MPI_COMM_WORLD);
   }
   int code = END_THREAD;
