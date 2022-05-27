@@ -20,7 +20,10 @@ int main() {
   unsigned int addr_len =
       sizeof(server_addr.sa_family) + strlen(server_addr.sa_data) + 1;
 
-  unlink("myserver1");
+  if (unlink("myserver1") < 0) {
+    printf("Unlink error\n");
+    exit(EXIT_FAILURE);
+  }
   if (bind(server_socket, &server_addr, addr_len) < 0) {
     printf("Binding error\n");
     exit(EXIT_FAILURE);
