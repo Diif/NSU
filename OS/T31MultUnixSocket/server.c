@@ -91,7 +91,7 @@ void serverJob() {
   while (1) {
     int num_events = poll(fd_array, arr_size, -1);
     if (num_events <= 0) {
-      fprintf(stderr, "Pool error\n");
+      fprintf(stderr, "Poll error\n");
       exit(EXIT_SUCCESS);
     }
     checkForEvents(fd_array, &arr_size, num_events);
