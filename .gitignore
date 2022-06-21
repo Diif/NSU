@@ -15,4 +15,5 @@ out
 .vim*
 .profile
 .ssh
-
+*.bin
+*javafx-sdk*
