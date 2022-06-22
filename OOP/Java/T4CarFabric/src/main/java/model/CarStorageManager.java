@@ -54,12 +54,17 @@ public class CarStorageManager extends Thread implements PropertyChangeListener{
                         }
                     }
                     monitor.wait();
-                    writeLog();
+                    if(logMode) {
+                        writeLog();
+                    }
                 } catch (InterruptedException e) {
                     System.out.println("CarStorageManager Thread was interrupted");
-                    try {
-                        logWriter.close();
-                    } catch (IOException ignored){}
+                    if(logMode) {
+                        try {
+                            logWriter.close();
+                        } catch (IOException ignored) {
+                        }
+                    }
                     return;
                 }
             }

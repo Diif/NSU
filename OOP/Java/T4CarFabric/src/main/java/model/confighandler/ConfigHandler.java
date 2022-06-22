@@ -7,17 +7,22 @@ import java.util.Scanner;
 
 public class ConfigHandler {
     private HashMap<String, Integer> options;
+    private final int DEFAULT_STORAGE_SIZE=100;
+    private final int DEFAULT_ACCESSORY_SUPPLIES=2;
+    private final int DEFAULT_WORKERS=3;
+    private final int DEFAULT_DEALERS=2;
+    private final int DEFAULT_LOG_MODE = 0;
 
     public ConfigHandler(){
         options = new HashMap<>();
-        options.put("storageBodySize", 100);
-        options.put("storageEngineSize", 100);
-        options.put("storageAccessorySize", 100);
-        options.put("storageCarSize", 100);
-        options.put("accessorySupplies", 2);
-        options.put("workers", 3);
-        options.put("dealers", 2);
-        options.put("logMode", 0);
+        options.put("storageBodySize", DEFAULT_STORAGE_SIZE);
+        options.put("storageEngineSize", DEFAULT_STORAGE_SIZE);
+        options.put("storageAccessorySize", DEFAULT_STORAGE_SIZE);
+        options.put("storageCarSize", DEFAULT_STORAGE_SIZE);
+        options.put("accessorySupplies", DEFAULT_ACCESSORY_SUPPLIES);
+        options.put("workers", DEFAULT_WORKERS);
+        options.put("dealers", DEFAULT_DEALERS);
+        options.put("logMode", DEFAULT_LOG_MODE);
     }
 
     public void loadConfigOptions(String pathname){
@@ -25,7 +30,15 @@ public class ConfigHandler {
         try {
             scanner = new Scanner(new File(pathname));
         } catch (FileNotFoundException e){
-            System.err.println("Can't open config. Default setting applied.");
+            System.err.println("Can't open config. Default setting applied.\n" +
+                    "\tstorageBodySize=" +DEFAULT_STORAGE_SIZE+'\n'+
+                    "\tstorageEngineSize=" +DEFAULT_STORAGE_SIZE+'\n'+
+                    "\tstorageAccessorySize=" +DEFAULT_STORAGE_SIZE+'\n'+
+                    "\tstorageCarSize=" +DEFAULT_STORAGE_SIZE+'\n'+
+                    "\taccessorySupplies=" +DEFAULT_ACCESSORY_SUPPLIES+'\n'+
+                    "\tworkers=" +DEFAULT_WORKERS+'\n'+
+                    "\tdealers=" +DEFAULT_DEALERS+'\n'+
+                    "\tlogMode="+DEFAULT_LOG_MODE);
             return;
         }
         int line = 0;
