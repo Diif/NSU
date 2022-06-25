@@ -98,7 +98,7 @@ public class GUI extends Application {
             controller.executeCommand(command);
         });
 
-        Label supAccessory = new Label("Body supplier delay");
+        Label supAccessory = new Label("Accessories suppliers delay");
         Slider sliderAccessory = new Slider(100, Math.max(model.getSupplierAccessoryDelay(), MAX_SLIDER_DELAY), model.getSupplierAccessoryDelay());
         Label sliderAccessoryVal = new Label(String.valueOf(sliderAccessory.getValue()));
         sliderAccessory.valueProperty().addListener((obsVal, oldVal, newVal) -> {
