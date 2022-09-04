@@ -1,0 +1,9 @@
+import runtime;
+import string;
+
+main() {
+  ar : [int] = [1,2,4,5,6];
+
+  res : [string] = map(ar, i2s);
+  iter(res, println);
+}

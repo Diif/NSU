@@ -1,0 +1,12 @@
+import runtime;
+import string;
+
+myfun(a : int,b : int) -> int {
+  a+b;
+}
+
+main() {
+  ar : [int] = [1,2,3];
+
+  println(fold(ar, 0, myfun));
+}
