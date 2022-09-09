@@ -8,5 +8,5 @@ myfun(a : int,b : int) -> int {
 main() {
   ar : [int] = [1,2,3];
 
-  println(fold(ar, 0, myfun));
+  fold(ar, 3, myfun) |> println
 }

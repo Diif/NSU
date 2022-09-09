@@ -1,0 +1,55 @@
+import runtime;
+import string;
+
+fib1(n : int) -> [int] {
+  if(n == 1)
+    [0]
+  else if (n == 2)
+    [0, 1]
+  else
+    {
+      arr : [int] = fib1(n-1);
+      miniarr : [int] = [arr[n-3] + arr[n-2]];
+      concat(arr,  miniarr)
+    }
+}
+
+fib2(n : int) -> [int] {
+  if(n == 1)
+    [0]
+  else
+  {
+    fibTail(n,3,[0,1])
+  }
+}
+
+fibTail(n : int, next_n : int, fibArr : [int]){
+  if(n == next_n){
+    concat(fibArr, [fibArr[next_n-2] + fibArr[next_n-3]])
+  } else {
+    fibTail(n, next_n+1, concat(fibArr, [fibArr[next_n-2] + fibArr[next_n-3]]))
+  }
+}
+
+fib3(n : int) -> [int] {
+  if(n == 1)
+    [0]
+  else {
+    arr : ref [int] = ref [0,1];
+    fibRef(arr, n);
+    ^arr
+  }
+}
+
+fibRef(arr : ref [int], n : int){
+  if(length(^arr) != n){
+    fibRef(arr, n-1);
+    refArrayPush(arr, ^arr[n-2] + ^arr[n-3]);
+  }
+}
+
+main() {
+  fib1(7) |> println;
+  fib2(7) |> println;
+  fib3(7) |> println;
+}

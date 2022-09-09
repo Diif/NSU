@@ -1,0 +1,58 @@
+import runtime;
+import ds/tree;
+
+
+getPairs(tree : Tree<int, [int]>, m : int){
+  node = popmin(tree);
+
+  switch (node) {
+    PopResult(k,v,rest): {
+      dif = m - k;
+      switch (lookupTree(rest, dif)) {
+        None() : getPairs(rest, m);
+        Some(val):{
+          concat (makePairs(v, val, 0), getPairs(rest, m));
+        }
+      }
+    }
+    EmptyPopResult() :{
+      []
+    }
+  }
+}
+
+// array decart multiplication to pairs, ex: [1,2], [3,4] to Pair(1,3), Pair(1,4), Pair(2,3), Pair(2,4) (unordered pairs!)
+
+makePairs(a : [int], indArr : [int], ind : int){
+  if(ind == (length(a) - 1)) {
+    map(indArr, \ x -> Pair(a[ind], x))
+  } else {
+    concat (map(indArr, \ x -> Pair(a[ind], x)), makePairs(a, indArr, ind + 1));
+  }
+}
+
+// add node with [index] if not exists, else concat [indexes with same val] and [new index with same val]
+
+setNode(index : int, tr : Tree<int,[int]> , x : int) {
+  val = lookupTree(tr, x);
+  if(val == None){
+    setTree(tr,x,[index])
+  } else {
+    setTree(tr, x, concat(either(val,[0]), [index]))
+  }
+}
+
+inds(a : [int], m : int){
+  if(length(a) == 0){
+    []
+  } else {
+  tree = foldi(a, makeTree(), setNode);
+  println(tree);
+  getPairs(tree, m)
+  }
+}
+
+main() {
+  arr = [1,2,3,4,5,1];
+  println(inds(arr, 5))
+}
