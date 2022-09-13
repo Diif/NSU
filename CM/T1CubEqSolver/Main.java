@@ -150,11 +150,16 @@ public class Main {
             a = Double.parseDouble(args[0]);
             b = Double.parseDouble(args[1]);
             c = Double.parseDouble(args[2]);
-            epsilon = Double.parseDouble(args[3]);
-            delta = Double.parseDouble(args[4]);
         } catch (Exception e){
             System.out.println("Bad args");
             System.exit(0);
+        }
+        try {
+            epsilon = Double.parseDouble(args[3]);
+            delta = Double.parseDouble(args[4]);
+        } catch (Exception e){
+            epsilon = 0.001;
+            delta = 10;
         }
         if(epsilon <= 0 || delta <= 0){
             System.out.println("Bad args");
