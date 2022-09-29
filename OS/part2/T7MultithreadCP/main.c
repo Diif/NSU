@@ -16,6 +16,7 @@ static int is_main_dir = 1;
 
 void removeWordUntilSlash(char* str);
 void* processDir(void* args);
+int dirFileCase(char* pathFrom, char* copy_to, struct dirent* file);
 void* copyFile(void* args);
 int regularFileCase(char* pathFrom, char* copy_to, struct dirent* file);
 char* getLastNameInPath(char* path);
@@ -275,6 +276,7 @@ void* copyFile(void* args) {
   char* filePath = ((char**)args)[0];
   char* copyToWithFileName = ((char**)args)[1];
   int file_from;
+  struct stat sts;
   while (1) {
     file_from = open(filePath, O_RDONLY);
     if (file_from == -1) {
@@ -290,10 +292,18 @@ void* copyFile(void* args) {
     }
     break;
   }
+  if (fstat(file_from, &sts) == -1) {
+    printf("Can't get open file stat.\n");
+    free(filePath);
+    free(copyToWithFileName);
+    free(args);
+    pthread_exit(NULL);
+  }
 
   int file_to;
   while (1) {
-    file_to = open(copyToWithFileName, O_CREAT | O_EXCL | O_WRONLY);
+    file_to = open(copyToWithFileName, O_CREAT | O_EXCL | O_WRONLY,
+                   sts.st_mode & 0777);
     if (file_to == -1) {
       if (errno == EMFILE) {
         sleep(2);
