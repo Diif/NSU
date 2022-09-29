@@ -21,8 +21,7 @@ int main() {
     perror(strerror(err));
     return 0;
   }
-
-  sleep(2);
+  nanosleep(2000, NULL);
 
   err = pthread_cancel(thread);
   if (err) {

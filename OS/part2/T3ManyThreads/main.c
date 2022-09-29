@@ -15,6 +15,14 @@ void *fun(void *arg) {
   return 0;
 }
 
+void freeAll(pthread_t *threads, char **strs) {
+  for (int i = 0; i < NUM_THREADS * NUM_STR; i++) {
+    free(strs[i]);
+  }
+  free(threads);
+  free(strs);
+}
+
 int main() {
   if (NUM_STR <= 0 || NUM_THREADS <= 0) {
     printf("Incorrect values\n");
@@ -26,9 +34,9 @@ int main() {
 
   for (int i = 0; i < NUM_THREADS; i++) {
     for (int j = 0; j < NUM_STR; j++) {
-      char *str = (char *)malloc(
-          sizeof("String ") + (int)(ceil(log10(NUM_STR))) + sizeof("thread ") +
-          (int)(ceil(log10(NUM_THREADS))) - 1);
+      char *str =
+          (char *)malloc(sizeof("String ") + (int)(ceil(log10(NUM_STR))) +
+                         sizeof("thread ") + (int)(ceil(log10(NUM_THREADS))));
       sprintf(str, "String %d thread %d", j, i);
       strs[i * NUM_THREADS + j] = str;
     }
@@ -37,7 +45,8 @@ int main() {
   for (int i = 0; i < NUM_THREADS; i++) {
     int err = pthread_create(threads + i, NULL, fun, strs + (NUM_THREADS * i));
     if (err) {
-      perror(strerror(err));
+      printf("NOOOOOOO MY THREAD COLLECTION!!!!");
+      freeAll(threads, strs);
       return 0;
     }
   }
@@ -45,6 +54,8 @@ int main() {
   for (int i = 0; i < NUM_THREADS; i++) {
     pthread_join(threads[i], NULL);
   }
+
+  freeAll(threads, strs);
 
   return 0;
 }
