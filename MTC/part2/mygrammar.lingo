@@ -9,7 +9,7 @@ exp =
 	| ws variable$v ws {Var($v)};
 
 
-number = (("-")* digit+ ("." digit+)?)$d {Val(s2d($d))}
+number = (("-")* digit+ ("." digit+)?)$d {Val(s2d($d))};
 variable = letter+ (digit | letter)*;
 letter = 'a'-'z';
 digit = '0'-'9';

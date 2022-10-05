@@ -119,60 +119,145 @@ makeRPNString(exp : Exp) -> string{
 	}
 }
 
-calculatePolish(stack : [Elem], topIndex : int) -> double{
-	elem = stack[topIndex];
-	switch(elem : Elem){
-		Val(val):{
-			val
-		}
-		Var(var):{
-			s2d(getUrlParameter(var))
-		}
-		Op(op):{
-			if(op == "*"){
-				calculatePolish(stack, topIndex - 2) * calculatePolish(stack, topIndex - 1)
+calculatePolish(elements : [Elem], curIndex : int, maxIndex : int, stack : [double], freeStackIndex : int) -> double{
+	if(curIndex > maxIndex){
+		stack[freeStackIndex - 1]
+	}
+	else{
+		elem = elements[curIndex];
+		switch(elem : Elem){
+			Val(val):{
+				calculatePolish(elements, curIndex + 1, maxIndex, replace(stack,freeStackIndex,val), freeStackIndex + 1)
 			}
-			else if(op == "/"){
-				calculatePolish(stack, topIndex - 2) / calculatePolish(stack, topIndex - 1)
+			Var(var):{
+				calculatePolish(elements, curIndex + 1, maxIndex, replace(stack,freeStackIndex,s2d(getUrlParameter(var))), freeStackIndex + 1)
 			}
-			else if(op == "-"){
-				calculatePolish(stack, topIndex - 2) - calculatePolish(stack, topIndex - 1)
-			}
-			else if (op == "^"){
-				dpow(calculatePolish(stack, topIndex - 2), calculatePolish(stack, topIndex - 1))
-			}
-			else{	
-				calculatePolish(stack, topIndex - 2) + calculatePolish(stack, topIndex - 1)
+			Op(op):{
+				if(op == "*"){
+					res = stack[freeStackIndex - 2] *stack[freeStackIndex - 1];
+					calculatePolish(elements, curIndex + 1, maxIndex, replace(stack, freeStackIndex-2, res), freeStackIndex - 1)
+				}
+				else if(op == "/"){
+					res = stack[freeStackIndex - 2]  / stack[freeStackIndex - 1];
+					calculatePolish(elements, curIndex + 1, maxIndex, replace(stack, freeStackIndex-2, res), freeStackIndex - 1)
+				}
+				else if(op == "-"){
+					res = stack[freeStackIndex - 2] - stack[freeStackIndex - 1];
+					calculatePolish(elements, curIndex + 1, maxIndex, replace(stack, freeStackIndex-2, res), freeStackIndex - 1)
+				}
+				else if (op == "^"){
+					res = dpow(stack[freeStackIndex - 2], stack[freeStackIndex - 1]);
+					calculatePolish(elements, curIndex + 1, maxIndex, replace(stack, freeStackIndex-2, res), freeStackIndex - 1)
+				}
+				else{	
+					res = stack[freeStackIndex - 2] + stack[freeStackIndex - 1];
+					calculatePolish(elements, curIndex + 1, maxIndex, replace(stack, freeStackIndex-2, res), freeStackIndex - 1)
+				}
 			}
 		}
 	}
 }
 
-polishToAr(stack : [Elem],  topIndex : int) -> string{
-	elem = stack[topIndex];
-	switch(elem : Elem){
+polishToAr(elements : [Elem], curIndex : int, maxIndex : int, stack : [string], freeStackIndex : int) -> string{
+	if(curIndex > maxIndex){
+		stack[freeStackIndex-1]
+	}
+	else{
+		elem = elements[curIndex];
+		switch(elem : Elem){
+			Val(val):{
+				polishToAr(elements, curIndex + 1, maxIndex, replace(stack,freeStackIndex,d2s(val)), freeStackIndex + 1)
+			}
+			Var(var):{
+				polishToAr(elements, curIndex + 1, maxIndex, replace(stack,freeStackIndex,var), freeStackIndex + 1)
+			}
+			Op(op):{
+				if(op == "*"){
+					res = "(" + stack[freeStackIndex - 2] + "*" + stack[freeStackIndex - 1] + ")";
+					polishToAr(elements, curIndex + 1, maxIndex, replace(stack, freeStackIndex-2, res), freeStackIndex - 1)
+				}
+				else if(op == "/"){
+					res = "(" + stack[freeStackIndex - 2] + "/" + stack[freeStackIndex - 1] + ")";
+					polishToAr(elements, curIndex + 1, maxIndex, replace(stack, freeStackIndex-2, res), freeStackIndex - 1)
+				}
+				else if(op == "-"){
+					res = "(" + stack[freeStackIndex - 2] + "-" + stack[freeStackIndex - 1] + ")";
+					polishToAr(elements, curIndex + 1, maxIndex, replace(stack, freeStackIndex-2, res), freeStackIndex - 1)
+				}
+				else if (op == "^"){
+					res = "(" + stack[freeStackIndex - 2] + "^" + stack[freeStackIndex - 1] + ")";
+					polishToAr(elements, curIndex + 1, maxIndex, replace(stack, freeStackIndex-2, res), freeStackIndex - 1)
+				}
+				else{	
+					res = "(" + stack[freeStackIndex - 2] + "+" + stack[freeStackIndex - 1] + ")";
+					polishToAr(elements, curIndex + 1, maxIndex, replace(stack, freeStackIndex-2, res), freeStackIndex - 1)
+				}
+			}
+		}
+	}
+}
+
+makeOneSimplification(exp : Exp){
+	switch(exp : Exp){
+		Add(e1,e2):{
+			if(e1 == Val(0.0)){
+				e2
+			}
+			else if(e2 == Val(0.0)){
+				e1
+			} else{
+				exp
+			}
+		} 
+		Mul(e1,e2):{
+			if(e1 == Val(1.0)){
+				e2
+			}
+			else if(e2 == Val(1.0)){
+				e1
+			}
+			else if(e1 == Val(0.0) || e2 == Val(0.0)){
+				Val(0.0)
+			}
+		  else if(isSameStructType(e1, Pow(e1,e2))){
+				pow_obj = cast(e1 : Exp -> Pow);
+				if(pow_obj.e1 == e2){
+					Pow(e2, Add(pow_obj.e2, Val(1.0)))
+				} else {
+					exp
+				}
+			}
+			else if(isSameStructType(e2, Pow(e1,e2))){
+				pow_obj = cast(e2 : Exp -> Pow);
+				if(pow_obj.e1 == e1){
+					Pow(e1, Add(pow_obj.e2, Val(1.0)))
+				}
+				else{
+					exp
+				}
+			}
+			else {
+				exp
+			}
+		}
+		Pow(e1,e2):{
+			exp
+		}
 		Val(val):{
-			d2s(val)
+			exp
 		}
 		Var(var):{
-			var
+			exp
+		};
+		Sub(e1,e2):{
+			if(e1 == e2){
+				Val(0.0)
+			} else {
+				exp
+			}
 		}
-		Op(op):{
-			if(op == "*"){
-				"(" + polishToAr(stack, topIndex - 2) + "*" + polishToAr(stack, topIndex - 1) + ")"
-			}
-			else if(op == "/"){
-				"(" + polishToAr(stack, topIndex - 2) + "/" + polishToAr(stack, topIndex - 1)+ ")"
-			}
-			else if(op == "-"){
-				"(" + polishToAr(stack, topIndex - 2) + "-" + polishToAr(stack, topIndex - 1)+ ")"
-			}
-			else if (op == "^"){
-				"(" + polishToAr(stack, topIndex - 2) + "^" + polishToAr(stack, topIndex - 1)+ ")"
-			}
-			else{	
-				"(" + polishToAr(stack, topIndex - 2) + "+" + polishToAr(stack, topIndex - 1)+ ")"
-			}
+		Div(e1,e2):{
+			exp
 		}
 	}
 }
@@ -188,27 +273,7 @@ makeSimpleTree(exp : Exp) -> Exp{
 			} else{
 				new_e1 = makeSimpleTree(e1);
 				new_e2 = makeSimpleTree(e2);
-			switch(new_e1 : Exp){
-				Sub(s1,s2):{
-					if(s1 == s2){
-						new_e2;
-					}
-				}
-				default:{
-					print("");
-				}
-			}
-			switch(new_e2 : Exp){
-				Sub(s11,s22):{
-					if(s11 == s22){
-						new_e1;
-					}
-				}
-				default:{
-					print("");
-				}
-			}
-			Add(new_e1,new_e2);
+				makeOneSimplification(Add(new_e1,new_e2));
 			}
 		} 
 		Mul(e1,e2):{
@@ -221,21 +286,53 @@ makeSimpleTree(exp : Exp) -> Exp{
 			else if(e1 == Val(0.0) || e2 == Val(0.0)){
 				Val(0.0)
 			}
+			else if(e1 == e2){
+				makeOneSimplification(Pow(makeSimpleTree(e1), Val(2.0)))
+			}
+			else if(isSameStructType(e1, Pow(e1,e2))){
+				pow_obj = cast(e1 : Exp -> Pow);
+				new_pow_e1 = makeSimpleTree(pow_obj.e1);
+				new_e2 = makeSimpleTree(e2);
+				if(new_pow_e1 == new_e2){
+					makeOneSimplification(Pow(new_pow_e1, Add(pow_obj.e2, Val(1.0))))
+				} else {
+					new_e1 = makeSimpleTree(e1);
+					makeOneSimplification(Mul(new_e1, new_e2))
+				}
+			}
+			else if(isSameStructType(e2, Pow(e1,e2))){
+				pow_obj = cast(e2 : Exp -> Pow);
+				new_pow_e1 = makeSimpleTree(pow_obj.e1);
+				new_e1 = makeSimpleTree(e1);
+				if(new_pow_e1 == new_e1){
+					makeOneSimplification(Pow(new_pow_e1, Add(pow_obj.e2, Val(1.0))))
+				}
+				else{
+					new_e2 = makeSimpleTree(e2);
+					makeOneSimplification(Mul(new_e1, new_e2))
+				}
+			}
 		  else {
-
+				new_e1 = makeSimpleTree(e1);
+				new_e2 = makeSimpleTree(e2);
+				makeOneSimplification(Mul(new_e1,new_e2));
 			}
 		}
 		Pow(e1,e2):{
 			Pow(makeSimpleTree(e1),makeSimpleTree(e2))
 		}
 		Val(val):{
-			val;
+			exp
 		}
 		Var(var):{
-			var;
+			exp
 		};
 		Sub(e1,e2):{
-			Sub(makeSimpleTree(e1),makeSimpleTree(e2))
+			if(e1 == e2){
+				Val(0.0)
+			} else {
+			makeOneSimplification(Sub(makeSimpleTree(e1),makeSimpleTree(e2)))
+			}
 		}
 		Div(e1,e2):{
 			Div(makeSimpleTree(e1),makeSimpleTree(e2))
@@ -244,6 +341,7 @@ makeSimpleTree(exp : Exp) -> Exp{
 }
 
 main() {
+	isSameStructType(Pow(Val(1.0), Var("a")), Pow(Var("a"), Val(5.05))) |> println;
   str : string = strsubsmart(readUntil("\n"), 0,-1);	
 	//lab5
 	resultAr = parsic(lingoGrammarAr(), str, defaultPegActions);
@@ -259,8 +357,10 @@ main() {
 	polish |> println;
 	resultPol = parsic(lingoGrammarPol(), polish, defaultPegActions);
 	println(resultPol);
-	polishToAr(resultPol, length(resultPol) - 1) |> println;
+	polishToAr(resultPol, 0,length(resultPol) - 1, [], 0) |> println;
 	//lab9?
-	println(calculatePolish(resultPol,length(resultPol) - 1));
+	println(calculatePolish(resultPol,0, length(resultPol) - 1, [], 0));
+
+	makeSimpleTree(r) |> println;
 	
 }
