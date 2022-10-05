@@ -1,0 +1,266 @@
+import string;
+import runtime;
+import ds/tree;
+import lingo/pegcode/driver;
+import net/url_parameter;
+import fs/filesystem;
+import mygrammar;
+
+lingoGrammarOpAr : ref Maybe<[PegOp]> = ref None();
+lingoGrammarOpPol : ref Maybe<[PegOp]> = ref None();
+
+lingoGrammarAr() {
+	onlyOnce(lingoGrammarOpAr, \ -> {
+		compilePegGrammar("#include /home/prozella/stuff/flow9/lib/lingo/mygrammar.lingo");
+	});
+}
+
+lingoGrammarPol() {
+	onlyOnce(lingoGrammarOpPol, \ -> {
+		compilePegGrammar("#include /home/prozella/stuff/flow9/lib/lingo/rpn.lingo");
+	});
+}
+
+astToStr(exp : Exp){
+	switch(exp : Exp){
+		Val(val):{
+			print(d2s(val));
+		}
+		Var(var):{
+			print(var);
+		}
+		Add(e1,e2):{
+			print("(");
+			astToStr(e1);
+			print("+");
+			astToStr(e2);
+			print(")");
+		}
+		Sub(e1,e2):{
+			print("(");
+			astToStr(e1);
+			print("-");
+			astToStr(e2);
+			print(")");
+		}
+		Div(e1,e2):{
+			print("(");
+			astToStr(e1);
+			print("/");
+			astToStr(e2);
+			print(")");
+		}
+		Mul(e1,e2):{
+			print("(");
+			astToStr(e1);
+			print("*");
+			astToStr(e2);
+			print(")");
+		}
+		Pow(e1,e2):{
+			print("(");
+			astToStr(e1);
+			print("^");
+			astToStr(e2);
+			print(")");
+		}
+	}
+}
+
+calculateAst(exp : Exp){
+	switch(exp : Exp){
+		Val(val):{
+			val;
+		}
+		Var(var):{
+			s2d(getUrlParameter(var));
+		}
+		Add(e1,e2):{
+			calculateAst(e1) + calculateAst(e2);
+		}
+		Sub(e1,e2):{
+			calculateAst(e1) - calculateAst(e2);
+		}
+		Div(e1,e2):{
+			calculateAst(e1) / calculateAst(e2);
+		}
+		Mul(e1,e2):{
+			calculateAst(e1) * calculateAst(e2);
+		}
+		Pow(e1,e2):{
+			dpow(calculateAst(e1), calculateAst(e2))
+		}
+	}
+}
+
+makeRPNString(exp : Exp) -> string{
+	switch(exp : Exp){
+		Val(val):{
+			d2s(val) + " ";
+		}
+		Var(var):{
+			var + " ";
+		}
+		Add(e1,e2):{
+			makeRPNString(e1) + makeRPNString(e2) + "+ "
+		}
+		Sub(e1,e2):{
+			makeRPNString(e1) + makeRPNString(e2) + "- "
+		}
+		Div(e1,e2):{
+			makeRPNString(e1) + makeRPNString(e2) + "/ "
+		}
+		Mul(e1,e2):{
+			makeRPNString(e1) + makeRPNString(e2) + "* "
+		}
+		Pow(e1,e2):{
+			makeRPNString(e1) + makeRPNString(e2) + "^ "
+		}
+	}
+}
+
+calculatePolish(stack : [Elem], topIndex : int) -> double{
+	elem = stack[topIndex];
+	switch(elem : Elem){
+		Val(val):{
+			val
+		}
+		Var(var):{
+			s2d(getUrlParameter(var))
+		}
+		Op(op):{
+			if(op == "*"){
+				calculatePolish(stack, topIndex - 2) * calculatePolish(stack, topIndex - 1)
+			}
+			else if(op == "/"){
+				calculatePolish(stack, topIndex - 2) / calculatePolish(stack, topIndex - 1)
+			}
+			else if(op == "-"){
+				calculatePolish(stack, topIndex - 2) - calculatePolish(stack, topIndex - 1)
+			}
+			else if (op == "^"){
+				dpow(calculatePolish(stack, topIndex - 2), calculatePolish(stack, topIndex - 1))
+			}
+			else{	
+				calculatePolish(stack, topIndex - 2) + calculatePolish(stack, topIndex - 1)
+			}
+		}
+	}
+}
+
+polishToAr(stack : [Elem],  topIndex : int) -> string{
+	elem = stack[topIndex];
+	switch(elem : Elem){
+		Val(val):{
+			d2s(val)
+		}
+		Var(var):{
+			var
+		}
+		Op(op):{
+			if(op == "*"){
+				"(" + polishToAr(stack, topIndex - 2) + "*" + polishToAr(stack, topIndex - 1) + ")"
+			}
+			else if(op == "/"){
+				"(" + polishToAr(stack, topIndex - 2) + "/" + polishToAr(stack, topIndex - 1)+ ")"
+			}
+			else if(op == "-"){
+				"(" + polishToAr(stack, topIndex - 2) + "-" + polishToAr(stack, topIndex - 1)+ ")"
+			}
+			else if (op == "^"){
+				"(" + polishToAr(stack, topIndex - 2) + "^" + polishToAr(stack, topIndex - 1)+ ")"
+			}
+			else{	
+				"(" + polishToAr(stack, topIndex - 2) + "+" + polishToAr(stack, topIndex - 1)+ ")"
+			}
+		}
+	}
+}
+
+makeSimpleTree(exp : Exp) -> Exp{
+	switch(exp : Exp){
+		Add(e1,e2):{
+			if(e1 == Val(0.0)){
+				makeSimpleTree(e2);
+			}
+			else if(e2 == Val(0.0)){
+				makeSimpleTree(e1);
+			} else{
+				new_e1 = makeSimpleTree(e1);
+				new_e2 = makeSimpleTree(e2);
+			switch(new_e1 : Exp){
+				Sub(s1,s2):{
+					if(s1 == s2){
+						new_e2;
+					}
+				}
+				default:{
+					print("");
+				}
+			}
+			switch(new_e2 : Exp){
+				Sub(s11,s22):{
+					if(s11 == s22){
+						new_e1;
+					}
+				}
+				default:{
+					print("");
+				}
+			}
+			Add(new_e1,new_e2);
+			}
+		} 
+		Mul(e1,e2):{
+			if(e1 == Val(1.0)){
+				makeSimpleTree(e2);
+			}
+			else if(e2 == Val(1.0)){
+				makeSimpleTree(e1);
+			}
+			else if(e1 == Val(0.0) || e2 == Val(0.0)){
+				Val(0.0)
+			}
+		  else {
+
+			}
+		}
+		Pow(e1,e2):{
+			Pow(makeSimpleTree(e1),makeSimpleTree(e2))
+		}
+		Val(val):{
+			val;
+		}
+		Var(var):{
+			var;
+		};
+		Sub(e1,e2):{
+			Sub(makeSimpleTree(e1),makeSimpleTree(e2))
+		}
+		Div(e1,e2):{
+			Div(makeSimpleTree(e1),makeSimpleTree(e2))
+		}
+	}
+}
+
+main() {
+  str : string = strsubsmart(readUntil("\n"), 0,-1);	
+	//lab5
+	resultAr = parsic(lingoGrammarAr(), str, defaultPegActions);
+  resultAr |> println;
+	//lab6
+	r = cast(resultAr : flow -> Exp);
+	astToStr(r);
+	println("");
+	//lab7
+	calculateAst(resultAr) |> println;
+	//lab8
+	polish = makeRPNString(resultAr);
+	polish |> println;
+	resultPol = parsic(lingoGrammarPol(), polish, defaultPegActions);
+	println(resultPol);
+	polishToAr(resultPol, length(resultPol) - 1) |> println;
+	//lab9?
+	println(calculatePolish(resultPol,length(resultPol) - 1));
+	
+}

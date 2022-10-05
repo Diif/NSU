@@ -1,0 +1,13 @@
+export{
+Exp ::= Add, Sub, Mul, Div, Pow, Val, Var;
+	Add : (e1 : Exp, e2 : Exp);
+	Sub : (e1 : Exp, e2 : Exp);
+	Mul : (e1 : Exp, e2 : Exp);
+	Div : (e1 : Exp, e2 : Exp);
+	Pow : (e1 : Exp, e2 : Exp);
+	Val : (val : double);
+	Var : (var : string);
+
+Elem ::= Val, Var, Op;
+	Op : (o : string);
+}

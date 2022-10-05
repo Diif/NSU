@@ -1,0 +1,9 @@
+export{
+Pexp ::= pAdd, pSub, pMul, pDiv, pVal, pVar;
+  pAdd : (p1 : Pexp, p2 : Pexp);
+	pSub : (p1 : Pexp, p2 : Pexp);
+	pMul : (p1 : Pexp, p2 : Pexp);
+	pDiv : (p1 : Pexp, p2 : Pexp);
+	pVal : (val : double);
+	pVar : (var : string);
+}

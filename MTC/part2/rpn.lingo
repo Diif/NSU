@@ -1,0 +1,10 @@
+stack = elem+:e {:e};
+elem = ws operation$o ws {Op($o)}| ws variable$v ws {Var($v)} | ws number$n ws {Val(s2d($n))};
+operation =  "*" | "+" | "/" | "-" | "^";
+variable = letter+ (digit | letter)*;
+number = digit+;
+letter = 'a'-'z';
+digit = '0'-'9';
+
+ws = w*;
+w = " " | "\t" | "\n";

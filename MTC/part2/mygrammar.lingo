@@ -1,0 +1,20 @@
+exp = 
+	  ws "(" ws exp:e1 ws "+" ws exp:e2 ws ")" ws { Add(:e1, :e2) }
+	| ws "(" ws exp:e1 ws "-" ws exp:e2 ws ")" ws { Sub(:e1, :e2) }
+	| ws "(" ws exp:e1 ws "*" ws exp:e2 ws ")" ws { Mul(:e1, :e2) }
+	| ws "(" ws exp:e1 ws "/" ws exp:e2 ws ")" ws { Div(:e1, :e2) }
+	| ws "(" ws exp:e1 ws "^" ws exp:e2 ws ")" ws { Pow(:e1, :e2) }
+	| ws "(" ws exp:e ws ")" ws { :e }
+	| ws (("-")* digit+ ("." digit+)?)$d ws {Val(s2d($d))}
+	| ws variable$v ws {Var($v)};
+
+
+number = (("-")* digit+ ("." digit+)?)$d {Val(s2d($d))}
+variable = letter+ (digit | letter)*;
+letter = 'a'-'z';
+digit = '0'-'9';
+digitZero = '0';
+digitOne = '1';
+
+ws = w*;
+w = " " | "\t" | "\n";
