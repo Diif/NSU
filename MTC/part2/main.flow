@@ -763,7 +763,7 @@ calculateDerivative(exp : Exp, vr : Var){
 		}
 		Pow(e1,e2):{
 			if(e1 == vr){
-				Mul(e2, Pow(e1, Sub(e2,Val(1.0))));
+				Mul(e2, Pow(e1, Add(e2,Val(-1.0))));
 			} else {
 				Val(0.0)
 			}
@@ -796,7 +796,7 @@ removeDegree(exp : Exp, vr : Var) -> Exp{
 		}
 		Pow(e1,pw):{
 			if(e1 == vr){
-				Pow(e1, Sub(pw, Val(-1.0)));
+				Pow(e1, Add(pw, Val(-1.0)));
 			} else {
 				Val(0.0)
 			}
@@ -869,7 +869,7 @@ calculatePow(exp : Exp, vr : Var) -> double{
 		}
 		Pow(e1,pw):{
 			if(e1 == vr){
-				cast((cast(e1 : Exp -> Pow).e2): Exp -> Val).val
+				cast(pw : Exp -> Val).val
 			} else {
 				0.0
 			}
@@ -923,13 +923,14 @@ main() {
 	//lab9?
 	println(calculatePolish(resultPol,0, length(resultPol) - 1, [], 0));
 
-	// makeSimpleTree(r) |> println;
-	// makeSimpleTree(openBrackets(r)) |> println;
-	open = makeSimpleTree(openBrackets(makeSimpleTree(changeDivisionToPow(makeSimpleTree(r)))));
+	makeSimpleTree(r) |> println;
+	makeSimpleTree(openBrackets(r)) |> println;
+	open = makeSimpleTree(changeDivisionToPow(makeSimpleTree(openBrackets(makeSimpleTree(r)))));
 	println(open);
 	astToStr(open);
 	println("");
 	calculateAst(open) |> println;
-	der = calculateDerivative(open, Var("x"));
-	println(der);
+	der = calculateDerivative(open, Var("y"));
+	println(makeSimpleTree(der));
+	astToStr(makeSimpleTree(der));
 }
