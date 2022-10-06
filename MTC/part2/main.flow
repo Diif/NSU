@@ -219,20 +219,81 @@ makeOneSimplification(exp : Exp){
 			else if(e1 == Val(0.0) || e2 == Val(0.0)){
 				Val(0.0)
 			}
-		  else if(isSameStructType(e1, Pow(e1,e2))){
-				pow_obj = cast(e1 : Exp -> Pow);
-				if(pow_obj.e1 == e2){
-					Pow(e2, Add(pow_obj.e2, Val(1.0)))
+			else if(isSameStructType(e1, Pow(e1,e2)) && isSameStructType(e2, Pow(e1,e2))){
+				pow_obj1 = cast(e1 : Exp -> Pow);
+				pow_obj2 = cast(e2 : Exp -> Pow);
+				if(pow_obj1.e1 == pow_obj2.e1){
+					makeOneSimplification(makeOneSimplification(Pow(pow_obj1.e1, Add(pow_obj1.e2, pow_obj2.e2))))
 				} else {
 					exp
 				}
 			}
-			else if(isSameStructType(e2, Pow(e1,e2))){
-				pow_obj = cast(e2 : Exp -> Pow);
-				if(pow_obj.e1 == e1){
-					Pow(e1, Add(pow_obj.e2, Val(1.0)))
+		  else if(isSameStructType(e1, Pow(e1,e2))){
+				pow_obj1 = cast(e1 : Exp -> Pow);
+				if(pow_obj1.e1 == e2){
+					makeOneSimplification(Pow(e2, Add(pow_obj1.e2, Val(1.0))))
+				}else if(isSameStructType(e2, exp)){
+					mul_obj_e2 = cast(e2 : Exp -> Mul);
+					if(mul_obj_e2.e1 == pow_obj1.e1){
+						makeOneSimplification(Mul(mul_obj_e2.e2,makeOneSimplification(Pow(mul_obj_e2.e1, Add(pow_obj1.e2, Val(1.0))))))
+					}else if(mul_obj_e2.e2 == pow_obj1.e1){
+						makeOneSimplification(Mul(mul_obj_e2.e1,makeOneSimplification(Pow(mul_obj_e2.e2, Add(pow_obj1.e2, Val(1.0))))))
+					} else {
+						exp
+					}
 				}
-				else{
+				else {
+					exp
+				}
+			}
+			else if(isSameStructType(e2, Pow(e1,e2))){
+				pow_obj2 = cast(e2 : Exp -> Pow);
+				if(pow_obj2.e1 == e1){
+					makeOneSimplification(Pow(e1, Add(pow_obj2.e2, Val(1.0))))
+				}else if(isSameStructType(e1, exp)){
+					mul_obj_e1 = cast(e1 : Exp -> Mul);
+					if(mul_obj_e1.e1 == pow_obj2.e1){
+						makeOneSimplification(Mul(mul_obj_e1.e2,makeOneSimplification(Pow(mul_obj_e1.e1, Add(pow_obj2.e2, Val(1.0))))))
+					}else if(mul_obj_e1.e2 == pow_obj2.e1){
+						makeOneSimplification(Mul(mul_obj_e1.e1,makeOneSimplification(Pow(mul_obj_e1.e2, Add(pow_obj2.e2, Val(1.0))))))
+					} else {
+						exp
+					}
+				}
+				else {
+					exp
+				}
+			} else if(isSameStructType(e1, exp)){
+				mul_e1 = cast(e1 : Exp -> Mul);
+				if(mul_e1.e1 == e2){
+					Mul(makeOneSimplification(Pow(mul_e1.e1,Val(2.0))), mul_e1.e2)
+				}
+				else if(mul_e1.e2 == e2){
+					Mul(mul_e1.e1, makeOneSimplification(Pow(mul_e1.e2,Val(2.0))))
+				} 
+				else if(isSameStructType(mul_e1.e1, Pow(e1,e2)) && cast(mul_e1.e1 : Exp -> Pow).e1 == e2){
+					Mul(makeOneSimplification(Pow(e2, Add(cast(mul_e1.e1 : Exp -> Pow).e2, Val(1.0)))), mul_e1.e2);
+				}
+				else if(isSameStructType(mul_e1.e2, Pow(e1,e2)) && cast(mul_e1.e2 : Exp -> Pow).e1 == e2){
+					Mul(Pow(e2,makeOneSimplification(Add(cast(mul_e1.e2 : Exp -> Pow).e2, Val(1.0)))), mul_e1.e1);
+				} else {
+					exp
+				}
+			}
+			else if(isSameStructType(e2, exp)){
+				mul_e2 = cast(e2 : Exp -> Mul);
+				if(mul_e2.e1 == e1){
+					Mul(makeOneSimplification(Pow(mul_e2.e1,Val(2.0))), mul_e2.e2)
+				}
+				else if(mul_e2.e2 == e1){
+					Mul(mul_e2.e1, makeOneSimplification(Pow(mul_e2.e2,Val(2.0))))
+				} 
+				else if(isSameStructType(mul_e2.e1, Pow(e1,e2)) && cast(mul_e2.e1 : Exp -> Pow).e1 == e2){
+					Mul(makeOneSimplification(Pow(e2, Add(cast(mul_e2.e1 : Exp -> Pow).e2, Val(1.0)))), mul_e2.e2);
+				}
+				else if(isSameStructType(mul_e2.e2, Pow(e1,e2)) && cast(mul_e2.e2 : Exp -> Pow).e1 == e2){
+					Mul(makeOneSimplification(Pow(e2, Add(cast(mul_e2.e2 : Exp -> Pow).e2, Val(1.0)))), mul_e2.e1);
+				} else {
 					exp
 				}
 			}
@@ -241,7 +302,12 @@ makeOneSimplification(exp : Exp){
 			}
 		}
 		Pow(e1,e2):{
-			exp
+			if(isSameStructType(e2, Add(e1,e2))){
+				buf = cast(e2 : Exp -> Add);
+				Pow(e1,squashAdd(buf))
+			}else{
+				exp
+			}
 		}
 		Val(val):{
 			exp
@@ -259,6 +325,27 @@ makeOneSimplification(exp : Exp){
 		Div(e1,e2):{
 			exp
 		}
+	}
+}
+
+squashAdd(add : Add){
+	e1 = add.e1;
+	e2 = add.e2;
+	if(isSameStructType(e1, Val(1.0)) && isSameStructType(e2, Val(1.0))){
+		Val(cast(e1 : Exp -> Val).val + cast(e2 : Exp -> Val).val)
+	}
+	else if(isSameStructType(e1, add) || isSameStructType(e1, add)){
+		new_e1 = squashAdd(cast(e1 : Exp -> Add));
+		new_e2 = squashAdd(cast(e2 : Exp -> Add));
+		if(isSameStructType(new_e1, Val(1.0)) && isSameStructType(new_e2, Val(1.0))){
+		Val(cast(new_e1 : Exp -> Val).val + cast(new_e2 : Exp -> Val).val)
+		}
+		else {
+			Add(new_e1, new_e2);
+		}
+	}
+	else {
+		add;
 	}
 }
 
@@ -288,13 +375,21 @@ makeSimpleTree(exp : Exp) -> Exp{
 			}
 			else if(e1 == e2){
 				makeOneSimplification(Pow(makeSimpleTree(e1), Val(2.0)))
-			}
+			} 
 			else if(isSameStructType(e1, Pow(e1,e2))){
 				pow_obj = cast(e1 : Exp -> Pow);
-				new_pow_e1 = makeSimpleTree(pow_obj.e1);
+				new_pow_e1 = cast(makeSimpleTree(pow_obj) : Exp -> Pow);
 				new_e2 = makeSimpleTree(e2);
-				if(new_pow_e1 == new_e2){
-					makeOneSimplification(Pow(new_pow_e1, Add(pow_obj.e2, Val(1.0))))
+				if(new_pow_e1.e1 == new_e2){
+					makeOneSimplification(Pow(new_pow_e1.e1, Add(pow_obj.e2, Val(1.0))))
+				}else if(isSameStructType(new_e2, Pow(e1,e2))){
+					new_pow_e2 = cast(new_e2 : Exp -> Pow);
+					if(new_pow_e1.e1 == new_pow_e2.e1){
+					makeOneSimplification(Pow(new_pow_e1.e1, Add(new_pow_e1.e2, new_pow_e2.e2)))
+					}else {
+					new_e1 = makeSimpleTree(e1);
+					makeOneSimplification(Mul(new_e1, new_e2))
+					}
 				} else {
 					new_e1 = makeSimpleTree(e1);
 					makeOneSimplification(Mul(new_e1, new_e2))
@@ -319,7 +414,7 @@ makeSimpleTree(exp : Exp) -> Exp{
 			}
 		}
 		Pow(e1,e2):{
-			Pow(makeSimpleTree(e1),makeSimpleTree(e2))
+			makeOneSimplification(Pow(makeSimpleTree(e1),makeSimpleTree(e2)))
 		}
 		Val(val):{
 			exp
@@ -339,6 +434,473 @@ makeSimpleTree(exp : Exp) -> Exp{
 		}
 	}
 }
+
+//Distributive property
+openBrackets(exp : Exp) -> Exp{
+	if(isSameStructType(exp, Mul(exp,exp))){
+		mul_exp = cast(exp : Exp -> Mul);
+		if(
+			   (isSameStructType(mul_exp.e1, Val(1.0)) && isSameStructType(mul_exp.e2, Val(1.0)))
+			|| (isSameStructType(mul_exp.e1, Val(1.0)) && isSameStructType(mul_exp.e2, Var("x")))
+			|| (isSameStructType(mul_exp.e1, Var("x")) && isSameStructType(mul_exp.e2, Val(1.0)))
+			|| (isSameStructType(mul_exp.e1, Var("x")) && isSameStructType(mul_exp.e2, Var("x")))
+			){
+				exp;
+			}
+			else if(isSameStructType(mul_exp.e1, Val(1.0)) || isSameStructType(mul_exp.e1, Var("x"))){
+				switch(mul_exp.e2 : Exp){
+					Add(e1,e2):{
+						Add(openBrackets(Mul(mul_exp.e1, e1)),openBrackets(Mul(mul_exp.e1, e2)))
+					}
+					Sub(e1,e2):{
+						Sub(openBrackets(Mul(mul_exp.e1, e1)),openBrackets(Mul(mul_exp.e1, e2)))
+					}
+					Mul(e1,e2):{
+					openOnce(Mul(openBrackets(Mul(mul_exp.e1, e1)),openBrackets(e2)))
+					}
+					Div(e1,e2):{
+						Div(openBrackets(Mul(mul_exp.e1, e1)),openBrackets(Mul(mul_exp.e1, e2)))
+					}
+					Pow(e1,e2):{
+						Pow(openBrackets(Mul(mul_exp.e1, e1)),openBrackets(Mul(mul_exp.e1, e2)))
+					}
+					//unreachable
+					Val(val):{
+						exp
+					}
+					//unreachable
+					Var(var):{
+						exp
+					}
+				}
+			}
+			else if(isSameStructType(mul_exp.e2, Val(1.0)) || isSameStructType(mul_exp.e2, Var("1.0"))){
+				switch(mul_exp.e1 : Exp){
+					Add(e1,e2):{
+						Add(openBrackets(Mul(e1,mul_exp.e2)),openBrackets(Mul(e2,mul_exp.e2)))
+					}
+					Sub(e1,e2):{
+						Sub(openBrackets(Mul(e1,mul_exp.e2)),openBrackets(Mul(e2,mul_exp.e2)))
+					}
+					Mul(e1,e2):{
+					openOnce(Mul(openBrackets(e1),openBrackets(Mul(e2,mul_exp.e2))))
+					}
+					Div(e1,e2):{
+						Div(openBrackets(Mul(e1,mul_exp.e2)),openBrackets(Mul(e2,mul_exp.e2)))
+					}
+					Pow(e1,e2):{
+						Pow(openBrackets(Mul(e1,mul_exp.e2)),openBrackets(Mul(e2,mul_exp.e2)))
+					}
+					//unreachable
+					Val(val):{
+						Var("ERROR")
+					}
+					//unreachable
+					Var(var):{
+						Var("ERROR")
+					}
+				}
+			} // exp * exp case
+			else{
+				switch(mul_exp.e2 : Exp){
+					Add(e1,e2):{
+						Add(openBrackets(Mul(mul_exp.e1, e1)),openBrackets(Mul(mul_exp.e1, e2)));
+					}
+					Sub(e1,e2):{
+						Sub(openBrackets(Mul(mul_exp.e1, e1)),openBrackets(Mul(mul_exp.e1, e2)));
+					}
+					Div(e1,e2):{
+						Div(openBrackets(Mul(mul_exp.e1, e1)),openBrackets(Mul(mul_exp.e1, e2)));
+					}
+					Mul(e1,e2):{
+							switch(mul_exp.e1 : Exp){
+								Add(e11,e22):{
+									Add(openBrackets(Mul(e11, mul_exp.e2)),openBrackets(Mul(e22, mul_exp.e2)));
+								}
+								Sub(e11,e22):{
+									Sub(openBrackets(Mul(e11, mul_exp.e2)),openBrackets(Mul(e22, mul_exp.e2)));
+								}
+								Div(e11,e22):{
+									Div(openBrackets(Mul(e11, mul_exp.e2)),openBrackets(Mul(e22, mul_exp.e2)));
+								}
+								Mul(e11,e22):{
+									openOnce(Mul(openBrackets(mul_exp.e1),openBrackets(mul_exp.e2)));
+								}
+								Pow(e11,e22):{
+								openOnce(Mul(openBrackets(mul_exp.e1),openBrackets(mul_exp.e2)));
+								}
+								Val(val):{
+									Var("ERROR")
+								}
+								Var(var):{
+									Var("ERROR")
+								}
+							}
+					}
+					Pow(e1,e2):{
+						switch(mul_exp.e1 : Exp){
+								Add(e11,e22):{
+									Add(openBrackets(Mul(e11, mul_exp.e2)),openBrackets(Mul(e22, mul_exp.e2)));
+								}
+								Sub(e11,e22):{
+									Sub(openBrackets(Mul(e11, mul_exp.e2)),openBrackets(Mul(e22, mul_exp.e2)));
+								}
+								Div(e11,e22):{
+									Div(openBrackets(Mul(e11, mul_exp.e2)),openBrackets(Mul(e22, mul_exp.e2)));
+								}
+								Mul(e11,e22):{
+									openOnce(Mul(openBrackets(mul_exp.e1),openBrackets(mul_exp.e2)));
+								}
+								Pow(e11,e22):{
+									openOnce(Mul(openBrackets(mul_exp.e1),openBrackets(mul_exp.e2)));
+								}
+								Val(val):{
+									Var("ERROR")
+								}
+								Var(var):{
+									Var("ERROR")
+								}
+							}
+					}
+					//unreachable
+					Val(val):{
+						Var("ERROR")
+					}
+					//unreachable
+					Var(var):{
+						Var("ERROR")
+					}
+				}
+			}
+	} else {
+		exp
+	}
+}
+
+
+openOnce(exp : Exp){
+if(isSameStructType(exp, Mul(exp,exp))){
+		mul_exp = cast(exp : Exp -> Mul);
+		if(
+			   (isSameStructType(mul_exp.e1, Val(1.0)) && isSameStructType(mul_exp.e2, Val(1.0)))
+			|| (isSameStructType(mul_exp.e1, Val(1.0)) && isSameStructType(mul_exp.e2, Var("x")))
+			|| (isSameStructType(mul_exp.e1, Var("x")) && isSameStructType(mul_exp.e2, Val(1.0)))
+			|| (isSameStructType(mul_exp.e1, Var("x")) && isSameStructType(mul_exp.e2, Var("x")))
+			){
+				exp;
+			}
+			else if(isSameStructType(mul_exp.e1, Val(1.0)) || isSameStructType(mul_exp.e1, Var("x"))){
+				switch(mul_exp.e2 : Exp){
+					Add(e1,e2):{
+						Add(openBrackets(Mul(mul_exp.e1, e1)),openBrackets(Mul(mul_exp.e1, e2)))
+					}
+					Sub(e1,e2):{
+						Sub(openBrackets(Mul(mul_exp.e1, e1)),openBrackets(Mul(mul_exp.e1, e2)))
+					}
+					Mul(e1,e2):{
+						Mul(openBrackets(Mul(mul_exp.e1, e1)),openBrackets(e2))
+					}
+					Div(e1,e2):{
+						Div(openBrackets(Mul(mul_exp.e1, e1)),openBrackets(Mul(mul_exp.e1, e2)))
+					}
+					Pow(e1,e2):{
+						Pow(openBrackets(Mul(mul_exp.e1, e1)),openBrackets(Mul(mul_exp.e1, e2)))
+					}
+					//unreachable
+					Val(val):{
+						exp
+					}
+					//unreachable
+					Var(var):{
+						exp
+					}
+				}
+			}
+			else if(isSameStructType(mul_exp.e2, Val(1.0)) || isSameStructType(mul_exp.e2, Var("1.0"))){
+				switch(mul_exp.e1 : Exp){
+					Add(e1,e2):{
+						Add(openBrackets(Mul(e1,mul_exp.e2)),openBrackets(Mul(e2,mul_exp.e2)))
+					}
+					Sub(e1,e2):{
+						Sub(openBrackets(Mul(e1,mul_exp.e2)),openBrackets(Mul(e2,mul_exp.e2)))
+					}
+					Mul(e1,e2):{
+						Mul(openBrackets(e1),openBrackets(Mul(e2,mul_exp.e2)))
+					}
+					Div(e1,e2):{
+						Div(openBrackets(Mul(e1,mul_exp.e2)),openBrackets(Mul(e2,mul_exp.e2)))
+					}
+					Pow(e1,e2):{
+						Pow(openBrackets(Mul(e1,mul_exp.e2)),openBrackets(Mul(e2,mul_exp.e2)))
+					}
+					//unreachable
+					Val(val):{
+						Var("ERROR")
+					}
+					//unreachable
+					Var(var):{
+						Var("ERROR")
+					}
+				}
+			} // exp * exp case
+			else{
+				switch(mul_exp.e2 : Exp){
+					Add(e1,e2):{
+						Add(openBrackets(Mul(mul_exp.e1, e1)),openBrackets(Mul(mul_exp.e1, e2)));
+					}
+					Sub(e1,e2):{
+						Sub(openBrackets(Mul(mul_exp.e1, e1)),openBrackets(Mul(mul_exp.e1, e2)));
+					}
+					Div(e1,e2):{
+						Div(openBrackets(Mul(mul_exp.e1, e1)),openBrackets(Mul(mul_exp.e1, e2)));
+					}
+					Mul(e1,e2):{
+							switch(mul_exp.e1 : Exp){
+								Add(e11,e22):{
+									Add(openBrackets(Mul(e11, mul_exp.e2)),openBrackets(Mul(e22, mul_exp.e2)));
+								}
+								Sub(e11,e22):{
+									Sub(openBrackets(Mul(e11, mul_exp.e2)),openBrackets(Mul(e22, mul_exp.e2)));
+								}
+								Div(e11,e22):{
+									Div(openBrackets(Mul(e11, mul_exp.e2)),openBrackets(Mul(e22, mul_exp.e2)));
+								}
+								Mul(e11,e22):{
+									Mul(openBrackets(mul_exp.e1),openBrackets(mul_exp.e2));
+								}
+								Pow(e11,e22):{
+									Mul(openBrackets(mul_exp.e1),openBrackets(mul_exp.e2));
+								}
+								Val(val):{
+									Var("ERROR")
+								}
+								Var(var):{
+									Var("ERROR")
+								}
+							}
+					}
+					Pow(e1,e2):{
+						switch(mul_exp.e1 : Exp){
+								Add(e11,e22):{
+									Add(openBrackets(Mul(e11, mul_exp.e2)),openBrackets(Mul(e22, mul_exp.e2)));
+								}
+								Sub(e11,e22):{
+									Sub(openBrackets(Mul(e11, mul_exp.e2)),openBrackets(Mul(e22, mul_exp.e2)));
+								}
+								Div(e11,e22):{
+									Div(openBrackets(Mul(e11, mul_exp.e2)),openBrackets(Mul(e22, mul_exp.e2)));
+								}
+								Mul(e11,e22):{
+									Mul(openBrackets(mul_exp.e1),openBrackets(mul_exp.e2));
+								}
+								Pow(e11,e22):{
+									Mul(openBrackets(mul_exp.e1),openBrackets(mul_exp.e2));
+								}
+								Val(val):{
+									Var("ERROR")
+								}
+								Var(var):{
+									Var("ERROR")
+								}
+							}
+					}
+					//unreachable
+					Val(val):{
+						Var("ERROR")
+					}
+					//unreachable
+					Var(var):{
+						Var("ERROR")
+					}
+				}
+			}
+	} else {
+		exp
+	}
+}
+
+changeDivisionToPow(exp : Exp){
+switch(exp : Exp){
+		Val(val):{
+			exp
+		}
+		Var(var):{
+			exp
+		}
+		Add(e1,e2):{
+			Add(changeDivisionToPow(e1), changeDivisionToPow(e2))
+		}
+		Sub(e1,e2):{
+			Sub(changeDivisionToPow(e1), changeDivisionToPow(e2))
+		}
+		Div(e1,e2):{
+			Mul(changeDivisionToPow(e1), Pow(changeDivisionToPow(e2), Val(-1.0)))
+		}
+		Mul(e1,e2):{
+			Mul(changeDivisionToPow(e1), changeDivisionToPow(e2))
+		}
+		Pow(e1,e2):{
+			Pow(changeDivisionToPow(e1), changeDivisionToPow(e2))
+		}
+	}	
+}
+
+calculateDerivative(exp : Exp, vr : Var){
+	switch(exp : Exp){
+		Add(e1,e2):{
+			Add(calculateDerivative(e1, vr), calculateDerivative(e2,vr))
+		}
+		Mul(e1,e2):{
+			num_var = calculatePow(exp, vr);
+			if(num_var == 0.0){
+				Val(0.0)
+			} else {
+				Mul(Val(num_var),removeDegree(exp, vr));
+			}
+		}
+		Sub(e1,e2):{
+			Sub(calculateDerivative(e1, vr), calculateDerivative(e2,vr))
+		}
+		Pow(e1,e2):{
+			if(e1 == vr){
+				Mul(e2, Pow(e1, Sub(e2,Val(1.0))));
+			} else {
+				Val(0.0)
+			}
+		}
+		Div(e1,e2):{
+			Var("ERROR");
+		}
+		Val(val):{
+			Val(0.0)
+		}
+		Var(var):{
+			if(exp == vr){
+				Val(1.0)
+			} else {
+				Val(0.0)
+			}
+		}
+
+	}
+}
+
+removeDegree(exp : Exp, vr : Var) -> Exp{
+	switch(exp : Exp){
+		Mul(e1,e2):{
+			if(canFindVar(e1,vr)){
+				Mul(removeDegree(e1,vr),e2)
+			} else {
+				Mul(e1,removeDegree(e2,vr))
+			}
+		}
+		Pow(e1,pw):{
+			if(e1 == vr){
+				Pow(e1, Sub(pw, Val(-1.0)));
+			} else {
+				Val(0.0)
+			}
+		}
+		Var(var):{
+			if(exp == vr){
+				Val(1.0)
+			} else {
+				exp
+			}
+		}
+		Val(val):{
+			Var("ERROR")
+		}
+		Sub(e1,e2):{
+			Var("ERROR")
+		}
+		Div(e1,e2):{
+			Var("ERROR")
+		}
+		Add(e1,e2):{
+			Var("ERROR")
+		}
+	}
+	
+}
+
+canFindVar(exp : Exp, vr : Var){
+	switch(exp : Exp){
+		Mul(e1,e2):{
+			canFindVar(e1, vr) || canFindVar(e2,vr)
+		}
+		Pow(e1,pw):{
+			if(e1 == vr){
+				true
+			} else {
+				false
+			}
+		}
+		Var(var):{
+			if(exp == vr){
+				true
+			} else {
+				false
+			}
+		}
+		Val(val):{
+			println("ERROR");
+			false
+		}
+		Sub(e1,e2):{
+			println("ERROR");
+			false
+		}
+		Div(e1,e2):{
+			println("ERROR");
+			false
+		}
+		Add(e1,e2):{
+			println("ERROR");
+			false
+		}
+	}
+}
+
+calculatePow(exp : Exp, vr : Var) -> double{
+	switch(exp : Exp){
+		Mul(e1,e2):{
+			calculatePow(e1,vr) + calculatePow(e2,vr)
+		}
+		Pow(e1,pw):{
+			if(e1 == vr){
+				cast((cast(e1 : Exp -> Pow).e2): Exp -> Val).val
+			} else {
+				0.0
+			}
+		}
+		Var(var):{
+			if(exp == vr){
+				1.0
+			} else {
+				0.0
+			}
+		}
+		Val(val):{
+			0.0
+		}
+		Sub(e1,e2):{
+			println("ERROR");
+			0.0
+		}
+		Div(e1,e2):{
+			println("ERROR");
+			0.0
+		}
+		Add(e1,e2):{
+			println("ERROR");
+			0.0
+		}
+	}
+	
+}
+
+
 
 main() {
 	isSameStructType(Pow(Val(1.0), Var("a")), Pow(Var("a"), Val(5.05))) |> println;
@@ -361,6 +923,13 @@ main() {
 	//lab9?
 	println(calculatePolish(resultPol,0, length(resultPol) - 1, [], 0));
 
-	makeSimpleTree(r) |> println;
-	
+	// makeSimpleTree(r) |> println;
+	// makeSimpleTree(openBrackets(r)) |> println;
+	open = makeSimpleTree(openBrackets(makeSimpleTree(changeDivisionToPow(makeSimpleTree(r)))));
+	println(open);
+	astToStr(open);
+	println("");
+	calculateAst(open) |> println;
+	der = calculateDerivative(open, Var("x"));
+	println(der);
 }
