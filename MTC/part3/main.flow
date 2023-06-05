@@ -1,0 +1,27 @@
+import string;
+import runtime;
+import maybe;
+
+import net/url_parameter;
+
+import nemoparser;
+import nemovmparser;
+import nemoruntimevm;
+import translator;
+
+main() {
+  // str : string = strsubsmart(readUntil("\n"), 0,-1);		
+
+	// str : string = getFileContent("/home/prozella/NSU/MTC/part3/test.txt");
+  // println(parseVm(str));
+  str : string = getFileContent("/home/prozella/NSU/MTC/part3/testnemo.txt");
+  resparse = parse(str);
+  maybeApply(resparse, translate);
+
+
+  str2 : string = getFileContent("/home/prozella/NSU/MTC/part3/trsl.txt");
+  // println(parseVm(str));
+  maybeApply(parseVm(str2), runNemo);
+
+
+}

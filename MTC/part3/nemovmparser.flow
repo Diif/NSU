@@ -1,0 +1,26 @@
+import runtime;
+import nemovm;
+import nemo;
+import ds/tree;
+import fs/filesystem;
+import lingo/pegcode/driver;
+import extendedPegActions;
+
+export{
+  parseVm(filename : string) -> Maybe<AsmProg>;
+}
+
+lingoGrammarOpVmNemo : ref Maybe<[PegOp]> = ref None();
+
+lingoGrammarNemoVm() {
+	onlyOnce(lingoGrammarOpVmNemo, \ -> {
+		compilePegGrammar("#include /home/prozella/stuff/flow9/lib/lingo/nemovm.lingo");
+	});
+}
+
+parseVm(filename : string) -> Maybe<AsmProg>{
+	
+	resultAr = parsic(lingoGrammarNemoVm(), filename, extendedPegActions);
+  Some(resultAr);
+  
+}

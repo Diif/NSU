@@ -1,0 +1,56 @@
+import lingo/pegaction;
+import nemo;
+export{
+  extendedPegActions : SemanticActions;
+}
+
+extendedPegActions  = {
+	t = ref makeTree();
+	add = \n, fn : ([flow]) -> flow -> {
+		t := setTree(^t, n, fn);
+	}
+	strUnescape = \xs : [flow] -> {
+		quote = if (flow2s(xs[1]) == "'") "\"" else "'";
+		flow(deserializeString("\"" + strReplace(flow2s(xs[0]), quote, "\\" + quote) + "\"").first);
+	}
+
+	add("consArray", \xs : [flow] -> flow(concat([xs[0]], cast(xs[1] : flow -> [flow]))));
+	add("strUnescape", strUnescape);
+	add("strUnescapePair", \xs : [flow] -> strUnescape([xs[0].first, xs[0].second]));
+	add("concat", \xs : [flow] -> flow(concat(cast(xs[0] : flow -> [flow]), cast(xs[1] : flow -> [flow]))));
+	add("s2i", \xs : [flow] -> {flow(s2i(flow2s(xs[0])))});
+	add("trim", \xs : [flow] -> {flow(trim(flow2s(xs[0])))});
+	add("s2d", \xs : [flow] -> {flow(s2d(flow2s(xs[0])))});
+  add("BuildSeqBody", \xs : [flow] -> {flow(BuildSeqBody(cast(xs[0] : flow -> [Body]), cast(xs[1] : flow -> int)))});
+	add("InverseRelation", \xs : [flow] -> {flow(InverseRelation(cast(xs[0] : flow -> Relation)))});
+	// Return the children as an array
+	add("array", \xs : [flow] -> flow(xs));
+	// Take the first element of an array
+	add("unarray", \xs : [flow] -> {
+		x0 = cast(xs[0] : flow -> [flow]);
+		if (length(x0) > 0) {
+			x0[0] 
+		} else flow([])
+	});
+	// Useful to debug what value is passed along
+	add("debug", \xs : [flow] -> { 
+		println("Debug: " + toString(if (length(xs) == 1) xs[0] else xs));
+		xs[0] 
+	});
+
+	add("true", \xs : [flow] -> flow(true));
+	add("false", \xs : [flow] -> flow(false));
+	add("zero", \xs : [flow] -> flow(0));
+	add("one", \xs : [flow] -> flow(1));
+	add("two", \xs : [flow] -> flow(2));
+	add("three", \xs : [flow] -> flow(3));
+	add("minus", \xs : [flow] -> flow(-flow2i(xs[0])));
+	add("storeComment", \xs : [flow] -> flow(""));
+	add("emptyArray", \xs : [flow] -> flow([]));
+	add("unarrayDef", \xs : [flow] -> {
+		x0 = cast(xs[0] : flow -> [flow]);
+		if (length(x0) > 0) x0[0] else flow(xs[1])
+	});
+
+	SemanticActions(^t);
+}

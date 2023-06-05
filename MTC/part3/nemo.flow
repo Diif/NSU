@@ -1,0 +1,84 @@
+import runtime;
+export{
+
+Prog : (descs : [Desc], body : Body);
+
+Desc : (name : string, type : Type);
+
+Type ::= Int, HyperTable;
+Int : ();
+HyperTable : (x : Type, y : Type);
+
+BuildSeqBody(arr : [Body], ind : int) -> Body;
+
+Body ::= OriginalSeqBody, SeqBody, AltBody, InfBody, EmptyBody, Assign, Relation, Show ;
+OriginalSeqBody : (b1 : Body, b2 : Body);
+SeqBody : (b1 : Body, b2 : Body);
+AltBody : (b : [Body]);
+InfBody : (b : Body);
+EmptyBody : ();
+
+Show : (toShow : ArExpr);
+Assign : (var : Var, val : Expr);
+
+Relation ::= Less, LessE, Great, GreatE, Equal, NotEqual;
+Less : (op1 : ArExpr, op2 : ArExpr);
+LessE : (op1 : ArExpr, op2 : ArExpr);
+Great : (op1 : ArExpr, op2 : ArExpr);
+GreatE : (op1 : ArExpr, op2 : ArExpr);
+Equal : (op1 : ArExpr, op2 : ArExpr);
+NotEqual : (op1 : ArExpr, op2 : ArExpr);
+InverseRelation(r : Relation) -> Relation;
+
+Expr ::= ArExpr, FunExpr, Operand;
+
+ArExpr ::= Add, Sub, Mul, Div, Var, Num, FunExpr;
+Add : (op1 : ArExpr, op2 : ArExpr);
+Sub : (op1 : ArExpr, op2 : ArExpr);
+Mul : (op1 : ArExpr, op2 : ArExpr);
+Div : (op1 : ArExpr, op2 : ArExpr);
+
+FunExpr ::= App, Upd;
+App : (arr : Var, indx : ArExpr);
+Upd : (arr : Var, indx : ArExpr, newVal : ArExpr);
+
+Operand ::= Var, Num;
+Var : (name : string);
+Num : (value : int);
+
+}
+
+BuildSeqBody(arr : [Body], ind : int) -> Body{
+  size : int = length(arr);
+  if(size == 0){
+    EmptyBody();
+  }
+  else if(ind == size - 1){
+    arr[ind]
+  } else{
+    SeqBody(arr[ind], BuildSeqBody(arr, ind+1))
+  }
+}
+
+InverseRelation(r : Relation) -> Relation{
+  switch(r){
+    Less (op1, op2 ):{
+      GreatE(op1, op2);
+    }
+    LessE (op1, op2 ):{
+      Great(op1,op2);
+    }
+    Great (op1, op2 ):{
+      LessE(op1,op2);
+    }
+    GreatE (op1, op2 ):{
+      Less(op1, op2);
+    }
+    Equal (op1, op2 ):{
+      NotEqual(op1,op2);
+    }
+    NotEqual (op1, op2 ):{
+      Equal(op1, op2);
+    }
+  }
+}

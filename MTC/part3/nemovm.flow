@@ -1,0 +1,21 @@
+import runtime;
+import nemo;
+import ds/tree;
+export{
+
+  // arrayLevels == 0 -> int, arrayLevels == 1 -> [], arrayLevels == 2 -> [[]] ...
+  RunVar ::=  ArrVar, IntVar;
+  ArrVar : (arr : Tree<flow, flow>, type : Type);
+  IntVar : (val : int);
+
+  AsmProg : (descs : [AsmDesc], markedOperators : [MarkedOperator]);
+  AsmDesc : (startMark : Mark, var : Var, type : Type, nextMark : Mark );
+
+  MarkedOperator ::= MarkedAssignOperator, MarkedTestOperator, MarkedPrintOperator, JumpOperator;
+  MarkedAssignOperator : (startMark : Mark, var : Var, arExpr : ArExpr, nextMark : Mark);
+  MarkedTestOperator : (startMark : Mark, test : Relation, trueMark : Mark, falseMark : Mark);
+  MarkedPrintOperator : (startMark : Mark, toPrint : ArExpr, nextMark : Mark);
+  JumpOperator : (startMark : Mark, nextMark : Mark);
+
+  Mark : (value : int);
+}

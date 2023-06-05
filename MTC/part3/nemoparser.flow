@@ -1,0 +1,518 @@
+import runtime;
+import nemo;
+import ds/tree;
+import fs/filesystem;
+import lingo/pegcode/driver;
+import extendedPegActions;
+
+export{
+  parse(filename : string) -> Maybe<Prog>;
+  checkTypeEquality(type1 : Type, type2 : Type) -> bool;
+}
+
+lingoGrammarOpNemo : ref Maybe<[PegOp]> = ref None();
+
+lingoGrammarNemo() {
+	onlyOnce(lingoGrammarOpNemo, \ -> {
+		compilePegGrammar("#include /home/prozella/stuff/flow9/lib/lingo/nemo.lingo");
+	});
+}
+
+parse(filename : string) -> Maybe<Prog>{
+	
+	resultAr = parsic(lingoGrammarNemo(), filename, extendedPegActions);
+  println("Parsic result:");
+  println(resultAr);
+  if(checkRules(resultAr)){
+    Some(resultAr);
+  } else {
+  None();
+  }
+}
+
+checkRules(parseResult : Prog){
+  emptr = makeTree();
+  if(length(parseResult.descs) != 0){
+    tr = checkDescs(parseResult.descs, 0 , emptr);
+    if(tr == None()){
+      println("Descs fall.");
+      false;
+    } else{
+    checkRelationsAndAssignments(parseResult.body, cast(tr : Maybe<Tree<string, Type>> -> Some<Tree<string, Type>>).value);
+    }
+  } else {
+    checkRelationsAndAssignments(parseResult.body, emptr);
+  }
+
+}
+
+//make sure size != 0 before call
+checkDescs(descs : [Desc], ind : int, tr : Tree<string, Type>) -> Maybe<Tree<string, Type>>{
+  size : int = length(descs);
+  if(size == ind){
+    Some(tr);
+  } else {
+    name : string = descs[ind].name;
+    val = lookupTree(tr, name);
+    if(val == None()){
+      checkDescs(descs, ind+1,setTree(tr, name, descs[ind].type));
+    } else {
+      None();
+    }
+  }
+}
+
+checkRelationsAndAssignments(body : Body, tr : Tree<string, Type>) {
+  switch(body : Body){
+    SeqBody(b1, b2):{
+      res1 = checkRelationsAndAssignments(b1, tr);
+      if(res1 == false){
+        false
+      } else{
+      checkRelationsAndAssignments(b2, tr);
+      }
+    }
+    OriginalSeqBody(b1, b2):{
+      res1 = checkRelationsAndAssignments(b1, tr);
+      if(res1 == false){
+        false
+      } else{
+      checkRelationsAndAssignments(b2, tr);
+      }
+    }
+    InfBody(b):{
+      checkRelationsAndAssignments(b,tr);
+    }
+    AltBody(b):{
+      checkAltBody(b, 0,tr)
+    }
+    Assign(var,val):{
+      checkTypeForAssignAndArOpAndFunOp(var,val,tr)
+    }
+    Relation():{
+      switch(body : Relation){
+         Less(op1, op2):{
+            checkTypeForRelation(op1,op2, tr);
+         }
+         LessE(op1, op2):{
+            checkTypeForRelation(op1,op2, tr);
+         }
+         Great(op1, op2):{
+            checkTypeForRelation(op1,op2, tr);
+         }
+         GreatE(op1, op2):{
+            checkTypeForRelation(op1,op2, tr);
+         }
+         Equal(op1, op2):{
+            checkTypeForRelation(op1,op2, tr);
+         }
+         NotEqual(op1, op2):{
+            checkTypeForRelation(op1,op2, tr);
+         }
+      }
+    }
+    EmptyBody():{
+      true;
+    }
+    Show(var):{
+      true;
+    }
+  }
+}
+
+checkAltBody(bodies : [Body], ind : int, tr : Tree<string, Type>){
+  body = bodies[ind];
+  res1 = checkRelationsAndAssignments(body, tr);
+  if(ind + 1 == length(bodies)){
+    res1;
+  } else {
+    if(res1 == false){
+      false;
+    } else {
+     checkAltBody(bodies, ind+1, tr); 
+    }
+  }
+}
+
+checkTypeForAssignAndArOpAndFunOp(var : Var, val : Expr, tr : Tree<string, Type>){
+  maybeVarType = getOperandType(var, tr);
+  
+  if(maybeVarType == None()){
+    print("Unknown variable: ");
+    println(var.name);
+    false;
+  } else 
+  {
+    varType = cast(maybeVarType : Maybe<Type> -> Some<Type>).value;
+    switch(val){
+    Operand():{
+      switch(val)
+      {
+        Var(name):{
+          maybeValType = lookupTree(tr, name);
+          if(maybeValType == None())
+          {
+            print("Unknown variable: ");
+            println(name);
+            false;
+          } else
+          {
+            checkTypeEquality( varType, cast(maybeValType : Maybe<Type> -> Some<Type>).value);
+          }
+        }
+        Num(numVal):{
+          checkTypeEquality(varType, Int());
+        }
+      }
+    }
+    FunExpr():{
+      switch(val){
+        Upd(arr, ind, newVal):{
+          res1 = checkFunctions(val,tr);
+          if(res1)
+          {
+            maybeArrValueType = getOperandType(arr,tr);
+            if(maybeArrValueType == None()){
+              print("Unknown variable: ");
+              println(arr);
+              false;
+            }
+            else
+            {
+              arrType = cast(cast(maybeArrValueType : Maybe<Type> -> Some<Type>).value : Type -> HyperTable);
+              checkTypeEquality(arrType, varType);
+            }
+          } else
+          {
+            print("Bad Upd expression: ");
+            println(val);
+            false
+          }
+        }
+        App(arr, ind):{
+          res1 = checkFunctions(val,tr);
+          if(res1)
+          {
+            maybeArrValueType = getOperandType(arr,tr);
+            if(maybeArrValueType == None()){
+              print("Unknown variable: ");
+              println(arr);
+              false;
+            }
+            else
+            {
+              arrValuesType =  cast(cast(maybeArrValueType : Maybe<Type> -> Some<Type>).value : Type -> HyperTable).y;
+              checkTypeEquality(arrValuesType, varType);
+            }
+          } else
+          {
+            print("Bad App expression: ");
+            println(val);
+            false
+          }
+        }
+      }
+    }
+    Add(op1,op2):{
+      checkArExpr(op1, tr) && checkArExpr(op2, tr) && checkTypeEquality(varType, Int());
+    }
+    Sub(op1,op2):{
+      checkArExpr(op1, tr) && checkArExpr(op2, tr) && checkTypeEquality(varType, Int());
+    }
+    Div(op1,op2):{
+      checkArExpr(op1, tr) && checkArExpr(op2, tr) && checkTypeEquality(varType, Int());
+    }
+    Mul(op1,op2):{
+      checkArExpr(op1, tr) && checkArExpr(op2, tr) && checkTypeEquality(varType, Int());
+    }
+  }
+  }
+}
+
+checkArExprOperands(op1, op2,tr : Tree<string, Type>){
+  maybeOp1Type = getOperandType(op1,tr);
+  if(maybeOp1Type == None()){
+    false;
+  } else{
+    maybeOp2Type = getOperandType(op2,tr);
+    if(maybeOp2Type == None()){
+    false;
+    }else
+    {
+      op1Type = cast(maybeOp1Type : Maybe<Type> -> Some<Type>).value;
+      op2Type = cast(maybeOp2Type : Maybe<Type> -> Some<Type>).value;
+      if(isSameStructType(op1Type, Int())){
+        if(isSameStructType(op1Type, op2Type)){
+          true;
+        } else{
+          false;
+        }
+      }else{
+        false;
+      }
+
+    }
+  }
+
+}
+
+checkFunctions(fun : FunExpr, tr : Tree<string, Type>){
+  switch(fun){
+        Upd(arr, ind, newVal):{
+          tbl =  getOperandType(arr, tr);
+          if(tbl == None() || isSameStructType(cast(tbl : Maybe<Type> -> Some<Type>).value, Int()))
+          {
+            print("Unknown/incorrect upd array: isNone?");
+            if(tbl == None()){
+              err = "true";
+              print(err);
+              print(" , ");
+              println(arr);
+              false;
+            } else
+            {
+              err = "false";
+              print(err);
+              print(" , ");
+              println(arr);
+              false;
+            }
+          } else
+          {
+            hyptbl = cast(cast(tbl : Maybe<Type> -> Some<Type>).value : Type ->HyperTable);
+            maybeIndType = getOperandType(ind, tr);
+            if( maybeIndType == None())
+            {
+              println("Unknown upd index");
+              false;
+            } 
+            else 
+            {
+              indType = cast(maybeIndType : Maybe<Type> -> Some<Type>).value;
+              maybeNewValType = getOperandType(newVal, tr);
+              if(maybeNewValType == None())
+              {
+                println("Unknown upd newval");
+                false;
+              } else
+              {
+                NewValType = cast(maybeNewValType : Maybe<Type> -> Some<Type>).value;
+                res1 = checkTypeEquality(hyptbl.x, indType);
+                if(res1)
+                {
+                  res2 = checkTypeEquality(hyptbl.y, NewValType);
+                  res2;
+                } else {
+                  println("Bad upd index");
+                  false;
+                }
+              }
+            }
+          }
+        }
+        App(arr, ind):{
+          tbl =  getOperandType(arr, tr);
+          if(tbl == None() || isSameStructType(cast(tbl : Maybe<Type> -> Some<Type>).value, Int()))
+          {
+            print("Unknown/incorrect upd array: isNone?");
+            if(tbl == None()){
+              err = "true";
+              print(err);
+              print(" , ");
+              println(arr);
+              false;
+            } else
+            {
+              err = "false";
+              print(err);
+              print(" , ");
+              println(arr);
+              false;
+            }
+          } else
+          {
+            hyptbl = cast(cast(tbl : Maybe<Type> -> Some<Type>).value : Type -> HyperTable);
+            maybeIndType = getOperandType(ind, tr);
+            if( maybeIndType == None())
+            {
+              println("Unknown app index");
+              false;
+            } 
+            else 
+            {
+              indType = cast(maybeIndType : Maybe<Type> -> Some<Type>).value;
+              res1 = checkTypeEquality(hyptbl.x, indType);
+              if(!res1){
+                println("Bad app index");
+                false;
+              } else{
+                true;
+              }
+            }
+          }
+        }
+      }
+}
+
+checkTypeEquality(type1 : Type, type2 : Type){
+  if(isSameStructType(type1, type2)){
+    switch(type1 : Type){
+      Int():{
+        true;
+      }
+      HyperTable(t11, t12):{
+        tbl2 = cast(type2 : Type -> HyperTable);
+        res1 = checkTypeEquality(t11, tbl2.x);
+        if(res1)
+        {
+          checkTypeEquality(t12, tbl2.y);
+        } else {
+          false
+        }
+      }
+    }
+  } else {
+    false;
+  }
+
+}
+
+getOperandType(op : ArExpr, tr : Tree<string, Type>){
+    switch(op){
+    Num(val):{
+      Some(Int());
+    }
+    Var(name):{
+      lookupTree(tr, name);
+    }
+    Add(op1,op2):{
+      res1 = checkArExpr(op1, tr);
+      res2 = checkArExpr(op2, tr);
+      if(res1 && res2){
+        Some(Int());
+      } else {
+        None();
+      }
+    }
+    Sub(op1,op2):{
+      res1 = checkArExpr(op1, tr);
+      res2 = checkArExpr(op2, tr);
+      if(res1 && res2){
+        Some(Int());
+      } else {
+        None();
+      }
+    }
+    Div(op1,op2):{
+      res1 = checkArExpr(op1, tr);
+      res2 = checkArExpr(op2, tr);
+      if(res1 && res2){
+        Some(Int());
+      } else {
+        None();
+      }
+    }
+    Mul(op1,op2):{
+      res1 = checkArExpr(op1, tr);
+      res2 = checkArExpr(op2, tr);
+      if(res1 && res2){
+        Some(Int());
+      } else {
+        None();
+      }
+    }
+    Upd(arr, ind, newval):{
+      if(checkFunctions(op, tr))
+      {
+        getOperandType(arr, tr);
+      }
+      else
+      {
+        None();
+      }
+    }
+    App(arr, ind):{
+      if(checkFunctions(op, tr))
+      {
+        res1 = getOperandType(arr, tr);
+        if(isSameStructType(res1, None())){
+          None();
+        } else {
+          Some(cast(cast(res1 : Maybe<Type> -> Some<Type>).value : Type -> HyperTable).x);
+        }
+      }
+      else
+      {
+        None();
+      }
+    }
+
+  }
+}
+
+checkTypeForRelation(op1 : ArExpr, op2 : ArExpr, tr : Tree<string, Type>){
+  checkArExpr(op1, tr) && checkArExpr(op2, tr);
+}
+
+checkArExpr(ar : ArExpr, tr : Tree<string, Type>){
+  switch (ar) {
+    Num(val):{
+      true;
+    }
+    Var(name):{
+      maybeType = getOperandType(ar, tr);
+      if(maybeType == None()){
+        false;
+      } else {
+        if(isSameStructType(cast(maybeType : Maybe<Type> -> Some<Type>).value, Int() ))
+        {
+          true;
+        } else
+        {
+          false;
+        }
+      }
+    }
+    Add(op1,op2):{
+      res1 = checkArExpr(op1, tr);
+      res2 = checkArExpr(op2, tr);
+      res1 && res2;
+    }
+    Sub(op1,op2):{
+      res1 = checkArExpr(op1, tr);
+      res2 = checkArExpr(op2, tr);
+      res1 && res2;
+    }
+    Div(op1,op2):{
+      res1 = checkArExpr(op1, tr);
+      res2 = checkArExpr(op2, tr);
+      res1 && res2;
+    }
+    Mul(op1,op2):{
+      res1 = checkArExpr(op1, tr);
+      res2 = checkArExpr(op2, tr);
+      res1 && res2;
+    }
+    Upd(o1,o2,o3):{
+      false;
+    }
+    App(arr, ind):{
+      res1 = checkFunctions(ar,tr);
+      if(res1){
+        typeArr =cast(cast(getOperandType(arr, tr) : Maybe<Type> -> Some<Type>).value : Type -> HyperTable);
+        if(isSameStructType(typeArr.y, Int()) ){
+          true;
+        }
+        else 
+        {
+          false;
+        }
+      }
+      else
+      {
+        false;
+      }
+    }
+  }
+}
+

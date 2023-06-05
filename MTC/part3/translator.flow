@@ -1,0 +1,206 @@
+import fs/filesystem;
+import string;
+
+export{
+  translate(prog : Prog) -> void;
+}
+
+translate(prog : Prog) -> void {
+  filename = "trsl.txt";
+  nextFreeMark = fold(prog.descs, 0, \mark, desc -> 
+  {
+    appendToFile(filename, descToAsmStr(desc, mark));
+    mark + 1;
+  })
+
+  translateBody(filename, prog.body, nextFreeMark, -1);
+  {}
+
+}
+
+translateBody(file : string, body : Body, freeMark : int, bodyEndMark : int) -> int {
+  switch(body){
+    OriginalSeqBody(b1,b2):{
+      seqEndMark = calculateBodyHeight(body) + freeMark +1;
+      translateBody(file,b2, translateBody(file,b1, freeMark, seqEndMark), seqEndMark);
+    }
+    SeqBody(b1, b2):{
+      translateBody(file,b2, translateBody(file,b1, freeMark, bodyEndMark), bodyEndMark);
+    }
+    AltBody(b):{
+      altEndMark = calculateBodyHeight(body) + freeMark;
+      fold(b, freeMark, \mrk, bdy ->
+      {
+        newMark = translateBody(file,bdy, mrk, calculateBodyHeight(bdy) +1 + mrk);
+        addJump(file ,newMark, altEndMark);
+        newMark+1;
+      })
+    }
+    InfBody(b):{
+      infEndMark = calculateBodyHeight(body) + freeMark;
+      newMark = translateBody(file, b, freeMark, infEndMark);
+      addJump(file ,newMark, freeMark);
+      newMark+1;
+    }
+    EmptyBody():{
+      -1
+    }
+    Assign(var, val):{
+      addAssign(file, freeMark, var, val, freeMark+1);
+      freeMark +1;
+    }
+    Relation():{
+      addTest(file, freeMark,body, freeMark+1, bodyEndMark);
+      freeMark+1;
+    }
+    Show(toShow):{
+      addShow(file, freeMark, toShow, freeMark+1);
+      freeMark+1;
+    }
+  }
+}
+
+calculateBodyHeight(body : Body){
+  switch(body){
+    SeqBody(b1, b2):{
+      calculateBodyHeight(b1) + calculateBodyHeight(b2);
+    }
+    OriginalSeqBody(b1,b2):{
+      calculateBodyHeight(b1) + calculateBodyHeight(b2);
+    }
+    AltBody(b):{
+      fold(b, 0, \num, bdy -> 1 + num + calculateBodyHeight(bdy))
+    }
+    InfBody(b):{
+      calculateBodyHeight(b) + 1;
+    }
+    EmptyBody():{
+      0
+    }
+    Assign(var, val):{
+      1
+    }
+    Relation():{
+      1
+    }
+    Show(toShov):{
+      1
+    }
+  }
+}
+
+addJump(file : string,markStart : int, markEnd : int) -> void {
+  appendToFile(file, i2s(markStart) + " : goto " + i2s(markEnd));
+}
+
+addAssign(file : string, markStart : int, var : Var, arExpr : ArExpr, markEnd : int) -> void {
+  appendToFile(file, i2s(markStart) + " : "+  var.name + " := " + arExprToStr(arExpr) + " goto " + i2s(markEnd));
+}
+
+addShow(file : string,markStart : int,arExpr : ArExpr, markEnd : int) -> void {
+  appendToFile(file, i2s(markStart) + " : SHOW(" + arExprToStr(arExpr) + ")" + " goto " + i2s(markEnd));
+}
+
+addTest(file : string,markStart : int, relation : Relation, markTrue : int, markFalse : int) -> void {
+  appendToFile(file, i2s(markStart) + " : " + relationToStr(relation) + " then " +  i2s(markTrue) + " else " + i2s(markFalse));
+}
+
+relationToStr(relation : Relation) -> string{
+      switch(relation){
+         Less(op1, op2):{
+            "(" + arExprToStr(op1) + "<" + arExprToStr(op2) + ")"
+         }
+         LessE(op1, op2):{
+            "(" + arExprToStr(op1) + "<=" + arExprToStr(op2) + ")"
+         }
+         Great(op1, op2):{
+            "(" + arExprToStr(op1) + ">" + arExprToStr(op2) + ")"
+         }
+         GreatE(op1, op2):{
+            "(" + arExprToStr(op1) + ">=" + arExprToStr(op2) + ")"
+         }
+         Equal(op1, op2):{
+            "(" + arExprToStr(op1) + "=" + arExprToStr(op2) + ")"
+         }
+         NotEqual(op1, op2):{
+            "(" + arExprToStr(op1) + "!=" + arExprToStr(op2) + ")"
+         }
+      }
+}
+
+arExprToStr(arExpr : ArExpr) -> string{
+  switch(arExpr){
+  Num(val):{
+        i2s(val)
+      }
+      Var(name):{
+        name
+      }
+      Add(op1,op2):{
+        "(" + arExprToStr(op1)+ " + "+ arExprToStr(op2) + ")"
+      }
+      Sub(op1,op2):{
+        "(" + arExprToStr(op1)+ " - "+ arExprToStr(op2) + ")"
+      }
+      Div(op1,op2):{
+        "(" + arExprToStr(op1) +" / "+arExprToStr(op2) + ")"
+      }
+      Mul(op1,op2):{
+        "(" + arExprToStr(op1)+ " * " +arExprToStr(op2) + ")"
+      }
+      Upd(arr, ind, newval):{
+        "(UPD(" + arExprToStr(arr) + " , " + arExprToStr(ind) + " , "  + arExprToStr(newval) +"))"
+      }
+      App(arr, ind):{
+        "(APP(" + arExprToStr(arr) + " , " + arExprToStr(ind) +"))"
+    }
+  }
+}
+
+appendToFile(filePath : string,	newContent : string) -> void {
+	oldContent : string = getFileContent(filePath);
+	if (!setFileContent(filePath, oldContent + newContent + "\n")) {
+		println("[ERROR] Can not write VM code to file \"" + filePath + "\"!");
+	}
+}
+
+descToAsmStr(desc : Desc, freeMark : int) -> string{
+  part1 = i2s(freeMark) + " : " + desc.name + " := ";
+  part3 = " goto " + i2s(freeMark + 1);
+
+  switch(desc.type){
+    Int():{
+      part2 = "(0)";
+      part1 + part2 + part3;
+    }
+    HyperTable(t1,t2):{
+      part2 = "(" + buildArrayInitializerStart(desc.type) + buildArrayInitializerEnd(desc.type) + ")";
+      part1 + part2 + part3;
+    }
+  }
+
+}
+
+buildArrayInitializerStart(type : Type) -> string{
+  switch(type){
+    Int():{
+      ""
+    }
+    HyperTable(t1,t2):{
+      "[" + buildArrayInitializerStart(t1) + buildArrayInitializerStart(t2);
+    }
+  }
+
+}
+
+buildArrayInitializerEnd(type : Type) -> string{
+  switch(type){
+    Int():{
+      ""
+    }
+    HyperTable(t1,t2):{
+      "]" + buildArrayInitializerEnd(t1) + buildArrayInitializerEnd(t2);
+    }
+  }
+
+}

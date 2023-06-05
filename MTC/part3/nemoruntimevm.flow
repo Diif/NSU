@@ -1,0 +1,329 @@
+import runtime;
+import dynamic;
+import nemovm;
+import ds/tree;
+import maybe;
+import sys/system;
+import string;
+export {
+  runNemo(prog : AsmProg ) -> void;
+}
+
+runNemo(prog : AsmProg){
+  varTr = fold(prog.descs, makeTree(), \tr, node -> setTree(tr, node.var.name, convertDescToRunVar(node)));
+  nextMarkAfterDescs = fold(prog.descs, -1, \x,y -> if(x < y.nextMark.value) y.nextMark.value else x);
+
+  operatorTr = fold(prog.markedOperators, makeTree(), \tr, node -> setTree(tr, getStartMarkValueFromOperator(node) ,node));
+
+  runOperators(operatorTr, varTr, nextMarkAfterDescs);
+
+  // varTr |> println;
+  // println("###");
+  // operatorsTr |> println;
+  // getResultOfArExpr(Div(Num(3), Num(0)), makeTree()) |>println;
+  // nextMarkAfterDescs |> println;
+  // AsmDesc : (startMark : Mark, var : Var, type : TypeInitializer, nextMark : Mark );
+  //   MarkedOperator ::= MarkedAssignOperator, MarkedTestOperator, MarkedPrintOperator;
+  // MarkedAssignOperator : (startMark : Mark, var : Var, expr : Expr, nextMark : Mark);
+  // MarkedTestOperator : (startMark : Mark, test : Relation, trueMark : Mark, falseMark : Mark);
+  // MarkedPrintOperator : (startMark : Mark, toPrint : ArExpr, nextMark : Mark);
+
+}
+
+runOperators(operatorTr :Tree<int, MarkedOperator>, varTr : Tree<string, RunVar> ,markValToExecute : int){
+  maybeOperator = lookupTree(operatorTr,markValToExecute);
+  if(isNone(maybeOperator)){
+    {}
+  } else {
+    switch (cast(maybeOperator : Maybe <MarkedOperator> -> Some<MarkedOperator>).value) {
+      MarkedAssignOperator(startMark, var, expr, nextMark):{
+        maybeApply(executeAssign(var, expr, varTr), \newtr -> runOperators(operatorTr,newtr, nextMark.value) );
+      }
+      MarkedTestOperator(startMark , test, trueMark, falseMark):{
+        res = executeTest(test, varTr);
+        if(isNone(res)){
+          println("Блин, глупый тест упал...");
+        } else {
+          maybeApply(res, \bol -> 
+          {
+            if(bol){
+              print(" next mark: ");
+              println(trueMark.value);
+              runOperators(operatorTr, varTr, trueMark.value)
+             }
+            else{
+              runOperators(operatorTr, varTr, falseMark.value)
+              }
+          })
+        }
+      }
+      MarkedPrintOperator(startMark , toPrint, nextMark):{
+          print("SHOW: ");
+          println(getValueFromArExpr(toPrint, varTr));
+          runOperators(operatorTr,varTr,nextMark.value);
+      }
+      JumpOperator(startMark, nextMark):{
+        runOperators(operatorTr,varTr,nextMark.value);
+      }
+    }
+  }
+}
+
+
+getExprType(op : ArExpr, tr : Tree<string, RunVar>) -> Maybe<Type>{
+    switch(op){
+      Num(val):{
+        Some(Int());
+      }
+      Var(name):{
+        maybeBind(lookupTree(tr, name), \rnvar -> if(isSameStructType(rnvar,IntVar(1))) Some(Int()) else maybeBind(castToArrVar(rnvar), \arvar -> Some(arvar.type)));
+      }
+      Add(op1,op2):{
+        maybeMap2(\x,y -> Int())(getResultOfArExpr(op1, tr),getResultOfArExpr(op2,tr));
+      }
+      Sub(op1,op2):{
+        maybeMap2(\x,y -> Int())(getResultOfArExpr(op1, tr),getResultOfArExpr(op2,tr));
+      }
+      Div(op1,op2):{
+        maybeMap2(\x,y -> Int())(getResultOfArExpr(op1, tr),getResultOfArExpr(op2,tr));
+      }
+      Mul(op1,op2):{
+        maybeMap2(\x,y -> Int())(getResultOfArExpr(op1, tr),getResultOfArExpr(op2,tr));
+      }
+      Upd(arr, ind, newval):{
+        getExprType(arr,tr);
+      }
+      App(arr, ind):{
+        maybeBind(getExprType(arr,tr), \arType -> Some(cast(arType : Type -> HyperTable).y));
+    }
+
+  }
+}
+
+executeAssign(var : Var, expr : ArExpr, tr : Tree<string, RunVar>) -> Maybe<Tree<string, RunVar>>{
+  maybeBind(getExprType(var, tr), \tp -> 
+  {
+    switch(tp){
+      Int():{
+        print("Assign: ");
+        println(var.name);
+        print(" with ");
+        println(expr);
+        maybeBind(getResultOfArExpr(expr, tr), \res -> Some(setTree(tr, var.name, IntVar(res))));
+      }
+      HyperTable(t1,t2):{
+        // println("WAS");
+        // println(tr);
+        // println("NOW");
+        
+        testtr = setTree(tr, var.name ,ArrVar(getValueFromArExpr(expr, tr), tp));
+        // println(testtr);
+        Some(testtr);
+      }
+    }
+  })
+}
+
+// checkTypeEquality(type1 : Type, type2 : Type){
+//   if(isSameStructType(type1, type2)){
+//     switch(type1 : Type){
+//       Int():{
+//         true;
+//       }
+//       HyperTable(t11, t12):{
+//         tbl2 = cast(type2 : Type -> HyperTable);
+//         res1 = checkTypeEquality(t11, tbl2.x);
+//         if(res1)
+//         {
+//           checkTypeEquality(t12, tbl2.y);
+//         } else {
+//           false
+//         }
+//       }
+//     }
+//   } else {
+//     false;
+//   }
+
+// }
+
+executeTest(test : Relation, tr : Tree<string, RunVar>) -> Maybe<bool>{
+  switch (test) {
+    Less  (op1 ,op2 ):{
+     maybeMap2(\x : int,y : int -> if(x < y) {print("Test true: "); print(i2s(x));print("<");print(i2s(y)); true }else {print("Test false: "); print(i2s(x));print("!<");println(i2s(y));false})(getResultOfArExpr(op1, tr),getResultOfArExpr(op2,tr)); 
+    }
+    LessE (op1 ,op2 ):{
+      maybeMap2(\x,y -> if(x <= y) {print("Test true: "); print(i2s(x));print("<=");print(i2s(y));true} else {print("Test false: "); print(i2s(x));print("!<=");println(i2s(y));false})(getResultOfArExpr(op1, tr),getResultOfArExpr(op2,tr)); 
+    }
+    Great (op1 ,op2 ):{
+      maybeMap2(\x,y -> if(x > y) {print("Test true: "); print(i2s(x));print(">");print(i2s(y));true} else {print("Test false: "); print(i2s(x));print("!>");println(i2s(y));false})(getResultOfArExpr(op1, tr),getResultOfArExpr(op2,tr)); 
+    }
+    GreatE (op1, op2):{
+      maybeMap2(\x,y -> if(x >= y) {print("Test true: "); print(i2s(x));print(">=");print(i2s(y));true} else {print("Test false: "); print(i2s(x));print("!>=");println(i2s(y));false})(getResultOfArExpr(op1, tr),getResultOfArExpr(op2,tr)); 
+    }
+    Equal (op1 ,op2 ):{
+      maybeMap2(\x,y -> if(x == y) {print("Test true: "); print(i2s(x));print("=");print(i2s(y));true} else {print("Test false: "); print(i2s(x));print("!=");println(i2s(y));false})(getResultOfArExpr(op1, tr),getResultOfArExpr(op2,tr)); 
+    }
+    NotEqual(op1, op2):{
+      maybeMap2(\x,y -> if(x != y) {print("Test true: "); print(i2s(x));print("!=");print(i2s(y));true} else {print("Test false: "); print(i2s(x));print("!!=");println(i2s(y));false})(getResultOfArExpr(op1, tr),getResultOfArExpr(op2,tr)); 
+    }
+  }
+}
+
+getValueFromVar(var :RunVar) -> flow{
+  switch(var){
+    IntVar(val):{
+      flow(val);
+    }
+    ArrVar(ar, type):{
+      flow(ar);
+    }
+  }
+}
+
+// насрал
+getValueFromArExpr(ar : ArExpr, tr : Tree<string, RunVar>) -> flow {
+  switch(ar){
+    Num(val):{
+      flow(val);
+    }
+    Var(name):{
+      flow(getValueFromVar(cast(lookupTree(tr, name) : Maybe<RunVar> -> Some<RunVar>).value));
+    }
+    Add(op1,op2):{
+      flow(flow2i(getValueFromArExpr(op1, tr)) + flow2i(getValueFromArExpr(op2, tr)));
+    }
+    Sub(op1,op2):{
+      flow(flow2i(getValueFromArExpr(op1, tr)) - flow2i(getValueFromArExpr(op2, tr)));
+    }
+    Div(op1,op2):{
+      flow(flow2i(getValueFromArExpr(op1, tr)) / flow2i(getValueFromArExpr(op2, tr)));
+    }
+    Mul(op1,op2):{
+      flow(flow2i(getValueFromArExpr(op1, tr)) * flow2i(getValueFromArExpr(op2, tr)));
+    }
+    Upd(arr, ind, newval):{
+      arrTree = cast(getValueFromVar(cast(lookupTree(tr, arr.name) : Maybe<RunVar> -> Some<RunVar>).value) : flow -> Tree<flow, flow>);
+      indRes = getValueFromArExpr(ind, tr);
+      newvalRes = getValueFromArExpr(newval, tr);
+      flow(setTree(arrTree, indRes, newvalRes));
+    }
+    App(arr, ind):{
+      arrTree = cast(getValueFromVar(cast(lookupTree(tr, arr.name) : Maybe<RunVar> -> Some<RunVar>).value) : flow -> Tree<flow, flow>);
+      indRes = getValueFromArExpr(ind, tr);
+      cast(lookupTree(arrTree, indRes) : Maybe<flow> -> Some<flow>).value;
+    }
+  }
+}
+
+// Not for values, integers only!!! So can't return array.
+getResultOfArExpr(ar : ArExpr, tr : Tree<string, RunVar>) -> Maybe<int>{
+  switch(ar){
+    Num(val):{
+      Some(val);
+    }
+    Var(name):{
+      getVarValueIfInt(name, tr);
+    }
+    Add(op1,op2):{
+      maybeMap2(\x,y -> x+y)(getResultOfArExpr(op1, tr),getResultOfArExpr(op2,tr));
+    }
+    Sub(op1,op2):{
+      maybeMap2(\x,y -> x-y)(getResultOfArExpr(op1, tr),getResultOfArExpr(op2,tr));
+    }
+    Div(op1,op2):{
+      maybeBind2(\x,y -> if(y != 0) Some(x/y) else {println("Дурак блин на 0 делишь.");None()})(getResultOfArExpr(op1, tr),getResultOfArExpr(op2,tr));
+    }
+    Mul(op1,op2):{
+      maybeMap2(\x,y -> x*y)(getResultOfArExpr(op1, tr),getResultOfArExpr(op2,tr));
+    }
+    Upd(o1,o2,o3):{
+      println("Массив в арифм. выражении - нехорошо.");
+      None();
+    }
+    App(arr, ind):{
+      maybeBind(lookupTree(tr, arr.name), \x -> maybeBind(castToArrVar(x), \array -> {
+          if(isSameStructType(cast(array.type : Type -> HyperTable).y, Int())){
+            maybeBind(getResultOfArExpr(ind, tr), \resind ->getValueFromArray(array, resind))
+          } else {
+            println("App в арифм. выражении оказался плохим, хых.");
+            None();
+          }
+        })
+      );
+      // println("App в арифм. выражении имеет неизвестный массив.");
+      // println(arr.name);
+      // println(lookupTree(tr, arr.name));
+      // None();
+    }
+  }
+}
+
+castToArrVar(var : RunVar) -> Maybe<ArrVar> {
+  switch(var){
+    ArrVar(tr, type):{
+      Some(var);
+    }
+    IntVar(val):{
+      None();
+    }
+  }
+}
+
+castToHyperTable(type : Type) -> Maybe<HyperTable> {
+  switch(type){
+    Int():{ 
+      None();
+    }
+    HyperTable(t1,t2):{
+      Some(type);
+    }
+  }
+}
+
+
+getValueFromArray(arr : ArrVar, ind : flow){
+  println(ind);
+  lookupTree(arr.arr, ind);
+}
+
+
+
+getVarValueIfInt(name : string, tr : Tree<string, RunVar>){
+  maybeBind(lookupTree(tr, name), \runvar -> if(isSameStructType(runvar, IntVar(1))) Some(cast(runvar : RunVar -> IntVar).val) else None())
+}
+
+getVarValueIfArr(name : string, tr : Tree<string, RunVar>){ 
+  maybeBind(lookupTree(tr, name), \runvar -> if(isSameStructType(runvar, IntVar(1))) None() else Some(cast(runvar : RunVar -> ArrVar).arr))
+}
+
+
+convertDescToRunVar(desc : AsmDesc){
+  switch(desc.type){
+    HyperTable(t1, t2):{
+      ArrVar(makeTree(), desc.type);
+    }
+    Int():{
+      IntVar(0);
+    }
+  }
+}
+
+
+getStartMarkValueFromOperator(op : MarkedOperator ){
+  switch(op){
+    MarkedAssignOperator (startMark , var, expr, nextMark):{
+      startMark.value;
+    }
+    MarkedTestOperator (startMark , test, trueMark, falseMark):{
+      startMark.value;
+    }
+    MarkedPrintOperator (startMark, toPrint, nextMark):{
+      startMark.value;
+    }
+    JumpOperator(startMark, nextMark):{
+      startMark.value;
+    }
+  }
+}
+

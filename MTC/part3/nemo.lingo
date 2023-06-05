@@ -1,0 +1,53 @@
+prog = (desc)*:d body:b {Prog(:d,:b)} ;
+desc = "VAR" ws varName$v ws ":" ws type:t  ";" ws {Desc($v,:t)};
+type =  "(" ws type:t1 "ARRAY" ws "OF" ws type:t2 ")" ws {HyperTable(:t1,:t2)}
+        | "INT" ws {Int()};
+        
+body =    "{" ws body:b1 (";"ws body)*:b2 ";" ws "}" ws {OriginalSeqBody(:b1, BuildSeqBody(:b2, 0))}
+        | "(" ws body:b1 (body)+:b2 ")" ws {AltBody(concat(array(:b1),:b2))}
+        | "[" ws body:b "]" ws {InfBody(:b)}
+        | assign:as {:as}
+        | test:t {:t}
+        | show:s {:s};
+
+show = "SHOW" ws "(" ws arExpr:ar ")" ws {Show(:ar)};
+assign = varName$var ws ":=" ws expr:val {Assign(Var($var), :val)};
+test = relation:r "?" ws {:r};
+
+relation = 
+          "(" ws arExpr:o1"!=" ws arExpr:o2")" ws{NotEqual(:o1, :o2)}
+        | "(" ws arExpr:o1 "=" ws arExpr:o2")" ws {Equal(:o1, :o2)}
+        | "(" ws arExpr:o1"<" ws arExpr:o2")" ws {Less(:o1,:o2)}
+        | "(" ws arExpr:o1 "<=" ws arExpr:o2 ")" ws {LessE(:o1,:o2)}
+        | "(" ws arExpr:o1">" ws arExpr:o2")" ws {Great(:o1,:o2)}
+        | "(" ws arExpr:o1 ">=" ws arExpr:o2 ")" ws {GreatE(:o1,:o2)}
+        | "!" ws relation:r ws {InverseRelation(:r)}
+        | "!" ws "(" ws relation:r ")" ws {InverseRelation(:r)}
+        | "(" ws relation:r ")" ws {:r};
+
+expr = operand | funExpr | arExpr;
+arExpr =
+        "(" ws arExpr:o1 "-" ws arExpr:o2 ")" ws {Sub(:o1,:o2)}
+      | "(" ws arExpr:o1 "*" ws arExpr:o2 ")" ws {Mul(:o1,:o2)}
+      | "(" ws arExpr:o1 "+" ws arExpr:o2 ")" ws {Add(:o1,:o2)}
+      | "(" ws arExpr:o1 "/" ws arExpr:o2 ")" ws {Div(:o1,:o2)}
+      | "(" ws arExpr:ar ")" ws {:ar}
+      | operand:o {:o}
+      | funExpr:f {:f};
+
+
+funExpr =
+          "APP" ws "(" ws operandWithoutNumber:o1 "," ws arExpr:o2 ")" ws {App(:o1,:o2)}
+        | "UPD" ws "(" ws operandWithoutNumber:o1 "," ws arExpr:o2 "," ws arExpr:o3 ")" ws {Upd(:o1,:o2,:o3)}
+        | "(" ws funExpr:ar ")" ws {:ar};
+
+operand = number$v ws {Num(s2i($v))}| varName$v ws {Var($v)} | "(" ws operand:o1 ")" ws {:o1};
+operandWithoutNumber = varName$v ws {Var($v)} | "(" ws operandWithoutNumber:o1 ")" ws {:o1};
+
+number = (digit+);
+varName = (letter+ (letter | digit)*);
+letter = 'a'-'z';
+digit = '0'-'9';
+
+ws = s*;
+s = " " | "\n" | "\t";
