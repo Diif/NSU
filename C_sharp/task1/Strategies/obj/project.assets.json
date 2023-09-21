@@ -1,0 +1,89 @@
+{
+  "version": 3,
+  "targets": {
+    "net7.0": {
+      "GameStuff/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v7.0",
+        "compile": {
+          "bin/placeholder/GameStuff.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/GameStuff.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "GameStuff/1.0.0": {
+      "type": "project",
+      "path": "../GameStuff/GameStuff.csproj",
+      "msbuildProject": "../GameStuff/GameStuff.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net7.0": [
+      "GameStuff >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "/home/prozella/.nuget/packages/": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "/home/prozella/NSU/C_sharp/task1/Strategies/Strategies.csproj",
+      "projectName": "Strategies",
+      "projectPath": "/home/prozella/NSU/C_sharp/task1/Strategies/Strategies.csproj",
+      "packagesPath": "/home/prozella/.nuget/packages/",
+      "outputPath": "/home/prozella/NSU/C_sharp/task1/Strategies/obj/",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "/home/prozella/.nuget/NuGet/NuGet.Config"
+      ],
+      "originalTargetFrameworks": [
+        "net7.0"
+      ],
+      "sources": {
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "projectReferences": {
+            "/home/prozella/NSU/C_sharp/task1/GameStuff/GameStuff.csproj": {
+              "projectPath": "/home/prozella/NSU/C_sharp/task1/GameStuff/GameStuff.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      }
+    },
+    "frameworks": {
+      "net7.0": {
+        "targetAlias": "net7.0",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "/home/prozella/.dotnet/sdk/7.0.400/RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
