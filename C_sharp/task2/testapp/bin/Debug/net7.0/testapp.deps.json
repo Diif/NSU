@@ -8,6 +8,8 @@
     ".NETCoreApp,Version=v7.0": {
       "testapp/1.0.0": {
         "dependencies": {
+          "CollisiumSandbox": "1.0.0",
+          "DeckShuffler": "1.0.0",
           "GameStuff": "1.0.0",
           "Microsoft.Extensions.Hosting": "7.0.1",
           "Strategies": "1.0.0"
@@ -378,6 +380,22 @@
           "System.Text.Encodings.Web": "7.0.0"
         }
       },
+      "CollisiumSandbox/1.0.0": {
+        "dependencies": {
+          "GameStuff": "1.0.0"
+        },
+        "runtime": {
+          "CollisiumSandbox.dll": {}
+        }
+      },
+      "DeckShuffler/1.0.0": {
+        "dependencies": {
+          "GameStuff": "1.0.0"
+        },
+        "runtime": {
+          "DeckShuffler.dll": {}
+        }
+      },
       "GameStuff/1.0.0": {
         "runtime": {
           "GameStuff.dll": {}
@@ -601,6 +619,16 @@
       "sha512": "sha512-DaGSsVqKsn/ia6RG8frjwmJonfos0srquhw09TlT8KRw5I43E+4gs+/bZj4K0vShJ5H9imCuXupb4RmS+dBy3w==",
       "path": "system.text.json/7.0.0",
       "hashPath": "system.text.json.7.0.0.nupkg.sha512"
+    },
+    "CollisiumSandbox/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "DeckShuffler/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     },
     "GameStuff/1.0.0": {
       "type": "project",

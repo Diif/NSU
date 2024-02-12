@@ -1,69 +1,30 @@
 namespace GameStuff;
+
+using GameStuff.Cards;
 public static class DeckStuff
 {
-
-  private static readonly Random _random = new();
-  private static Cards[] _deck;
-  public static ArraySegment<GameStuff.Cards> Deck {get; private set;}
+  private static readonly int _MAX_CARDS = 32;
+  public static readonly Card[] Deck;
   static DeckStuff()
   {
-    const int MAX_CARDS = 32;
-    _deck = new Cards[MAX_CARDS];
-    Deck = new ArraySegment<GameStuff.Cards>(_deck);
-    ShuffleDeck(_deck);
-  }
-
-  public static ArraySegment<GameStuff.Cards> ResizeDeck(int size)
-  {
-    _deck = new Cards[size];
-    Deck = new ArraySegment<GameStuff.Cards>(_deck);
-    ShuffleDeck(Deck);
-    return Deck;
-  }
-
-  public static void ShuffleDeck(ArraySegment<GameStuff.Cards> deck)
-  {
-    int redCount = 0;
-    int blackCount = 0;
-
-    int half = deck.Count / 2;
-
-    for (int i = 0; i < deck.Count; i++)
+    Deck = new Card[_MAX_CARDS];
+    for(int i = 0; i < _MAX_CARDS; i+=2)
     {
-      if (redCount == half)
-      {
-        deck[i] = Cards.Black;
-        blackCount++;
-      }
-      else if (blackCount == half)
-      {
-        deck[i] = Cards.Red;
-        redCount++;
-      }
-      else 
-      {
-        if (_random.Next((int)Cards.Black, (int) Cards.Red + 1) == (int) Cards.Black)
-        {
-          deck[i] = Cards.Black;
-          blackCount++;
-        }
-        else
-        {
-          deck[i] = Cards.Red;
-          redCount++;
-        }
-      }
+      Deck[i] = new Card(CardColor.Black);
+      Deck[i+1] = new Card(CardColor.Red);
     }
   }
 
-  public static void SplitDeck(in ArraySegment<GameStuff.Cards> deck, out ArraySegment<GameStuff.Cards> part1, out ArraySegment<GameStuff.Cards> part2)
+  public static void SplitDeck(out Card[] part1, out Card[] part2)
   {
-    if (deck.Array is null)
+    int half = _MAX_CARDS / 2;
+    part1 = new Card[half];
+    part2 = new Card[half];
+    for (int i = 0; i < half; i++)
     {
-      throw new ArgumentNullException(nameof(deck));
+      part1[i] = Deck[i];
+      part2[i] = Deck[half + i];
     }
-    part1 = new ArraySegment<GameStuff.Cards>(deck.Array, deck.Offset, deck.Count / 2);
-    part2 = new ArraySegment<GameStuff.Cards>(deck.Array, deck.Offset + deck.Count / 2, deck.Count /2 );
   }
 
 }

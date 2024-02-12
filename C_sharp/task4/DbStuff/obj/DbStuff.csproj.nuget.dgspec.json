@@ -1,0 +1,198 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/prozella/NSU/C_sharp/task4/DbStuff/DbStuff.csproj": {}
+  },
+  "projects": {
+    "/home/prozella/NSU/C_sharp/task4/DbStuff/DbStuff.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/prozella/NSU/C_sharp/task4/DbStuff/DbStuff.csproj",
+        "projectName": "DbStuff",
+        "projectPath": "/home/prozella/NSU/C_sharp/task4/DbStuff/DbStuff.csproj",
+        "packagesPath": "/home/prozella/.nuget/packages/",
+        "outputPath": "/home/prozella/NSU/C_sharp/task4/DbStuff/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/prozella/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {
+              "/home/prozella/NSU/C_sharp/task4/DeckShuffler/DeckShuffler.csproj": {
+                "projectPath": "/home/prozella/NSU/C_sharp/task4/DeckShuffler/DeckShuffler.csproj"
+              },
+              "/home/prozella/NSU/C_sharp/task4/GameStuff/GameStuff.csproj": {
+                "projectPath": "/home/prozella/NSU/C_sharp/task4/GameStuff/GameStuff.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "dependencies": {
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[7.0.13, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[7.0.13, )"
+            },
+            "Microsoft.EntityFrameworkCore.Sqlite": {
+              "target": "Package",
+              "version": "[7.0.13, )"
+            },
+            "Microsoft.Extensions.Hosting": {
+              "target": "Package",
+              "version": "[7.0.1, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/home/prozella/.dotnet/sdk/7.0.400/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/prozella/NSU/C_sharp/task4/DeckShuffler/DeckShuffler.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/prozella/NSU/C_sharp/task4/DeckShuffler/DeckShuffler.csproj",
+        "projectName": "DeckShuffler",
+        "projectPath": "/home/prozella/NSU/C_sharp/task4/DeckShuffler/DeckShuffler.csproj",
+        "packagesPath": "/home/prozella/.nuget/packages/",
+        "outputPath": "/home/prozella/NSU/C_sharp/task4/DeckShuffler/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/prozella/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {
+              "/home/prozella/NSU/C_sharp/task4/GameStuff/GameStuff.csproj": {
+                "projectPath": "/home/prozella/NSU/C_sharp/task4/GameStuff/GameStuff.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/home/prozella/.dotnet/sdk/7.0.400/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/prozella/NSU/C_sharp/task4/GameStuff/GameStuff.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/prozella/NSU/C_sharp/task4/GameStuff/GameStuff.csproj",
+        "projectName": "GameStuff",
+        "projectPath": "/home/prozella/NSU/C_sharp/task4/GameStuff/GameStuff.csproj",
+        "packagesPath": "/home/prozella/.nuget/packages/",
+        "outputPath": "/home/prozella/NSU/C_sharp/task4/GameStuff/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/prozella/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/home/prozella/.dotnet/sdk/7.0.400/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

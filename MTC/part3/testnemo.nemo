@@ -1,0 +1,37 @@
+VAR farr : (INT ARRAY OF INT);
+VAR count : INT;
+VAR stop : INT;
+VAR f1 : INT;
+VAR f2 : INT;
+VAR showvar : INT;
+
+{
+	farr := UPD(farr, 0, 0);
+	farr := UPD(farr, 1, 1);
+	stop := 30;
+	(
+		{
+			(stop = 0)?;
+			showvar := APP(farr, 0);
+			SHOW(showvar);
+		}
+		{
+			(stop = 1)?;
+			showvar := APP(farr, 1);
+			SHOW(showvar);
+		}
+		{
+			(stop >= 2)?;
+			count := 1;
+			[
+				{
+					((!(count = stop)))?;
+					farr := UPD(farr, (count + 1), (APP(farr, (count - 1)) + APP(farr, count)));
+					count := (count + 1);
+				}
+			];
+			showvar := APP(farr, count);
+			SHOW(showvar);
+		}
+	);
+}

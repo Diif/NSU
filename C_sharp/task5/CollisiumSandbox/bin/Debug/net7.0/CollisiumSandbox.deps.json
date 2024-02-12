@@ -1,0 +1,50 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v7.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v7.0": {
+      "CollisiumSandbox/1.0.0": {
+        "dependencies": {
+          "DeckShuffler": "1.0.0",
+          "GameStuff": "1.0.0"
+        },
+        "runtime": {
+          "CollisiumSandbox.dll": {}
+        }
+      },
+      "DeckShuffler/1.0.0": {
+        "dependencies": {
+          "GameStuff": "1.0.0"
+        },
+        "runtime": {
+          "DeckShuffler.dll": {}
+        }
+      },
+      "GameStuff/1.0.0": {
+        "runtime": {
+          "GameStuff.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "CollisiumSandbox/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "DeckShuffler/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "GameStuff/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

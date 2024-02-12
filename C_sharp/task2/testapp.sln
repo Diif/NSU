@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Strategies", "Strategies\St
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameStuff", "GameStuff\GameStuff.csproj", "{152770D8-D82B-4537-95A2-8AAB8F9ECDE4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CollisiumSandbox", "CollisiumSandbox\CollisiumSandbox.csproj", "{8000D598-99A1-4B8C-B900-9A32F986375B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeckShuffler", "DeckShuffler\DeckShuffler.csproj", "{04984030-67B4-4A61-A08E-59C0ED19C05C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +34,21 @@ Global
 		{152770D8-D82B-4537-95A2-8AAB8F9ECDE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{152770D8-D82B-4537-95A2-8AAB8F9ECDE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{152770D8-D82B-4537-95A2-8AAB8F9ECDE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8000D598-99A1-4B8C-B900-9A32F986375B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8000D598-99A1-4B8C-B900-9A32F986375B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8000D598-99A1-4B8C-B900-9A32F986375B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8000D598-99A1-4B8C-B900-9A32F986375B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35EC78C8-2522-4063-88CD-53FAF4BB8A97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35EC78C8-2522-4063-88CD-53FAF4BB8A97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35EC78C8-2522-4063-88CD-53FAF4BB8A97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35EC78C8-2522-4063-88CD-53FAF4BB8A97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A5CC33C-9FF5-4063-B640-13577AD23DDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A5CC33C-9FF5-4063-B640-13577AD23DDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A5CC33C-9FF5-4063-B640-13577AD23DDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A5CC33C-9FF5-4063-B640-13577AD23DDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04984030-67B4-4A61-A08E-59C0ED19C05C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04984030-67B4-4A61-A08E-59C0ED19C05C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04984030-67B4-4A61-A08E-59C0ED19C05C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04984030-67B4-4A61-A08E-59C0ED19C05C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

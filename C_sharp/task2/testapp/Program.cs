@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using GameStuff;
 class Program
 {
   public static void Main(string[] args)
@@ -14,10 +15,12 @@ class Program
       .ConfigureServices((hostContext, services) =>
         {
           services.AddHostedService<CollisiumExperimentWorker>();
-          // services.AddScoped<CollisiumSandbox>();
-          // services.AddScoped<IDeckShufller, DeckShufller>();
-          // Зарегистрировать партнеров и их стратегии
+          services.AddScoped<CollisiumSandbox>();
+          services.AddScoped<IDeckShuffler,DeckShuffler>();
+          // services.AddScoped<ICardPickStrategy, Strategies.Random>();
+          // services.AddScoped<ICardPickStrategy, Strategies.Random>();
+          // Maybe just replace with transient strategy?
+          services.AddScoped<Strategies.StrategiesFactory>();
           });
-
   }
 }

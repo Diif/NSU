@@ -619,6 +619,32 @@
           "buildTransitive/net6.0/System.Text.Json.targets": {}
         }
       },
+      "CollisiumSandbox/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v7.0",
+        "dependencies": {
+          "GameStuff": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/CollisiumSandbox.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/CollisiumSandbox.dll": {}
+        }
+      },
+      "DeckShuffler/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v7.0",
+        "dependencies": {
+          "GameStuff": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/DeckShuffler.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/DeckShuffler.dll": {}
+        }
+      },
       "GameStuff/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v7.0",
@@ -1543,6 +1569,16 @@
         "useSharedDesignerContext.txt"
       ]
     },
+    "CollisiumSandbox/1.0.0": {
+      "type": "project",
+      "path": "../CollisiumSandbox/CollisiumSandbox.csproj",
+      "msbuildProject": "../CollisiumSandbox/CollisiumSandbox.csproj"
+    },
+    "DeckShuffler/1.0.0": {
+      "type": "project",
+      "path": "../DeckShuffler/DeckShuffler.csproj",
+      "msbuildProject": "../DeckShuffler/DeckShuffler.csproj"
+    },
     "GameStuff/1.0.0": {
       "type": "project",
       "path": "../GameStuff/GameStuff.csproj",
@@ -1556,6 +1592,8 @@
   },
   "projectFileDependencyGroups": {
     "net7.0": [
+      "CollisiumSandbox >= 1.0.0",
+      "DeckShuffler >= 1.0.0",
       "GameStuff >= 1.0.0",
       "Microsoft.Extensions.Hosting >= 7.0.1",
       "Strategies >= 1.0.0"
@@ -1586,6 +1624,12 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "projectReferences": {
+            "/home/prozella/NSU/C_sharp/task2/CollisiumSandbox/CollisiumSandbox.csproj": {
+              "projectPath": "/home/prozella/NSU/C_sharp/task2/CollisiumSandbox/CollisiumSandbox.csproj"
+            },
+            "/home/prozella/NSU/C_sharp/task2/DeckShuffler/DeckShuffler.csproj": {
+              "projectPath": "/home/prozella/NSU/C_sharp/task2/DeckShuffler/DeckShuffler.csproj"
+            },
             "/home/prozella/NSU/C_sharp/task2/GameStuff/GameStuff.csproj": {
               "projectPath": "/home/prozella/NSU/C_sharp/task2/GameStuff/GameStuff.csproj"
             },
