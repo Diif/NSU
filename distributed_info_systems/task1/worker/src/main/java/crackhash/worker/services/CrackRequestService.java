@@ -39,9 +39,9 @@ public class CrackRequestService implements ICrackRequestService {
   private void crackHash(CrackRequest crackRequest){
     var res = crackRequest.getResult();
     
-		for (int l = 1; l <= crackRequest.getMaxLen(); l++)
-		{
-			var generator = Generator.permutation(dict).withRepetitions(l).iterator();
+    for (int l = 1; l <= crackRequest.getMaxLen(); l++)
+    {
+      var generator = Generator.permutation(dict).withRepetitions(l).iterator();
       int totalPerm = (int)Math.pow((double) dict.length, (double)l);
       int partSize = (int) Math.floor((double)totalPerm / crackRequest.getPartTotal());
       int startInd =  partSize * (crackRequest.getPartNum() - 1);
@@ -52,22 +52,22 @@ public class CrackRequestService implements ICrackRequestService {
         endInd += totalPerm % crackRequest.getPartTotal();
       }
 
-			for (int i = 0; i < endInd; i++)
-			{
-				if (i < startInd)
-				{
-					generator.next();
-					continue;
-				}
-				
-				var word = generator.next().stream().map(String::valueOf).collect(Collectors.joining());
+      for (int i = 0; i < endInd; i++)
+      {
+        if (i < startInd)
+        {
+          generator.next();
+          continue;
+        }
         
-				if (DigestUtils.md5Hex(word).equals(crackRequest.getHash()))
-				{
-					res.add(word);
-				}
-			}
-		}
+        var word = generator.next().stream().map(String::valueOf).collect(Collectors.joining());
+        
+        if (DigestUtils.md5Hex(word).equals(crackRequest.getHash()))
+        {
+          res.add(word);
+        }
+      }
+    }
     sendPatchRequest(crackRequest);
   }
 
