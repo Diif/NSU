@@ -1,0 +1,36 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.2.2'
+	id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'crackhash'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '21'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'com.github.dpaukov:combinatoricslib3:3.4.0'
+	implementation 'org.apache.httpcomponents.client5:httpclient5'
+	implementation group: 'commons-codec', name: 'commons-codec', version: '1.16.1'
+	implementation 'org.springframework.boot:spring-boot-starter-web:3.2.2'
+	compileOnly 'org.projectlombok:lombok:1.18.30'
+	annotationProcessor 'org.projectlombok:lombok:1.18.30'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test:3.2.2'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
