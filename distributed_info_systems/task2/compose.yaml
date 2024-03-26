@@ -1,0 +1,82 @@
+services:
+  worker1:
+    depends_on:
+      - node0.mongo
+      - rabbitmq
+    build: ./worker
+    environment:
+      - WORKER_NUM=1
+      - SENDER_MESSAGE_CAPACITY=${SENDER_MESSAGE_CAPACITY}
+      - EXCHANGE_NAME=${EXCHANGE_NAME}
+      - MANAGER_QUEUE_NAME=${MANAGER_QUEUE_NAME}
+      - PING_TICK_MILLIS=${PING_TICK_MILLIS}
+      - DATABASE_URI=${DATABASE_URI}
+    volumes:
+      - ./worker/src:/worker/src
+  worker2:
+    depends_on:
+      - node0.mongo
+      - rabbitmq
+    build: ./worker
+    environment:
+      - WORKER_NUM=2
+      - SENDER_MESSAGE_CAPACITY=${SENDER_MESSAGE_CAPACITY}
+      - EXCHANGE_NAME=${EXCHANGE_NAME}
+      - MANAGER_QUEUE_NAME=${MANAGER_QUEUE_NAME}
+      - PING_TICK_MILLIS=${PING_TICK_MILLIS}
+      - DATABASE_URI=${DATABASE_URI}
+    volumes:
+      - ./worker/src:/worker/src
+  worker3:
+    depends_on:
+      - node0.mongo
+      - rabbitmq
+    build: ./worker
+    environment:
+      - WORKER_NUM=3
+      - SENDER_MESSAGE_CAPACITY=${SENDER_MESSAGE_CAPACITY}
+      - EXCHANGE_NAME=${EXCHANGE_NAME}
+      - MANAGER_QUEUE_NAME=${MANAGER_QUEUE_NAME}
+      - PING_TICK_MILLIS=${PING_TICK_MILLIS}
+      - DATABASE_URI=${DATABASE_URI}
+    volumes:
+      - ./worker/src:/worker/src
+  manager:
+    depends_on:
+      - node0.mongo
+      - rabbitmq
+      - worker1
+      - worker2
+      - worker3
+    build: ./manager
+    environment:
+      - SENDER_MESSAGE_CAPACITY=${SENDER_MESSAGE_CAPACITY}
+      - SENDER_COMMAND_CAPACITY=200
+      - MAX_TIMEOUT_STREAK=5
+      - PING_TICK_MILLIS=${PING_TICK_MILLIS}
+      - EXCHANGE_NAME=${EXCHANGE_NAME}
+      - MANAGER_QUEUE_NAME=${MANAGER_QUEUE_NAME}
+      - DATABASE_URI=${DATABASE_URI}
+    volumes:
+      - ./manager/src:/manager/src
+    ports:
+      - "8080:8080"
+  # rabbitmq:
+  #   image: rabbitmq:management
+  #   ports:
+  #     - "15672:15672"
+  #     - "5672:5672"
+    
+  # node0.mongo:
+  #   image: mongo
+  #   command: mongod --replSet "rs" --bind_ip node0.mongo,localhost
+  #   ports:
+  #   - 27017:27017
+
+  # node1.mongo:
+  #   image: mongo  
+  #   command: mongod --replSet "rs" --bind_ip node1.mongo,localhost
+
+  # node2.mongo:
+  #   image: mongo
+  #   command: mongod --replSet "rs" --bind_ip node2.mongo,localhost

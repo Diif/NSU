@@ -1,0 +1,20 @@
+services:
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    
+  node0.mongo:
+    image: mongo
+    command: mongod --replSet "rs" --bind_ip node0.mongo,localhost
+    ports:
+    - 27017:27017
+
+  node1.mongo:
+    image: mongo  
+    command: mongod --replSet "rs" --bind_ip node1.mongo,localhost
+
+  node2.mongo:
+    image: mongo
+    command: mongod --replSet "rs" --bind_ip node2.mongo,localhost
