@@ -33,7 +33,8 @@ public class WorkerApplication {
 
   @Bean
   Queue queue() {
-    return new Queue("worker"+workerNumber, true);
+    // return new Queue("worker"+workerNumber, true);
+    return new Queue("worker", true);
   }
 
   @Bean
@@ -43,7 +44,8 @@ public class WorkerApplication {
 
   @Bean
   Binding binding(Queue queue, TopicExchange exchange) {
-    return BindingBuilder.bind(queue).to(exchange).with("worker"+workerNumber);
+    // return BindingBuilder.bind(queue).to(exchange).with("worker"+workerNumber);
+    return BindingBuilder.bind(queue).to(exchange).with("worker");
   }
 
   @Bean
@@ -51,7 +53,8 @@ public class WorkerApplication {
       MessageListenerAdapter listenerAdapter) {
     SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
     container.setConnectionFactory(connectionFactory);
-    container.setQueueNames("worker"+workerNumber);
+    // container.setQueueNames("worker"+workerNumber);
+    container.setQueueNames("worker");
     container.setMessageListener(listenerAdapter);
     return container;
   }

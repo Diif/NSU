@@ -13,41 +13,14 @@ services:
       - DATABASE_URI=${DATABASE_URI}
     volumes:
       - ./worker/src:/worker/src
-  worker2:
-    depends_on:
-      - node0.mongo
-      - rabbitmq
-    build: ./worker
-    environment:
-      - WORKER_NUM=2
-      - SENDER_MESSAGE_CAPACITY=${SENDER_MESSAGE_CAPACITY}
-      - EXCHANGE_NAME=${EXCHANGE_NAME}
-      - MANAGER_QUEUE_NAME=${MANAGER_QUEUE_NAME}
-      - PING_TICK_MILLIS=${PING_TICK_MILLIS}
-      - DATABASE_URI=${DATABASE_URI}
-    volumes:
-      - ./worker/src:/worker/src
-  worker3:
-    depends_on:
-      - node0.mongo
-      - rabbitmq
-    build: ./worker
-    environment:
-      - WORKER_NUM=3
-      - SENDER_MESSAGE_CAPACITY=${SENDER_MESSAGE_CAPACITY}
-      - EXCHANGE_NAME=${EXCHANGE_NAME}
-      - MANAGER_QUEUE_NAME=${MANAGER_QUEUE_NAME}
-      - PING_TICK_MILLIS=${PING_TICK_MILLIS}
-      - DATABASE_URI=${DATABASE_URI}
-    volumes:
-      - ./worker/src:/worker/src
+    deploy:
+      mode: replicated
+      replicas: 5
   manager:
     depends_on:
       - node0.mongo
       - rabbitmq
       - worker1
-      - worker2
-      - worker3
     build: ./manager
     environment:
       - SENDER_MESSAGE_CAPACITY=${SENDER_MESSAGE_CAPACITY}

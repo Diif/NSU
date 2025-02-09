@@ -70,13 +70,15 @@ public class ServiceInfoProviderImpl implements ServiceInfoProvider{
 
   @Override
   public int getAmountOfAliveWorkers() {
-    return aliveWorkers.size();
+    // return aliveWorkers.size();
+    return 10;
   }
 
   @Override
   public String getWorkerRouteKey(int worker) {
     assert(worker > 0);
-    return workerAddresses.computeIfAbsent(worker, (n) -> "worker" + n);
+    // return workerAddresses.computeIfAbsent(worker, (n) -> "worker" + n);
+    return workerAddresses.computeIfAbsent(worker, (n) -> "worker");
   }
 
   @Override
