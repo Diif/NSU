@@ -5,9 +5,7 @@ def caesar_encrypt(text, key):
     result = ""
     for ch in text:
         if ch.isalpha():
-            # Determine the base code ('A' for uppercase, 'a' for lowercase)
             base = ord('A') if ch.isupper() else ord('a')
-            # Shift the character by the key with wrap-around
             result += chr((ord(ch) - base + key) % 26 + base)
         else:
             result += ch
