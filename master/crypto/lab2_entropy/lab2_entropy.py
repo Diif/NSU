@@ -97,7 +97,6 @@ def generate_files_menu():
         if not symbol_input:
             print("Символ не введён.")
             return
-        # Берём первый символ и кодируем его в байты
         symbol = symbol_input[0].encode('utf-8')
         generate_identical_file(file_path, symbol, size)
     elif choice == "2":
