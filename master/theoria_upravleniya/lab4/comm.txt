@@ -6,13 +6,14 @@ T2=0.05
 K3=2.1
 T3=0.013
 
+s = poly(0, 's');
 W1= K1
 W2= K2/(T2*s + 1)
 W3=K3/(s*(T3*s + 1))
 
 W = W1*W2*W3
 
-w = logspace(-2, 3, 500);
+w = logspace(-2, 3, 1000);
 mag = zeros(1, length(w));
 for i = 1:length(w)
     // horner подставляет s = j*w(i)
@@ -36,13 +37,14 @@ T2=0.05
 K3=2.1
 T3=0.013
 
+s = poly(0, 's');
 W1= K1
 W2= K2/(T2*s + 1)
 W3=K3/(s*(T3*s + 1))
 
 W = W1*W2*W3
 
-w = logspace(-2, 3, 500);
+w = logspace(-2, 3, 1000);
 mag = zeros(1, length(w));
 for i = 1:length(w)
     // horner подставляет s = j*w(i)
@@ -73,13 +75,14 @@ T2=0.05
 K3=2.1
 T3=0.013
 
+s = poly(0, 's');
 W1= K1
 W2= K2/(T2*s + 1)
 W3=K3/(s*(T3*s + 1))
 
 W = W1*W2*W3
 
-w = logspace(-2, 3, 500);
+w = logspace(-2, 3, 1000);
 mag = zeros(1, length(w));
 for i = 1:length(w)
     // horner подставляет s = j*w(i)
@@ -140,4 +143,124 @@ ylabel('Уровень, дБ');
 title('ЛАЧХ: исходная, смещённая и линии МЗУ / средних частот');
 //legend('Исходная','Смещённая','+L','-L','f = 0.6*wp','f = 0.9*wp','location','northeast');
 legend('Исходная','Смещённая','+L','-L','wc','-20дб/дек','location','northeast');
+xgrid(); ygrid();
+
+
+
+// Сопряжение с нижними и высокими частотами
+
+K1 = 25
+K2 = 2
+T2=0.05
+K3=2.1
+T3=0.013
+
+s = poly(0, 's');
+W1= K1
+W2= K2/(T2*s + 1)
+W3=K3/(s*(T3*s + 1))
+
+W = W1*W2*W3
+
+w = logspace(-2, 3, 1000);
+mag = zeros(1, length(w));
+for i = 1:length(w)
+    // horner подставляет s = j*w(i)
+    Wjw = horner(W, %i * w(i));
+    mag(i) = abs(Wjw);
+end
+
+Kcor = 0.096
+shift_dB = 20*log10(Kcor);
+
+mag_dB         = 20*log10(mag);
+mag_dB_shifted = mag_dB + shift_dB;
+
+// Границы по оси Y для вертикальных линий (модуль устойчивости)
+ymin = min([mag_dB, mag_dB_shifted]) - 5;
+ymax = max([mag_dB, mag_dB_shifted]) + 5;
+
+// по номограмме находим коэф. 3.4
+wp = 3.4*%pi;
+// выбираем произвольно wc из отрезка, пусть 0.7
+wc = 0.7*wp;
+
+// 2. Строим прямую с наклоном -20 дБ/дек через wc
+slope = -20;
+line_dB = 0 + slope*(log10(w) - log10(wc));
+
+// Запас устойчивости
+L = 25
+
+err1 = abs(line_dB - L);
+err2 = abs(line_dB - (-L));
+
+[ignore, idx2] = min(err1);
+[ignore, idx3] = min(err2);
+// находим пересечение -20дб/сек линии с модулем запаса устойчивости
+w_at_plus25  = w(idx2);
+w_at_minus25 = w(idx3);
+
+w2 = w_at_plus25;
+w4 = w_at_minus25;
+
+// построим прямые для сопряжения
+
+i1 = find(w >= w2, 1);    // первый индекс, где w >= w2
+i2 = find(w >= w4, 1);
+
+// 3) Определяем диапазоны индексов для отрезков
+idxs_for_low = 1:i1;              // от начала до i1
+idxs_for_high = i2:length(w);      // от i2 до конца
+
+slope_low = -40;
+
+M1 = line_dB(i1);   
+M2 = line_dB(i2) - mag_dB_shifted(i2);
+line_low  = M1 + slope_low *( log10(w(idxs_for_low))  - log10(w(i1)) );
+line_high = mag_dB_shifted(idxs_for_high) + M2;
+
+err1 = abs(line_low - mag_dB_shifted(idxs_for_low));
+
+[ignore, idx1] = min(err1);
+
+w1  = w(idx1);
+
+// получаем желаемую ЛАЧХ
+line_comb = zeros(1, length(w));
+
+line_comb(1:idx1) = mag_dB_shifted(1:idx1);
+line_comb(idx1+1:i1) = line_low(idx1+1:i1);
+
+if i1+1 <= i2-1 then
+  line_comb(i1+1 : i2-1) = line_dB(i1+1 : i2-1);
+end
+
+line_comb(idxs_for_high) = line_high;
+corr = line_comb - mag_dB_shifted;
+
+figure;
+semilogx(w, mag_dB,         'b-', "thickness", 1);    // исходная – синяя
+semilogx(w, mag_dB_shifted, 'r--', "thickness", 1);  // смещённая – красная
+
+// Добавляем линии запаса устойчивости (толще и другого цвета)
+semilogx([w(1) w($)], [ L  L], 'm-', "thickness", 3);  // LдБ – пурпурная толстая
+semilogx([w(1) w($)], [-L -L], 'm-', "thickness", 3);  // -LдБ – пурпурная толстая
+
+// линия пересечения с 0
+semilogx([wc wc], [ymin ymax], 'g-', "thickness", 3);   // wc – зелёная толстая
+// желаемая ЛАЧХ в области средних частот
+semilogx(w, line_dB,       'k-.',"thickness",2);  // прямая -20 дБ/дек
+
+// сопряжение с нижними
+semilogx(w(idxs_for_low), line_low,       'k-.',"thickness",2);  // прямая -40 дБ/дек на нижних
+semilogx(w(idxs_for_high), line_high,       'k-.',"thickness",2);  // прямая -40 дБ/дек на высоких
+
+semilogx(w, line_comb,         'k-', "thickness", 3);    // желаемая ЛАЧХ
+semilogx(w, corr,         'r-', "thickness", 3);    // ЛАЧХ корр. звена
+xlabel('Частота, рад/с');
+ylabel('Уровень, дБ');
+title('ЛАЧХ: исходная, смещённая и линии МЗУ / средних частот');
+//legend('Исходная','Смещённая','+L','-L','f = 0.6*wp','f = 0.9*wp','location','northeast');
+legend('Исходная','Смещённая','+L','-L','wc','-20дб/дек','-40дб w_low','-40дб w_high','желаемая','корр. звено','location','northeast');
 xgrid(); ygrid();
