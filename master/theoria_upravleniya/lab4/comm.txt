@@ -16,9 +16,9 @@ W = W1*W2*W3
 w = logspace(-2, 3, 1000);
 mag = zeros(1, length(w));
 for i = 1:length(w)
-    // horner подставляет s = j*w(i)
-    Wjw = horner(W, %i * w(i));
-    mag(i) = abs(Wjw);
+	// horner подставляет s = j*w(i)
+	Wjw = horner(W, %i * w(i));
+	mag(i) = abs(Wjw);
 end
 
 figure;
@@ -47,9 +47,9 @@ W = W1*W2*W3
 w = logspace(-2, 3, 1000);
 mag = zeros(1, length(w));
 for i = 1:length(w)
-    // horner подставляет s = j*w(i)
-    Wjw = horner(W, %i * w(i));
-    mag(i) = abs(Wjw);
+	// horner подставляет s = j*w(i)
+	Wjw = horner(W, %i * w(i));
+	mag(i) = abs(Wjw);
 end
 
 Kcor = 0.096
@@ -60,7 +60,7 @@ mag_dB_shifted = mag_dB + shift_dB;
 
 figure;
 semilogx(w, mag_dB,         'b-', ...
-         w, mag_dB_shifted, 'r--');
+		 w, mag_dB_shifted, 'r--');
 xlabel('Частота, рад/с');
 ylabel('Уровень, дБ');
 title('ЛАЧХ: исходная и смещённая на 20·lg(Kcor)');
@@ -85,9 +85,9 @@ W = W1*W2*W3
 w = logspace(-2, 3, 1000);
 mag = zeros(1, length(w));
 for i = 1:length(w)
-    // horner подставляет s = j*w(i)
-    Wjw = horner(W, %i * w(i));
-    mag(i) = abs(Wjw);
+	// horner подставляет s = j*w(i)
+	Wjw = horner(W, %i * w(i));
+	mag(i) = abs(Wjw);
 end
 
 Kcor = 0.096
@@ -165,9 +165,9 @@ W = W1*W2*W3
 w = logspace(-2, 3, 1000);
 mag = zeros(1, length(w));
 for i = 1:length(w)
-    // horner подставляет s = j*w(i)
-    Wjw = horner(W, %i * w(i));
-    mag(i) = abs(Wjw);
+	// horner подставляет s = j*w(i)
+	Wjw = horner(W, %i * w(i));
+	mag(i) = abs(Wjw);
 end
 
 Kcor = 0.096
@@ -264,3 +264,136 @@ title('ЛАЧХ: исходная, смещённая и линии МЗУ / с�
 //legend('Исходная','Смещённая','+L','-L','f = 0.6*wp','f = 0.9*wp','location','northeast');
 legend('Исходная','Смещённая','+L','-L','wc','-20дб/дек','-40дб w_low','-40дб w_high','желаемая','корр. звено','location','northeast');
 xgrid(); ygrid();
+
+
+// Варьируем параметры корр. звена
+
+model="s_korr_zvenov_step.zcos"
+
+loadXcosLibs()
+scs_m = xcosDiagramToScilab(model)
+
+T1_0=3.2258
+T2_0=2.38095
+T3_0=0.71
+T4_0=0.00744
+
+// 2) Массив из трёх (или более) вариантов T1: –20%, 0%, +20%
+factors = [0.8, 1, 1.2, 1.4];
+dummy = [1, 1, 1, 1];
+
+T1_vals = T1_0 * dummy;
+T2_vals = T2_0 * dummy;
+T3_vals = T3_0 * dummy;
+T4_vals = T4_0 * factors;
+
+changed_label = "T4"
+changed_vals = T4_vals
+
+// 3) Подготовка графика
+figure();
+clf;
+colors = ['b','r','g', 'm'];
+legend_entries = [];
+
+// 4) Пустые векторы для метрик
+tp_list    = zeros(1, length(T1_vals));  // время переходного процесса
+Mp_list    = zeros(1, length(T1_vals));  // перерегулирование, %
+
+// 5) Цикл по вариантам T1
+for k = 1:length(T1_vals)
+	ContextValues.T1corr=T1_vals(k)
+	ContextValues.T2corr=T2_vals(k);
+	ContextValues.T3corr=T3_vals(k);
+	ContextValues.T4corr=T4_vals(k);
+
+	scicos_simulate(scs_m, ContextValues);
+
+	t = A.time;           // 1×n
+	V = A.values;         // 4×n
+	u = V(:,1);           // вход
+	y = V(:,2);           // выход
+	e = V(:,3);           // ошибка = u-y
+
+	plot(t, y, colors(k)+"-", "thickness", 2);
+	legend_entries($+1) = changed_label+"=" + string(ContextValues.T1corr);
+	if k==1 then
+		// первый раз — рисуем и вход
+		plot(t, u, 'k--', "thickness",1);
+		legend_entries($+1) = "r(t)";
+	end
+
+	// ---  финальное значение (ступенька или рамп) ---
+	y_inf = y($);
+	tol = 0.05 * abs(y_inf);
+	// находим все индексы, где y в пределах ±2% от y_inf
+	within_bounds = abs(y - y_inf) <= tol;
+
+	// теперь ищем самый первый индекс, после которого все значения остаются в пределах
+	tp_index = %nan;
+	for i = 1:length(t)
+		if and(within_bounds(i:$)) then
+			tp_index = i;
+			break
+		end
+	end
+
+	if ~isnan(tp_index) then
+		tp = t(tp_index);
+	else
+		tp = %nan; // переход не завершён
+	end
+
+	// (c) скоростная ошибка для рампа r = a*t:  
+	//     a = u(end)/t(end)
+	a = u($)/t($);
+
+	Mp_list(k) = 100*(max(y) - y_inf)/abs(y_inf);
+	tp_list(k) = tp
+end
+
+xlabel("t, c");
+ylabel("y(t)");
+title("Выход y(t) при варьировании "+changed_label);
+legend(legend_entries,"location","best");
+xgrid();
+
+// Для расчета скоростной ошибки
+
+model="s_korr_zvenov_ramp.zcos"
+
+loadXcosLibs()
+scs_m = xcosDiagramToScilab(model)
+
+ev_list    = zeros(1, length(T1_vals));  // скоростная ошибка, %
+
+// 5) Цикл по вариантам T1
+for k = 1:length(T1_vals)
+	ContextValues.T1corr=T1_vals(k)
+	ContextValues.T2corr=T2_vals(k);
+	ContextValues.T3corr=T3_vals(k);
+	ContextValues.T4corr=T4_vals(k);
+
+	scicos_simulate(scs_m, ContextValues);
+
+	t = A.time;           // 1×n
+	V = A.values;         // 4×n
+	u = V(:,1);           // вход
+	y = V(:,2);           // выход
+	e = V(:,3);           // ошибка = u-y
+
+	// (c) скоростная ошибка для рампа r = a*t:  
+	//     a = u(end)/t(end)
+	a = u($)/t($);
+
+	ev_list(k) = 100*abs(e($))/(a);  
+end
+
+// 7) Выводим таблицу метрик
+
+for k=1:length(T1_vals)
+	if k == 1 then
+		disp(" "+changed_label+"      tp (s)    Mp (%)    ev (%)");
+	end
+	printf("%5.3f  %8.3f  %8.2f  %8.2f\n", changed_vals(k), tp_list(k), Mp_list(k), ev_list(k));
+end
