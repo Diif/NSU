@@ -1,0 +1,37 @@
+{
+  "kdf": "pbkdf2_sha256",
+  "salt": "T8vk1OmHQG9EyowX2+GMUQ==",
+  "iterations": 100000,
+  "files": {
+    "/home/prozella/NSU/master/crypto/lab10_mac/lab_hmac.py": {
+      "mac": "bf1daff255d40ae9cbf887e1e8e0fa684039d5e8de47cd528fb9fa4d7b2582f5",
+      "size": 10290,
+      "mtime": 1764133309.7308471
+    },
+    "/home/prozella/NSU/master/crypto/lab10_mac/test (Copy 2).txt": {
+      "mac": "bdbe90496727e783404da53b8def23b6b1ddf3b2a556ecd45fdf42972411816d",
+      "size": 4,
+      "mtime": 1764133065.5940604
+    },
+    "/home/prozella/NSU/master/crypto/lab10_mac/test (Copy 3).txt": {
+      "mac": "bdbe90496727e783404da53b8def23b6b1ddf3b2a556ecd45fdf42972411816d",
+      "size": 4,
+      "mtime": 1764133065.5940604
+    },
+    "/home/prozella/NSU/master/crypto/lab10_mac/test (Copy 4).txt": {
+      "mac": "bdbe90496727e783404da53b8def23b6b1ddf3b2a556ecd45fdf42972411816d",
+      "size": 4,
+      "mtime": 1764133065.5940604
+    },
+    "/home/prozella/NSU/master/crypto/lab10_mac/test (Copy).txt": {
+      "mac": "bdbe90496727e783404da53b8def23b6b1ddf3b2a556ecd45fdf42972411816d",
+      "size": 4,
+      "mtime": 1764133065.5940604
+    },
+    "/home/prozella/NSU/master/crypto/lab10_mac/test.txt": {
+      "mac": "bdbe90496727e783404da53b8def23b6b1ddf3b2a556ecd45fdf42972411816d",
+      "size": 4,
+      "mtime": 1764133065.5940604
+    }
+  }
+}
